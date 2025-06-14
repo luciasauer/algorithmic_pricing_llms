@@ -3,13 +3,17 @@ import re
 import json
 import asyncio
 import numpy as np
+import pandas as pd
 from PIL import Image
 from datetime import datetime
 from mistralai import Mistral
 from matplotlib import cm
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import matplotlib.gridspec as gridspec
 from IPython.display import display, clear_output
+import warnings
+warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 API_KEY = os.getenv("MISTRAL_API_KEY", "")
 MODEL = "magistral-small-2506"
@@ -110,7 +114,7 @@ def update_plot(
     fig.savefig(save_path, bbox_inches='tight')  # fix cut-off issue
 
 
-def update_plot_duoploy(fig, axs,
+def update_plot_duopoloy(fig, axs,
     p_m, q_m, pi_m, alpha, nash_price,
     price_history, quantity_history, profit_history, time_history,
     model_name, start_time, save_path, prompt_number
@@ -159,8 +163,8 @@ def update_plot_duoploy(fig, axs,
     ax_profit.grid(True)
 
     # === Price Trajectory Plot ===
-    p1 = price_history[firm1][-100:]
-    p2 = price_history[firm2][-100:]
+    p1 = price_history[firm1][-50:]
+    p2 = price_history[firm2][-50:]
     n_points = len(p1)
     cmap = cm.get_cmap('Blues')
     for i in range(1, n_points):
@@ -171,7 +175,7 @@ def update_plot_duoploy(fig, axs,
     ax_price_traj.axhline(nash_price, color='red', linestyle='--', linewidth=1)
     ax_price_traj.set_xlabel('Firm 1 Price')
     ax_price_traj.set_ylabel('Firm 2 Price')
-    ax_price_traj.set_title('Price Trajectory')
+    ax_price_traj.set_title('Price Trajectory (Last 50 Rounds)')
     ax_price_traj.grid(True)
 
     # === Profit Trajectory Plot (Difference vs Sum) ===
@@ -371,3 +375,104 @@ def create_gif_from_pngs(path: str, gif_name="000_animation.gif", duration=200):
 
     print(f"GIF saved to: {gif_path}")
     return gif_path
+
+
+def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2: Duopoly Experiment Results"):
+    fig, axs = plt.subplots(1, 2, figsize=(14, 6))
+    fig.suptitle(title, fontsize=16)
+
+    # === Panel 1: Price comparison ===
+    axs[0].scatter(df.loc[df['prompt']==1,'p1'], df.loc[df['prompt']==1,'p2'], color='tab:blue', marker='s', label='P1 vs. P1')
+    axs[0].scatter(df.loc[df['prompt']==2,'p1'], df.loc[df['prompt']==2,'p2'], color='tab:orange', marker='^', label='P2 vs. P2')
+
+    # Axis setup
+    axs[0].set_xlim(1.4, 2.2)
+    axs[0].set_ylim(1.4, 2.2)
+    axs[0].set_xticks(np.arange(1.4, 2.21, 0.2))
+    axs[0].set_yticks(np.arange(1.4, 2.21, 0.2))
+    axs[0].xaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
+    axs[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
+
+    # Reference lines
+    axs[0].axvline(p_nash, color='red', linestyle='--', linewidth=1)
+    axs[0].axhline(p_nash, color='red', linestyle='--', linewidth=1)
+    axs[0].axvline(p_m, color='green', linestyle=':', linewidth=1)
+    axs[0].axhline(p_m, color='green', linestyle=':', linewidth=1)
+
+    # Axis annotations (external, aligned with ticks)
+    axs[0].annotate(r'$p^{Nash}$', xy=(p_nash, axs[0].get_ylim()[0]),
+                    xytext=(0, -5), textcoords='offset points',
+                    ha='center', va='top', color='red', fontsize=10)
+    axs[0].annotate(r'$p^{Nash}$', xy=(axs[0].get_xlim()[0], p_nash),
+                    xytext=(-5, 0), textcoords='offset points',
+                    ha='right', va='center', color='red', fontsize=10)
+
+    axs[0].annotate(r'$p^M$', xy=(p_m, axs[0].get_ylim()[0]),
+                    xytext=(0, -5), textcoords='offset points',
+                    ha='center', va='top', color='green', fontsize=10)
+    axs[0].annotate(r'$p^M$', xy=(axs[0].get_xlim()[0], p_m),
+                    xytext=(-5, 0), textcoords='offset points',
+                    ha='right', va='center', color='green', fontsize=10)
+
+    axs[0].set_xlabel('Firm 1 average price (over periods 251–300)')
+    axs[0].set_ylabel('Firm 2 average price (over periods 251–300)')
+    axs[0].set_title("P1 Compared to P2: Pricing Behavior")
+    axs[0].grid(False)
+
+    # === Panel 2: Profit comparison ===
+    df['pi_sum'] = df['pi_1'] + df['pi_2']
+    axs[1].scatter(df.loc[df['prompt']==1,'pi_delta'], df.loc[df['prompt']==1,'pi_sum'], color='tab:blue', marker='s', label='P1 vs. P1')
+    axs[1].scatter(df.loc[df['prompt']==2,'pi_delta'], df.loc[df['prompt']==2,'pi_sum'], color='tab:orange', marker='^', label='P2 vs. P1')
+
+    x_vals = np.linspace(-20, 20, 200)
+    axs[1].plot(x_vals, 2 * pi_nash + np.abs(x_vals), 'r--', label=r'$\pi_1 = \pi^{Nash}$ / $\pi_2 = \pi^{Nash}$')
+    axs[1].text(-10, 2 * pi_nash + 1, r'$\pi_1 = \pi^{Nash}$', color='red', fontsize=10)
+    axs[1].text(5, 2 * pi_nash + 1, r'$\pi_2 = \pi^{Nash}$', color='red', fontsize=10)
+
+    axs[1].axhline(pi_m, color='green', linestyle=':', linewidth=1)
+    axs[1].text(21, pi_m + 0.8, r'$\pi^M$', color='green', fontsize=10)
+
+    axs[1].set_xlim(-22, 22)
+    axs[1].set_ylim(40, 70)
+    axs[1].set_xlabel('Average difference in profits $\pi_1 - \pi_2$ (over periods 251–300)')
+    axs[1].set_ylabel('Average sum of profits $\pi_1 + \pi_2$ (over periods 251–300)')
+    axs[1].set_title("P1 Compared to P2: Profits Earned")
+    axs[1].grid(False)
+
+    # === Legend outside below both plots ===
+    handles, labels = axs[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=4, bbox_to_anchor=(0.5, -0.07))
+
+    plt.tight_layout(rect=[0, 0.07, 1, 0.95])
+    plt.show()
+
+
+def make_df_from_results(results_path):
+   summarized_results = []
+   for prompt in os.listdir(results_path):  # Just to ensure the directory is created if it doesn't exist
+         prmt = 1 if 'prompt_1' in prompt else 2
+         if 'other' in prompt:
+            continue
+         alph = int(prompt.split('alpha_')[1].split('-')[0])
+         alph = 3.2 if alph == 3 else alph
+         for experiment in os.listdir(f"{results_path}/{prompt}"):
+            with open(f"{results_path}/{prompt}/{experiment}/results.json", 'r') as f:
+               results = json.load(f)
+            p1 = np.mean(np.array(results['price_history']['firm_1'][-50:])/alph)
+            p2 = np.mean(np.array(results['price_history']['firm_2'][-50:])/alph)
+            pi_1 = np.mean(np.array(results['profit_history']['firm_1'][-50:])/alph)
+            pi_2 = np.mean(np.array(results['profit_history']['firm_2'][-50:])/alph)
+            pi_delta = pi_1 - pi_2
+
+            summarized_results.append({
+               "prompt": prmt,
+               "alpha": alph,
+               "experiment": experiment,
+               "p1": p1,
+               "p2": p2,
+               "pi_1": pi_1,
+               "pi_2": pi_2,
+               "pi_delta": pi_delta
+            })
+
+   return pd.DataFrame(summarized_results)
