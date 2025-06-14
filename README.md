@@ -1,1 +1,1 @@
-# algorithmic_pricing_llms
+# Algoritmic Pricing with LLM Agents
