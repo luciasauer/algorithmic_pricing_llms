@@ -118,7 +118,7 @@ def update_plot(
 def update_plot_duopoloy(fig, axs,
     p_m, q_m, pi_m, alpha, nash_price,
     price_history, quantity_history, profit_history, time_history,
-    model_name, start_time, save_path, prompt_number
+    model_name, start_time, save_path, prompt_number, display_notebook=True
 ):
     firm_names = list(price_history.keys())
     firm1, firm2 = firm_names[:2]
@@ -197,8 +197,9 @@ def update_plot_duopoloy(fig, axs,
     fig.suptitle(f'Duopoly Experiment | Prompt: P{prompt_number} | Alpha: {alpha} | {model_name} | Run: {start_time}', fontsize=14)
     plt.tight_layout(rect=[0, 0, 1, 0.97])
 
-    display(fig)
-    clear_output(wait=True)
+    if display_notebook:
+        display(fig)
+        clear_output(wait=True)
     fig.savefig(save_path, bbox_inches='tight')
 
 
