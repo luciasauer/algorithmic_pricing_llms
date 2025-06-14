@@ -64,7 +64,8 @@ def update_plot(
     fig, axs,
     p_m, q_m, pi_m, alpha,
     price_history, quantity_history, profit_history, time_history,
-    model_name, start_time, save_path, prompt_number, nash_price=False, fill_convergende_range=True
+    model_name, start_time, save_path, prompt_number, nash_price=False, fill_convergende_range=True,
+    title_experiment_type="Monopoly"
 ):
     n_agents = len(price_history)
     firm_names = list(price_history.keys())
@@ -105,7 +106,7 @@ def update_plot(
     axs[2].legend()
     axs[2].grid(True)
 
-    axs[0].set_title(f'Duopoly Experiment | Prompt: P{prompt_number} | Alpha: {alpha} | {model_name} | Run: {start_time}')
+    axs[0].set_title(f'{title_experiment_type} Experiment | Prompt: P{prompt_number} | Alpha: {alpha} | {model_name} | Run: {start_time}')
     plt.tight_layout(rect=[0, 0, 1, 0.96])  # optional
 
     display(fig)
@@ -386,10 +387,10 @@ def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2
     axs[0].scatter(df.loc[df['prompt']==2,'p1'], df.loc[df['prompt']==2,'p2'], color='tab:orange', marker='^', label='P2 vs. P2')
 
     # Axis setup
-    axs[0].set_xlim(1.4, 2.2)
-    axs[0].set_ylim(1.4, 2.2)
-    axs[0].set_xticks(np.arange(1.4, 2.21, 0.2))
-    axs[0].set_yticks(np.arange(1.4, 2.21, 0.2))
+    # axs[0].set_xlim(1.4, 2.2)
+    # axs[0].set_ylim(1.4, 2.2)
+    # axs[0].set_xticks(np.arange(1.4, 2.21, 0.2))
+    # axs[0].set_yticks(np.arange(1.4, 2.21, 0.2))
     axs[0].xaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
     axs[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
 
