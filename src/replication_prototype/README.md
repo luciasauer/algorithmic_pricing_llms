@@ -11,6 +11,15 @@ In this section, we replicate the implementation of LLMs as pricing agents based
 * [Fish et al. Replication Code on GitHub](https://github.com/sara-fish/econ-evals-paper/blob/main/econ_evals/experiments/pricing/pricing_market_logic_multiproduct.py)
 * [Mistral Structured Output Docs](https://docs.mistral.ai/capabilities/structured-output/custom_structured_output/)
 
+
+---
+
+# Preliminary Results
+
+![Duopoly Results](imgs/duopoly_experiment_results.png)
+
+In contrast to the original paper, where P1 shows collusion and P2 nash prices, in this case Mistral-Magistral-Small achieves different results.
+
 ---
 
 # Section 2: Experimental Design
@@ -118,3 +127,4 @@ We study a single LLM-based pricing agent in a monopoly market. Each run consist
 * **Convergence to a price $p$**: 90th percentile and 10th percentile of prices in periods 201–300 within 5% of $p$
 * **Monopoly price $p_M$**: maximizes
   $\pi_1 = (p_1 - \alpha c_1) \cdot q_1$
+
