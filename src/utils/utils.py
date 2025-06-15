@@ -17,6 +17,7 @@ warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 API_KEY = os.getenv("MISTRAL_API_KEY", "")
 MODEL = "magistral-small-2506"
+# MODEL = "mistral-medium-latest"
 
 def has_converged_to_price(price_history, p, start_round=-101, end_round=-1, tolerance=0.05):
     # Convert to 0-based indexing
@@ -79,8 +80,8 @@ def update_plot(
     #fill in 0.95 and 1.05 from p_m in green area
         axs[0].fill_between(
             time_history,
-            p_m[0] * 0.95,
-            p_m[0] * 1.05,
+            p_m * 0.95,
+            p_m * 1.05,
             color='green', alpha=0.4, label='Convergence Range'
         )
     if nash_price:
@@ -449,15 +450,19 @@ def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2
     plt.show()
 
 
-def make_df_from_results(results_path):
+def make_df_from_results(results_path, model_name):
    summarized_results = []
    for prompt in os.listdir(results_path):  # Just to ensure the directory is created if it doesn't exist
+         if 'prompt' not in prompt:
+            continue
          prmt = 1 if 'prompt_1' in prompt else 2
          if 'other' in prompt:
             continue
-         alph = int(prompt.split('alpha_')[1].split('-')[0])
+         alph = int(prompt.split('alpha_')[-1])
          alph = 3.2 if alph == 3 else alph
          for experiment in os.listdir(f"{results_path}/{prompt}"):
+            if model_name not in experiment:
+                continue
             with open(f"{results_path}/{prompt}/{experiment}/results.json", 'r') as f:
                results = json.load(f)
             p1 = np.mean(np.array(results['price_history']['firm_1'][-50:])/alph)
