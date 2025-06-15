@@ -380,7 +380,7 @@ def create_gif_from_pngs(path: str, gif_name="000_animation.gif", duration=200):
     return gif_path
 
 
-def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2: Duopoly Experiment Results"):
+def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2: Duopoly Experiment Results", save_path=None):
     fig, axs = plt.subplots(1, 2, figsize=(14, 6))
     fig.suptitle(title, fontsize=16)
 
@@ -447,6 +447,8 @@ def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2
     fig.legend(handles, labels, loc='lower center', ncol=4, bbox_to_anchor=(0.5, -0.07))
 
     plt.tight_layout(rect=[0, 0.07, 1, 0.95])
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight')
     plt.show()
 
 
