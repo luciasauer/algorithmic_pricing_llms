@@ -152,7 +152,7 @@ class HistoricalMarketEnvironment:
         """Reset to beginning"""
         self.current_period = 0
 
-    def get_market_history(self, lookback_periods: int = 30) -> List[MarketState]:
+    def get_market_history(self, lookback_periods: int = 21) -> List[MarketState]:
         """Get market history for the last N periods"""
         history = []
         current_period_backup = self.current_period
@@ -330,14 +330,14 @@ Consider both immediate profit margins and competitive positioning."""
             f"My_Price={my_price:.1f}p"
         )
 
-        # Keep last 30 periods of history
+        # Keep last 21 periods (3 weeks) of history
         lines = self.market_data_history.split("\n")
         if lines[0] == "No previous market data.":
             lines = []
 
         lines.append(new_entry)
-        if len(lines) > 30:
-            lines = lines[-30:]
+        if len(lines) > 21:
+            lines = lines[-21:]
 
         self.market_data_history = "\n".join(lines)
 
@@ -692,7 +692,7 @@ def run_historical_market_experiment(
             print(f"\n⚠️ Reached end of market data at period {period}")
             break
 
-        market_history = market_env.get_market_history(30)
+        market_history = market_env.get_market_history(21)
 
         print(f"\n📅 Period {period} ({current_state.date.strftime('%Y-%m-%d')})")
         print(f"   TGP: {current_state.tgp_cost:.1f}p")
@@ -841,7 +841,7 @@ if __name__ == "__main__":
         market_env=market_env,
         agents=agents,
         max_periods=20,  # Start small to test
-        save_every=3,
+        save_every=1,
     )
 
     print("\n🎉 Historical market experiment completed successfully!")

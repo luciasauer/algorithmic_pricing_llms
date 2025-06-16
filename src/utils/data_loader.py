@@ -102,7 +102,18 @@ def load_retail_data(
 
     for file in file_path.glob(file):
         q = pl.scan_csv(file, try_parse_dates=True).filter(
-            start_condition & end_condition
+            start_condition
+            & end_condition
+            &
+            # Filter data such that it replicates Byrne 2019 as in `MakeData1_RawPrices.do`
+            (pl.col("PRODUCT_DESCRIPTION") == "ULP")  # Only unleaded fuels
+            & (pl.col("POSTCODE") < 6200)  # Only Perth
+            & (pl.col("ADDRESS") != "XXXXX")  # Must have an address
+            & (
+                pl.col("PUBLISH_DATE").is_between(  # Between Jan 2001-2015
+                    datetime(2001, 1, 1), datetime(2015, 1, 1)
+                )
+            )
         )
         queries.append(q)
 
