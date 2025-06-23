@@ -19,6 +19,7 @@ dependencies = [
     "pydantic>=2.11.7",
     "requests>=2.32.4",
     "ruff>=0.11.13",
+    "scikit-learn>=1.7.0",
     "scipy>=1.15.3",
     "seaborn>=0.13.2",
 ]
