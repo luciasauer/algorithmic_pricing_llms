@@ -297,7 +297,7 @@ async def call_firm(firm_name: str, prefix:str, prompt: str):
         for attempt in range(1, MAX_RETRIES + 1):
             try:
                 response = await client.chat.complete_async(
-                    model=MODEL,
+                    model=MODEL_NAME,
                     messages=[
                         {"role": "system", "content": prefix},
                         {"role": "system", "content": SYSTEM_PROMPT},
