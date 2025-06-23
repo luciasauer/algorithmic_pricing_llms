@@ -205,5 +205,6 @@ __marimo__/
 
 # Data
 data/
+output/
 results/
 .DS_Store
