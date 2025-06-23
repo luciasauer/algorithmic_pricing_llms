@@ -118,7 +118,9 @@ def load_retail_data(
         queries.append(q)
 
     dataframes = pl.collect_all(queries)
-    return pl.concat(dataframes, how="diagonal_relaxed").sort("PUBLISH_DATE")
+    return pl.concat(dataframes, how="diagonal_relaxed").sort(
+        ["PUBLISH_DATE", "BRAND_DESCRIPTION", "TRADING_NAME"]
+    )
 
 
 def get_retail_price_for_period(

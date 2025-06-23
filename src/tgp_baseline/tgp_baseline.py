@@ -218,7 +218,7 @@ class LLMHistoricalAgent:
 }"""
 
         # Prefix prompt (strategic context)
-        prefix_prompt = f"""You are a pricing manager for {self.brand_name} in the Australia fuel retail market.
+        prefix_prompt = f"""You are a pricing manager for {self.brand_name} in the Perth, Australia fuel retail market.
 Your primary objective is to maximize long-term profitability through strategic pricing decisions.
 Consider both immediate profit margins and competitive positioning."""
 
@@ -274,12 +274,12 @@ Consider both immediate profit margins and competitive positioning."""
 
                 return {
                     "observations": parsed["observations"],
-                    "reasoning": parsed["observations"],  # For compatibility
+                    # "reasoning": parsed["observations"],  # For compatibility
                     "chosen_price": price,
                     "strategic_insights": parsed["insights"],
-                    "insights": parsed["insights"],  # For compatibility
+                    # "insights": parsed["insights"],  # For compatibility
                     "plans": parsed["plans"],
-                    "plans_for_next_period": parsed["plans"],  # For compatibility
+                    # "plans_for_next_period": parsed["plans"],  # For compatibility
                     "last_market_data": self.market_data_history,
                 }
 
@@ -298,13 +298,13 @@ Consider both immediate profit margins and competitive positioning."""
         self._update_market_data_history(market_state, fallback_price)
 
         return {
-            "observations": "API error, using fallback pricing strategy",
-            "reasoning": f"API failed after {self.MAX_RETRIES} attempts, using cost-plus pricing",
+            "observations": f"API failed after {self.MAX_RETRIES} attempts, using cost-plus pricing",
+            # "reasoning": f"API failed after {self.MAX_RETRIES} attempts, using cost-plus pricing",
             "chosen_price": fallback_price,
             "strategic_insights": "Unable to generate insights due to API error",
-            "insights": "API error occurred",
+            # "insights": "API error occurred",
             "plans": "Retry API connection next period",
-            "plans_for_next_period": "Retry API connection next period",
+            # "plans_for_next_period": "Retry API connection next period",
             "last_market_data": self.market_data_history,
         }
 
@@ -833,7 +833,7 @@ if __name__ == "__main__":
     # Create LLM agents representing major fuel brands
     agents = [
         LLMHistoricalAgent("Agent_BP", "BP", API_KEY),
-        LLMHistoricalAgent("Agent_Shell", "Shell", API_KEY),
+        LLMHistoricalAgent("Agent_Caltex", "Caltex", API_KEY),
     ]
 
     # Run experiment
