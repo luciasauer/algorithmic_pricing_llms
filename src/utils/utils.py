@@ -16,8 +16,7 @@ import warnings
 warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 API_KEY = os.getenv("MISTRAL_API_KEY", "")
-MODEL = "magistral-small-2506"
-# MODEL = "mistral-medium-latest"
+MODEL_NAME = os.getenv("MODEL_NAME", "magistral-small-2506")
 
 def has_converged_to_price(price_history, p, start_round=-101, end_round=-1, tolerance=0.05):
     # Convert to 0-based indexing
