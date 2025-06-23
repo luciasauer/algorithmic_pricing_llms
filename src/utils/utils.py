@@ -380,7 +380,7 @@ def create_gif_from_pngs(path: str, gif_name="000_animation.gif", duration=200):
 
 
 def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2: Duopoly Experiment Results", save_path=None):
-    fig, axs = plt.subplots(1, 2, figsize=(14, 6))
+    fig, axs = plt.subplots(1, 2, figsize=(14, 5))
     fig.suptitle(title, fontsize=16)
 
     # === Panel 1: Price comparison ===
@@ -388,10 +388,6 @@ def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2
     axs[0].scatter(df.loc[df['prompt']==2,'p1'], df.loc[df['prompt']==2,'p2'], color='tab:orange', marker='^', label='P2 vs. P2')
 
     # Axis setup
-    # axs[0].set_xlim(1.4, 2.2)
-    # axs[0].set_ylim(1.4, 2.2)
-    # axs[0].set_xticks(np.arange(1.4, 2.21, 0.2))
-    # axs[0].set_yticks(np.arange(1.4, 2.21, 0.2))
     axs[0].xaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
     axs[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
 
@@ -426,16 +422,17 @@ def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2
     axs[1].scatter(df.loc[df['prompt']==1,'pi_delta'], df.loc[df['prompt']==1,'pi_sum'], color='tab:blue', marker='s', label='P1 vs. P1')
     axs[1].scatter(df.loc[df['prompt']==2,'pi_delta'], df.loc[df['prompt']==2,'pi_sum'], color='tab:orange', marker='^', label='P2 vs. P1')
 
-    x_vals = np.linspace(-20, 20, 200)
-    axs[1].plot(x_vals, 2 * pi_nash + np.abs(x_vals), 'r--', label=r'$\pi_1 = \pi^{Nash}$ / $\pi_2 = \pi^{Nash}$')
-    axs[1].text(-10, 2 * pi_nash + 1, r'$\pi_1 = \pi^{Nash}$', color='red', fontsize=10)
-    axs[1].text(5, 2 * pi_nash + 1, r'$\pi_2 = \pi^{Nash}$', color='red', fontsize=10)
+    # x_vals = np.linspace(-20, 20, 200)
+    # axs[1].plot(x_vals, 2 * pi_nash + np.abs(x_vals), 'r--', label=r'$\pi_1 = \pi^{Nash}$ / $\pi_2 = \pi^{Nash}$')
+    # axs[1].text(-10, 2 * pi_nash + 1, r'$\pi_1 = \pi^{Nash}$', color='red', fontsize=10)
+    # axs[1].text(5, 2 * pi_nash + 1, r'$\pi_2 = \pi^{Nash}$', color='red', fontsize=10)
 
     axs[1].axhline(pi_m, color='green', linestyle=':', linewidth=1)
-    axs[1].text(21, pi_m + 0.8, r'$\pi^M$', color='green', fontsize=10)
+    axs[1].axvline(0, color='black', linestyle='--', linewidth=1)
+    axs[1].text(df['pi_delta'].min()*1.05, pi_m, r'$\pi^M$', color='green', fontsize=10)
 
-    axs[1].set_xlim(-22, 22)
-    axs[1].set_ylim(40, 70)
+    # axs[1].set_xlim(-22, 22)
+    # axs[1].set_ylim(40, 70)
     axs[1].set_xlabel('Average difference in profits $\pi_1 - \pi_2$ (over periods 251–300)')
     axs[1].set_ylabel('Average sum of profits $\pi_1 + \pi_2$ (over periods 251–300)')
     axs[1].set_title("P1 Compared to P2: Profits Earned")
@@ -443,9 +440,7 @@ def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2
 
     # === Legend outside below both plots ===
     handles, labels = axs[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc='lower center', ncol=4, bbox_to_anchor=(0.5, -0.07))
-
-    plt.tight_layout(rect=[0, 0.07, 1, 0.95])
+    fig.legend(handles, labels, loc='lower center', ncol=4, bbox_to_anchor=(0.5, -0.05))
     if save_path:
         plt.savefig(save_path, bbox_inches='tight')
     plt.show()
