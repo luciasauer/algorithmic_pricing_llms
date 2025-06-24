@@ -1,0 +1,259 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+
+\geometry{a4paper, margin=1in}
+\setstretch{1.15}
+
+\titleformat{\section}
+  {\normalfont\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    {\LARGE \textbf{Old Questions, New Tools: Revisiting Seminal Economic Research with Causal Machine Learning}\par}
+    \vspace{1.5cm}
+    {\Large A Research Proposal and Plan for a Master's Thesis\par}
+    \vspace{0.5cm}
+    {\large Julian Romero -- Lucia Sauer -- Moritz Peist\par}
+    \vspace{0.5cm}
+    {Master in Data Science for Decision Making at BSE\par}
+    \vfill
+    {\large \today\par}
+    \vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Project Overview}
+
+\subsection{Research Question}
+How do causal machine learning approaches affect the robustness, precision, and policy implications of influential economic research compared to traditional econometric methods?
+
+\subsection{Objectives}
+\begin{enumerate}
+    \item Replicate 5 influential economics papers using their original methods
+    \item Re-analyze the same research questions using modern causal machine learning techniques
+    \item Compare results, precision, heterogeneous effects, and policy implications
+    \item Develop a methodological framework for systematically evaluating when causal ML methods offer advantages over traditional approaches
+    \item Create accessible tools and visualizations to explain differences in approaches and findings
+\end{enumerate}
+
+\section{Theoretical Framework}
+
+\subsection{Causal Inference Evolution}
+The intersection of machine learning and causal inference has evolved rapidly, with foundational developments by Athey, Imbens, Wager, Chernozhukov, and others creating new possibilities for policy evaluation. This project builds on the seminal work of \citet{athey2017state}, which outlined the potential for integrating machine learning methods into causal inference frameworks.
+
+\subsection{Key Methodological Innovations}
+Our analysis will leverage several key innovations in causal machine learning:
+
+\begin{enumerate}
+    \item \textbf{Causal Forests} \citep{athey2018estimation}: Enables flexible, non-parametric estimation of heterogeneous treatment effects
+    \item \textbf{Generalized Random Forests} \citep{athey2019generalized}: Extends random forests beyond prediction to solve causal parameters
+    \item \textbf{Double/Debiased Machine Learning} \citep{chernozhukov2018double}: Provides robust inference in high-dimensional settings
+    \item \textbf{Synthetic Difference-in-Differences} \citep{arkhangelsky2021synthetic}: Combines synthetic control and DiD approaches for more robust panel data analysis
+    \item \textbf{Matrix Completion Methods} \citep{athey2021matrix}: Addresses counterfactual estimation with missing data
+\end{enumerate}
+
+\subsection{Critiques and Limitations}
+We will incorporate critiques from researchers like \citet{heckman2022causality}, who argue for structural approaches in certain contexts, to ensure a balanced assessment of when causal ML methods offer genuine advantages.
+
+\section{Paper Selection}
+
+We will focus on 5 influential papers with robust replication packages, representing different causal identification strategies and spanning from classic studies to recent methodological innovations:
+
+\subsection{Difference-in-Differences Design (Classic)}
+\textbf{\citet{card1994minimum}} - "Minimum Wages and Employment: A Case Study of the Fast-Food Industry in New Jersey and Pennsylvania"
+\begin{itemize}
+    \item \textit{Identification strategy}: DiD comparing employment outcomes after NJ minimum wage increase
+    \item \textit{Causal ML alternatives}: Double ML with geographic features, causal forests for heterogeneous effects
+    \item \textit{Policy relevance}: Minimum wage policy continues to be highly debated
+\end{itemize}
+
+\subsection{Regression Discontinuity Design (Classic)}
+\textbf{\citet{angrist2001does}} - "Does Teacher Training Affect Pupil Learning? Evidence from Matched Comparisons in Jerusalem Public Schools"
+\begin{itemize}
+    \item \textit{Identification strategy}: RD design evaluating teacher training impacts
+    \item \textit{Causal ML alternatives}: RD forests, generalized random forests
+    \item \textit{Policy relevance}: Educational interventions and teacher quality
+\end{itemize}
+
+\subsection{Instrumental Variables Approach (Classic)}
+\textbf{\citet{acemoglu2001colonial}} - "The Colonial Origins of Comparative Development: An Empirical Investigation"
+\begin{itemize}
+    \item \textit{Identification strategy}: IV using settler mortality as instrument for institutions
+    \item \textit{Causal ML alternatives}: Double/debiased ML for IV, orthogonal random forests
+    \item \textit{Policy relevance}: Institutional development and economic growth strategies
+\end{itemize}
+
+\subsection{Matching/Selection on Observables (Classic)}
+\textbf{\citet{dehejia1999causal}} - "Causal Effects in Nonexperimental Studies: Reevaluating the Evaluation of Training Programs"
+\begin{itemize}
+    \item \textit{Identification strategy}: Propensity score matching
+    \item \textit{Causal ML alternatives}: Causal forests, ensemble methods with automated balance checking
+    \item \textit{Policy relevance}: Job training program effectiveness
+\end{itemize}
+
+\subsection{Modern Staggered Difference-in-Differences (Recent)}
+\textbf{\citet{autor2020importing}} - "Importing Political Polarization? The Electoral Consequences of Rising Trade Exposure"
+\begin{itemize}
+    \item \textit{Identification strategy}: Staggered DiD with shift-share instrumental variable
+    \item \textit{Causal ML alternatives}: Synthetic DiD, Double ML with staggered treatment
+    \item \textit{Policy relevance}: Trade policy, economic shocks, and political polarization
+    \item \textit{Advantages}: Addresses modern econometric concerns about staggered DiD designs raised by \citet{goodman2021difference} and others
+\end{itemize}
+
+\section{Methodology}
+
+\subsection{Replication Phase}
+\begin{enumerate}
+    \item Obtain original replication packages
+    \item Document and understand original data cleaning and analysis steps
+    \item Precisely reproduce original results
+    \item Evaluate robustness of original findings to minor specification changes
+\end{enumerate}
+
+\subsection{Causal ML Implementation}
+\begin{enumerate}
+    \item Prepare data for causal ML frameworks
+    \item Implement appropriate causal ML methods for each identification strategy:
+    \begin{itemize}
+        \item DiD studies → Synthetic DiD, Double ML
+        \item RD studies → RD forests, generalized random forests
+        \item IV studies → Double ML for IV
+        \item Matching studies → Causal forests, ensemble methods
+    \end{itemize}
+    \item Conduct hyperparameter tuning and robustness checks
+    \item Extract heterogeneous treatment effects where possible
+\end{enumerate}
+
+\subsection{Comparative Analysis}
+\begin{enumerate}
+    \item Compare point estimates and confidence intervals
+    \item Evaluate precision and efficiency of different methods
+    \item Assess heterogeneous effects uncovered by ML methods but not original analysis
+    \item Analyze sensitivity to modeling choices and assumptions
+    \item Evaluate computational requirements and practical implementation considerations
+\end{enumerate}
+
+\subsection{Policy Implications Analysis}
+\begin{enumerate}
+    \item Compare policy conclusions from original and ML-based analyses
+    \item Identify cases where ML methods lead to substantively different recommendations
+    \item Develop framework for explaining when and why methods diverge in policy implications
+    \item Create visualization tools for communicating results to policy audiences
+\end{enumerate}
+
+\section{Implementation Plan}
+
+\subsection{Timeline}
+\begin{itemize}
+    \item \textbf{Weeks 1}: Paper selection and replication package acquisition
+    \item \textbf{Weeks 2-3}: Replication of original results
+    \item \textbf{Weeks 4-6}: Implementation of causal ML methods
+    \item \textbf{Weeks 7-8}: Comparative analysis and initial findings
+    \item \textbf{Weeks 9}: Policy implications analysis
+    \item \textbf{Weeks 10-11}: Documentation and thesis writing
+    \item \textbf{Weeks 12}: Finalization and presentation preparation
+\end{itemize}
+
+\subsection{Team Structure and Responsibilities}
+
+\textbf{Team Member 1: Methods} -- \textit{Julian}
+\begin{itemize}
+    \item Lead implementation of causal ML methods
+    \item Ensure methodological consistency across papers
+    \item Address technical challenges in adaptation
+    \item Primary focus: Causal forests and double ML implementation
+\end{itemize}
+
+\textbf{Team Member 2: Economics \& Policy} -- \textit{Lucia}
+\begin{itemize}
+    \item Focus on economic context and interpretation
+    \item Lead policy implications analysis
+    \item Ensure economically meaningful comparisons
+    \item Primary focus: IV and DiD studies
+\end{itemize}
+
+\textbf{Team Member 3: Data \& Evaluation} -- \textit{Moritz}
+\begin{itemize}
+    \item Manage replication packages and data processing
+    \item Design evaluation frameworks
+    \item Lead visualization and explanation tools
+    \item Primary focus: RD and matching studies
+\end{itemize}
+
+\section{Expected Contributions}
+
+\subsection{Methodological Contributions}
+\begin{enumerate}
+    \item Systematic comparison of traditional econometrics vs. causal ML across multiple identification strategies
+    \item Framework for determining when causal ML offers advantages over traditional methods
+    \item Best practices for implementation and interpretation of causal ML in policy contexts
+\end{enumerate}
+
+\subsection{Empirical Contributions}
+\begin{enumerate}
+    \item Updated estimates for important policy questions using state-of-the-art methods
+    \item Identification of heterogeneous effects missed in original analyses
+    \item Assessment of robustness of influential findings to methodological innovations
+\end{enumerate}
+
+\subsection{Policy Contributions}
+\begin{enumerate}
+    \item Evaluation of whether key policy conclusions change with modern methods
+    \item Communication tools to explain methodological differences to non-technical audiences
+    \item Guidelines for policymakers on when to trust traditional vs. ML-based analyses
+\end{enumerate}
+
+\section{Potential Challenges and Mitigation Strategies}
+
+\subsection{Technical Challenges}
+\begin{itemize}
+    \item \textbf{Challenge}: Implementation complexity of advanced causal ML methods
+    \item \textbf{Mitigation}: Leverage existing R/Python packages (grf, econml, doubleml)
+\end{itemize}
+
+\subsection{Interpretation Challenges}
+\begin{itemize}
+    \item \textbf{Challenge}: Maintaining interpretability for policy relevance
+    \item \textbf{Mitigation}: Develop visualization tools, focus on explaining key parameters
+\end{itemize}
+
+\subsection{Computational Constraints}
+\begin{itemize}
+    \item \textbf{Challenge}: High computational demands of some methods
+    \item \textbf{Mitigation}: Use cloud computing resources, implement efficient versions
+\end{itemize}
+
+\subsection{Fairness in Comparison}
+\begin{itemize}
+    \item \textbf{Challenge}: Ensuring fair comparison between methods
+    \item \textbf{Mitigation}: Establish objective evaluation criteria, consider multiple metrics
+\end{itemize}
+
+\bibliographystyle{apalike}
+\bibliography{references}
+
+\appendix
+
+
+\end{document}

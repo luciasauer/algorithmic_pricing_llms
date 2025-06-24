@@ -1,0 +1,47 @@
+% Verfügbar unter: https://github.com/terben/LaTeX_Tutorial_Deutsch/blob/master/Tutorial_18_Arbeiten_mit_grossen_Dokumenten/my_newcommands_german.tex
+% Einige nützliche newcommand Definitionen
+% für deutsche LaTeX Texte
+
+% Abkürzungen für 'zum Beispiel', 'unter anderem'
+% etc. In diesen Abkürzungen ist das Leerzeichen
+% zwischen den Buchstaben kleiner als
+% normalerweise. Deswegen wird dieses
+% mit '\,' anstatt mit einem space gesetzt.
+% Abgeschlossen werden die Definitionen durch ein
+% \xspace so dass, wenn nötig,
+% im Text ein Leerzeichen nach den Makros eingefügt
+% wird.
+%\newcommand{\zB}{z.\,B.\xspace} % zum Beispiel (z. B.)
+%\newcommand{\ua}{u.\,a.\xspace} % unter anderem (u. a.)
+%\newcommand{\uU}{u.\,U.\xspace} % unter Umständen (u. U.)
+
+% Kurzformen für existierende, lange LaTeX Befehle:
+\newcommand{\tb}{\textbackslash}
+
+% Commands for reference (ref) commands
+\newcommand{\chapterref}[1]{Chapter~\ref{#1}}
+\newcommand{\sectionref}[1]{Section~\ref{#1}}
+\newcommand{\subsectionref}[1]{Subsection~\ref{#1}}
+\newcommand{\equationref}[1]{Eq.~\ref{#1}}
+\newcommand{\figureref}[1]{Figure~\ref{#1}}
+\newcommand{\tableref}[1]{Table~\ref{#1}}
+\newcommand{\appref}[1]{Appendix~\ref{#1}}
+
+% Kommandos für Mathemtikkonstrukte:
+
+% Betragsstriche mit korrekter Größe um jedes Objekt:
+\newcommand{\abs}[1]{\left|#1\right|}
+
+% Ableitungen mit aufrecht gedruckten Differentialoperator:
+\newcommand{\deriv}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+
+% Aufrecht gedruckte Eulersche Zahl und imaginäre Einheit:
+\newcommand{\euler}{\mathrm{e}}
+\newcommand{\imag}{\mathrm{i}}
+
+% Expected value
+\DeclareMathOperator{\EX}{\mathbb{E}}% expected value
+\newcommand*\mean[1]{\overline{#1}}
+
+% Command for align environment to show transformation steps
+\newcommand{\sh}[2]{&& \quad \vert\ \text{#1} #2\\}

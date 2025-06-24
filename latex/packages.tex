@@ -1,0 +1,111 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Doc set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\gr{}      % Set the group number cons. across doc
+\def\nass{}    % Set the assignment number cons. across doc
+\def\cl{Intro to Text Mining and NLP }   % Define the class
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[utf8]{inputenc} % Unicode characters
+% \usepackage[ngerman]{babel} % New German language corrections
+\usepackage[T1]{fontenc} % Correct Umlaut appearance
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=30mm,
+ right=25mm,
+ top=30mm,
+ bottom=25mm
+ }
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\graphicspath{{imgs/}}
+\usepackage{pgfplots} % Plots
+\pgfplotsset{width=12cm,compat=newest}
+\usepackage{xcolor}
+\usepackage{multicol}
+\usepackage{threeparttable} % For tablenotes environment
+\usepackage{transparent}
+\usepackage{svg}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{subcaption}
+\usepackage{float}
+%\usepackage{subfig}     % Easy graphics next to each other
+\usepackage{enumitem}   % Allows to change enumerate labels
+\usepackage{xspace}
+\usepackage{fancyhdr}
+\pagestyle{fancy}                    % Eigener Seitenstil
+\fancyhf{}                           % Alle Kopf- und Fußzeilenfelder bereinigen
+\fancyhead[L]{DSDM - BSE}            % Kopfzeile links
+\fancyhead[C]{\cl}     % Zentrierte Kopfzeile
+\fancyhead[R]{Final Project \nass}          % Kopfzeile rechts
+\renewcommand{\headrulewidth}{0.4pt} % Obere Trennlinie
+\fancyfoot[C]{\thepage}              % Seitennummer
+\usepackage{pdfpages}
+\usepackage{newclude}
+\usepackage{hyperref} %Links, z.B. direkt zum gewünschten Kapitel springen
+\hypersetup{
+    pdftitle    = {\cl - Assignment \nass},
+    pdfsubject  = {This is a submission in the DSDM Masters at BSE.},
+    pdfauthor   = {Group\gr},
+    % pdfkeywords = {Ha11, Bachelor thesis},
+    pdfcreator  = {Overleaf},
+    pdfstartview= FitH,        % PDF Fenster ausgefüllt
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Code highlighting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[newfloat]{minted}     % Code highlighting
+\newenvironment{code}{\captionsetup{type=listing}}{}
+\SetupFloatingEnvironment{listing}{name=Code}
+
+%   Code list in content index
+\renewcommand{\listoflistings}{
+  \cleardoublepage
+  \addcontentsline{toc}{chapter}{List of Code}
+  \listof{listing}{List of Code}
+}
+
+\setminted{
+    %style=monokai,           % Color scheme
+    fontsize=\small,         % Text size
+    %frame=lines,             % Frame style (none, lines, single)
+    %framesep=2mm,           % Frame separation
+    %baselinestretch=1.2,    % Line spacing
+    breaklines=true,        % Enable line breaking
+    linenos=true,           % Show line numbers
+    %numbersep=5pt,          % Space between numbers and code
+    %tabsize=4,              % Tab size
+    autogobble=true,        % Remove common leading whitespace
+    %bgcolor=lightgray,      % Background color
+    mathescape=true,         % Allow LaTeX math mode in code
+    breaklines=true,        % Enable line breaking
+    breakanywhere=true,     % Break lines anywhere
+    samepage=false          % Explicitly allow page breaks
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage[
+    backend=biber, 
+    style=authoryear,
+    hyperref=true
+    ]{biblatex}
+% Configure cite to show Author (Year)
+\DeclareCiteCommand{\cite}
+  {\usebibmacro{prenote}}
+  {\usebibmacro{citeindex}%
+   \printnames{labelname}%
+   \space(\printfield{year})}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+
+% Configure parencite to show (Author et al., Year)
+\DeclareNameAlias{labelname}{family-given}
+\renewcommand*{\nameyeardelim}{\addcomma\space}
+\AtEveryCitekey{\ifciteseen{}{\defcounter{maxnames}{1}}}
+\usepackage{csquotes}
+%\usepackage{biblatex}
+\addbibresource{LaTex/chapters/references.bib}
+%\usepackage[all]{hypcap} %Positioning of linked objects after jump
+\setlength{\parskip}{0.3\baselineskip} % Adjust spacing between paragraphs
+\setlength{\parindent}{0pt} % Remove paragraph indentation if desired

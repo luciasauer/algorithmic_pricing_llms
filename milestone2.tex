@@ -1,0 +1,217 @@
+\documentclass{beamer}
+\usepackage[style=apa, backend=biber]{biblatex}
+\addbibresource{LaTex/references.bib}
+\AtBeginBibliography{\scriptsize} % Reduce size of the bibliography to use less pages
+\usepackage{svg}
+\usepackage{booktabs}
+\usepackage{hwemoji}
+\usepackage{graphicx} % Load graphics
+\usepackage{booktabs} % Nice tables
+\usepackage{dcolumn} % Booktabs column spacing
+\usepackage{threeparttable} % Align column caption, table, and notes
+\usepackage{adjustbox} % Shrink stuff
+\usetheme{metropolis}
+\title{Shifting Knowledge Networks: Mapping Causality in Developer Community Dynamics}
+\subtitle{COVID and ChatGPT's influence on developer communities}
+\date{\centering\today}
+\author{\centering Julian Romero, Lucia Sauer, Moritz Peist}
+\institute{\centering\includesvg[width=4cm]{LaTex/imgs/BSE Barcelona Graduate School of Economics.svg}}
+\begin{document}
+
+    \begin{frame}{}
+        \titlepage
+    \end{frame}
+    % Add BSE Logo
+    \setbeamertemplate{frametitle}
+    {
+        \nointerlineskip
+        \begin{beamercolorbox}[sep=0.3cm,wd=\paperwidth]{frametitle}
+            \strut\insertframetitle\strut
+            \hfill
+            \raisebox{-0.8mm}{\includesvg[width=1cm]{LaTex/imgs/BSE Barcelona Graduate School of Economics.svg}}
+        \end{beamercolorbox}
+    }
+
+    \begin{frame}
+        \frametitle{Outline}
+        \tableofcontents
+    \end{frame}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    \section{Project Overview}
+    
+    \begin{frame}{What happened so far?}
+        \begin{enumerate}
+            \item Revisit seminal economics paper and establish Causal-AI framework -- dismissed since:
+            \begin{itemize}
+                \item Foundational papers already existed
+                \item Replication not enough
+                \item Own framework potential too difficult
+            \end{itemize}
+            \item Glovo -- denied data access, due to confidentiality issues
+            \item Now we are here
+        \end{enumerate}
+    \end{frame}
+   
+    \begin{frame}{New idea}
+        \begin{center}
+            \itshape Investigate growth and decline in Stack Overflow activity from a causal, network perspective
+        \end{center}
+        \textbf{Why are we investigating this:}
+        \begin{itemize}
+            \item Presents a unique opportunity to analyze causal factors in (developer) knowledge networks.
+            \item Research could examine how external shocks (global pandemic, emergence of AI tools) potentially transform knowledge-sharing ecosystems.
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}{Research Question}
+        \begin{center}
+            tbd, but:
+        \end{center}
+        \rule{\textwidth}{0.4pt}
+        \begin{columns}[c]
+            \begin{column}{0.475\textwidth}
+                \begin{figure}
+                    \centering
+                    \includesvg[width=0.95\linewidth, inkscapelatex=false]{LaTex/imgs/milestone2/posts.svg}
+                    \caption{SO total posts \parencite{celik_fall_2025}}
+                    \label{fig:soposts}
+                \end{figure}
+            \end{column}
+            \begin{column}{0.475\textwidth}
+                \begin{figure}
+                    \centering
+                    \includegraphics[width=0.95\linewidth]{LaTex/imgs/milestone2/event_study_scripting_languages.pdf}
+                    \caption{ChatGPT impact on scripting languages}
+                    \label{fig:sdid}
+                \end{figure}
+            \end{column}
+        \end{columns}
+        \rule{\textwidth}{0.4pt}
+        \begin{center}
+             Topic is relevant \& offers rich, accessible data
+        \end{center}
+    \end{frame}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    \section{Literature}
+
+    \begin{frame}{Research}
+        \textbf{Research on StackOverflow is broad:}
+        \begin{itemize}
+            \item Research on Stack Overflow employs diverse methodologies including community detection algorithms, network analysis, and causal modeling to examine user interaction patterns, reputation systems, and technology-specific clusters over time.
+            \item Studies combine quantitative metrics (traffic data, posting volumes, user migration) with social network analysis techniques (centrality measures, community detection) to investigate how external factors and intrinsic network dynamics influence collaboration patterns and knowledge exchange.
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}{Research}
+        \begin{center}
+            \textbf{\textcite{burtch_consequences_2024}}, published in Nature:
+        \end{center}
+        \begin{columns}[c]
+            \begin{column}{0.55\textwidth}
+                \begin{itemize}
+                    \item ChatGPT caused 12\% decline in Stack Overflow traffic, with newer users most likely to exit; topics with ample training data were most affected
+                    \item Social fabric acts as buffer: Reddit developer communities showed no activity decline (social connections vs. pure information exchange)
+                    \item Synthetic Controls and DiD used
+                \end{itemize}
+            \end{column}
+            \begin{column}{0.4\textwidth}
+                \begin{figure}
+                    \centering
+                    \includegraphics[width=1\linewidth]{LaTex/imgs/milestone2/Burcher2024.png}
+                    \caption{\textcite{burtch_consequences_2024}}
+                    \label{fig:burcher2024}
+                \end{figure}
+            \end{column}
+        \end{columns}
+    \end{frame}
+
+    \begin{frame}{Research}
+        \begin{center}
+            \textbf{\textcite{moutidis_community_2021}}:
+        \end{center}
+        \begin{columns}[c]
+            \begin{column}{0.55\textwidth}
+                \begin{itemize}
+                    \item Data from 2008-2020, identifying persistent user communities organized around technology clusters using tag similarity networks and community detection algorithms
+                    \item Users typically stay within their community rather than migrate, 
+                    \item Tracked the rise of technologies like Python \& a shift from generalized to more specialized communities over time.
+                \end{itemize}
+            \end{column}
+            \begin{column}{0.4\textwidth}
+                \begin{figure}
+                    \centering
+                    \includegraphics[width=1\linewidth]{LaTex/imgs/milestone2/moutidis_2021.png}
+                    \caption{\textcite{moutidis_community_2021}}
+                    \label{fig:burcher2024}
+                \end{figure}
+            \end{column}
+        \end{columns}
+    \end{frame}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    \section{Methodology}
+
+    \begin{frame}{Overview}
+        \begin{itemize}
+            \item Currently in the data discovery phase
+            \item Looking for ideal infrastructure
+        \end{itemize}
+    \end{frame}
+    
+    \begin{frame}{Data Architecture}
+        \begin{columns}[c]
+            \begin{column}{0.4\textwidth}
+                \centering
+                    \begin{itemize}
+                        \item 356GB XML-formatted Stack Exchange data dump
+                        \item Updated quarterly
+                        \item Posts, Users, Comments, History
+                        \item 8 relational tables
+                        \item Significant pre-processing
+                    \end{itemize}
+            \end{column}
+            \begin{column}{0.55\textwidth}
+                \begin{figure}[H]
+                    \centering
+                    \includegraphics[width=1\linewidth]{LaTex/imgs/milestone2/AyIkW.png}
+                    \caption{Stack Overflow ERD \parencite{stackexchange_answer_2019}}
+                    \label{fig:erd}
+                \end{figure}
+            \end{column}
+        \end{columns}  
+    \end{frame}
+
+    \begin{frame}{Data Architecture cont.}
+        \begin{columns}[c]
+            \begin{column}{0.475\textwidth}
+                Currently evaluating setups:
+                \centering
+                    \begin{itemize}
+                        \item Neo4J vs. Postgres with Apache AGE
+                        \item Polars (local) vs. Apache Spark (cluster)
+                        \item Network algorithms \& causal strategy tbd (e.g., Synthetic Controls)
+                    \end{itemize}
+            \end{column}
+            \begin{column}{0.475\textwidth}
+                \begin{figure}[H]
+                    \centering
+                    \includegraphics[width=1\linewidth]{LaTex/imgs/milestone2/AyIkW.png}
+                    \caption{Stack Overflow ERD \parencite{stackexchange_answer_2019}}
+                    \label{fig:erd}
+                \end{figure}
+            \end{column}
+        \end{columns}  
+    \end{frame}    
+  
+    \section{References}
+    
+    \begin{frame}[allowframebreaks]{References}
+        \printbibliography[heading=none]
+    \end{frame}
+    
+\end{document}
