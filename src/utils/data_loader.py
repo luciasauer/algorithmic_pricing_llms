@@ -149,3 +149,24 @@ def get_retail_price_for_period(
         (pl.col("PUBLISH_DATE") - target_date).abs()
         == (pl.col("PUBLISH_DATE") - target_date).abs().min()
     )
+
+
+def prepare_simulation_data(tgp: pl.DataFrame, retail: pl.DataFrame) -> pl.DataFrame:
+    """Prepare daily market data for simulation"""
+
+    # Calculate daily average prices by brand
+    daily_prices = retail.group_by(
+        ["PUBLISH_DATE", "BRAND_DESCRIPTION"], maintain_order=True
+    ).agg(pl.col("PRODUCT_PRICE").mean().alias("avg_price"))
+
+    # Pivot to have brands as columns
+    pivot_prices = daily_prices.pivot(
+        values="avg_price", index="PUBLISH_DATE", on="BRAND_DESCRIPTION"
+    )
+
+    # Join with TGP data
+    market_data = pivot_prices.join(
+        tgp.rename({"date": "PUBLISH_DATE"}), on="PUBLISH_DATE", how="inner"
+    ).sort("PUBLISH_DATE")
+
+    return market_data
