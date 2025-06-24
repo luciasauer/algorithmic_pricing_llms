@@ -380,7 +380,7 @@ def create_gif_from_pngs(path: str, gif_name="000_animation.gif", duration=200):
 
 
 def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2: Duopoly Experiment Results", save_path=None):
-    fig, axs = plt.subplots(1, 2, figsize=(14, 6))
+    fig, axs = plt.subplots(1, 2, figsize=(14, 5))
     fig.suptitle(title, fontsize=16)
 
     # === Panel 1: Price comparison ===
@@ -388,12 +388,11 @@ def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2
     axs[0].scatter(df.loc[df['prompt']==2,'p1'], df.loc[df['prompt']==2,'p2'], color='tab:orange', marker='^', label='P2 vs. P2')
 
     # Axis setup
-    # axs[0].set_xlim(1.4, 2.2)
-    # axs[0].set_ylim(1.4, 2.2)
-    # axs[0].set_xticks(np.arange(1.4, 2.21, 0.2))
-    # axs[0].set_yticks(np.arange(1.4, 2.21, 0.2))
     axs[0].xaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
     axs[0].yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
+    #set x and y ticks each 0.2 
+    axs[0].xaxis.set_major_locator(ticker.MultipleLocator(0.2))
+    axs[0].yaxis.set_major_locator(ticker.MultipleLocator(0.2))
 
     # Reference lines
     axs[0].axvline(p_nash, color='red', linestyle='--', linewidth=1)
@@ -424,18 +423,26 @@ def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2
     # === Panel 2: Profit comparison ===
     df['pi_sum'] = df['pi_1'] + df['pi_2']
     axs[1].scatter(df.loc[df['prompt']==1,'pi_delta'], df.loc[df['prompt']==1,'pi_sum'], color='tab:blue', marker='s', label='P1 vs. P1')
-    axs[1].scatter(df.loc[df['prompt']==2,'pi_delta'], df.loc[df['prompt']==2,'pi_sum'], color='tab:orange', marker='^', label='P2 vs. P1')
+    axs[1].scatter(df.loc[df['prompt']==2,'pi_delta'], df.loc[df['prompt']==2,'pi_sum'], color='tab:orange', marker='^', label='P2 vs. P2')
 
-    x_vals = np.linspace(-20, 20, 200)
-    axs[1].plot(x_vals, 2 * pi_nash + np.abs(x_vals), 'r--', label=r'$\pi_1 = \pi^{Nash}$ / $\pi_2 = \pi^{Nash}$')
-    axs[1].text(-10, 2 * pi_nash + 1, r'$\pi_1 = \pi^{Nash}$', color='red', fontsize=10)
-    axs[1].text(5, 2 * pi_nash + 1, r'$\pi_2 = \pi^{Nash}$', color='red', fontsize=10)
+    # Diagonal lines for π₁ = π^{Nash} and π₂ = π^{Nash}
+    y_vals = np.linspace(2 * pi_nash, 2 * pi_m, 200)
+    delta_1 = 2 * pi_nash - y_vals  # π₁ = π^{Nash}
+    delta_2 = y_vals - 2 * pi_nash  # π₂ = π^{Nash}
 
-    axs[1].axhline(pi_m, color='green', linestyle=':', linewidth=1)
-    axs[1].text(21, pi_m + 0.8, r'$\pi^M$', color='green', fontsize=10)
+    axs[1].plot(delta_1, y_vals, 'r--', linewidth=1)
+    axs[1].plot(delta_2, y_vals, 'r--', linewidth=1)
 
-    axs[1].set_xlim(-22, 22)
-    axs[1].set_ylim(40, 70)
+    # Annotations
+    axs[1].text(np.mean(delta_1)*1.5, (2.2*pi_nash), r'$\pi_1 = \pi^{Nash}$', color='red', fontsize=10)
+    axs[1].text(np.mean(delta_2), (2.2*pi_nash), r'$\pi_2 = \pi^{Nash}$', color='red', fontsize=10)
+
+    # Monopoly profit line
+    axs[1].axhline(2 * pi_m, color='green', linestyle=':', linewidth=1)
+    axs[1].text(min(df['pi_delta'].min(),min(delta_1))*1.05, 2 * pi_m, r'$\pi^M$', color='green', fontsize=10)
+
+    # Axes setup
+    axs[1].axvline(0, color='black', linestyle='--', linewidth=1)
     axs[1].set_xlabel('Average difference in profits $\pi_1 - \pi_2$ (over periods 251–300)')
     axs[1].set_ylabel('Average sum of profits $\pi_1 + \pi_2$ (over periods 251–300)')
     axs[1].set_title("P1 Compared to P2: Profits Earned")
@@ -443,9 +450,7 @@ def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2
 
     # === Legend outside below both plots ===
     handles, labels = axs[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc='lower center', ncol=4, bbox_to_anchor=(0.5, -0.07))
-
-    plt.tight_layout(rect=[0, 0.07, 1, 0.95])
+    fig.legend(handles, labels, loc='lower center', ncol=4, bbox_to_anchor=(0.5, -0.05))
     if save_path:
         plt.savefig(save_path, bbox_inches='tight')
     plt.show()
@@ -453,7 +458,7 @@ def plot_duopoly_results_from_df(df, p_nash, p_m, pi_nash, pi_m, title="Figure 2
 
 def make_df_from_results(results_path, model_name):
    summarized_results = []
-   for prompt in os.listdir(results_path):  # Just to ensure the directory is created if it doesn't exist
+   for prompt in os.listdir(results_path):
          if 'prompt' not in prompt:
             continue
          prmt = 1 if 'prompt_1' in prompt else 2
@@ -468,8 +473,8 @@ def make_df_from_results(results_path, model_name):
                results = json.load(f)
             p1 = np.mean(np.array(results['price_history']['firm_1'][-50:])/alph)
             p2 = np.mean(np.array(results['price_history']['firm_2'][-50:])/alph)
-            pi_1 = np.mean(np.array(results['profit_history']['firm_1'][-50:])/alph)
-            pi_2 = np.mean(np.array(results['profit_history']['firm_2'][-50:])/alph)
+            pi_1 = np.mean(np.array(results['profit_history']['firm_1'][-50:]))
+            pi_2 = np.mean(np.array(results['profit_history']['firm_2'][-50:]))
             pi_delta = pi_1 - pi_2
 
             summarized_results.append({
