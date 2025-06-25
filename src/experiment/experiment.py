@@ -1,10 +1,12 @@
 import datetime
 import asyncio
+import polars as pl
 from typing import List
 from src.utils.logger import setup_logger
 from src.agents.base_agent import Agent
 from src.experiment.storage import StorageManager
 from src.prompts.prompt_manager import PromptManager
+from src.plotting.plotting import plot_experiment_svg
 
 
 class Experiment:
@@ -63,6 +65,18 @@ class Experiment:
         prices = self._store_agent_outputs(results, round_num)
         quantities, profits = self.environment.compute_quantities_and_profits(prices)
         self._store_environment_outputs(round_num, prices, quantities, profits)
+        df_history = self._create_environment_dataframe()
+        self.storage.save_environment_parquet(df_history)
+        metadata = self.storage.load_metadata()
+        svg_path = self.storage.experiment_path / "results_plot.svg"
+        plot_experiment_svg(
+                df=df_history,
+                metadata=metadata,
+                save_path=svg_path,
+                show_quantities=True,
+                show_profits=True,
+            )
+
         self.storage.save_round_data(self.history)
 
     def _store_agent_outputs(self, results, round_num) -> dict:
@@ -94,3 +108,19 @@ class Experiment:
         metadata["end_time"] = datetime.datetime.now().isoformat()
         self.storage.save_metadata(metadata)
         self.logger.info("✅ Experiment completed.\n")
+    
+    def _create_environment_dataframe(self) -> pl.DataFrame:
+        records = []
+
+        for agent in self.agents:
+            agent_name = agent.name
+            for round_num, data in self.history[agent_name].items():
+                records.append({
+                    "round": round_num,
+                    "agent": agent_name,
+                    "price": data.get("chosen_price"),
+                    "quantity": data.get("quantity"),
+                    "profit": data.get("profit"),
+                })
+
+        return pl.DataFrame(records)

@@ -1,7 +1,8 @@
 import json
 import time
-from pathlib import Path
 import logging
+import polars as pl
+from pathlib import Path
 
 class StorageManager:
     def __init__(self, n_agents: int, base_dir="experiments_runs", logger: logging.Logger = None):
@@ -41,3 +42,10 @@ class StorageManager:
     
     def get_log_file_path(self):
         return self.experiment_path / "log.txt"
+    
+    def save_environment_parquet(self, df: pl.DataFrame):
+        try:
+            path = self.experiment_path / "environment_history.parquet"
+            df.write_parquet(path)
+        except Exception as e:
+            self.logger.error(f"❌ Failed to save environment data in parquet: {e}")
