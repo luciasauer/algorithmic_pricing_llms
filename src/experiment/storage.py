@@ -22,10 +22,19 @@ class StorageManager:
         with open(self.experiment_path / "metadata.json", "w") as f:
             json.dump(metadata, f, indent=2)
         self.logger.info(f"✅ Metadata saved")
+    
+    def load_metadata(self):
+        try:
+            with open(self.experiment_path / "metadata.json", "r") as f:
+                metadata = json.load(f)
+            return metadata
+        except FileNotFoundError:
+            self.logger.error("❌ Metadata file not found.")
+            raise FileNotFoundError("Metadata file not found. Please ensure the experiment has been set up correctly.")
 
     def save_round_data(self, data: dict):
         try:
-            with open(self.experiment_path / f"resutls.json", "w") as f:
+            with open(self.experiment_path / f"results.json", "w") as f:
                 json.dump(data, f, indent=2)
         except Exception as e:
             self.logger.error(f"❌ Failed to save round data: {e}")
