@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Doc set %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\gr{}      % Set the group number cons. across doc
 \def\nass{}    % Set the assignment number cons. across doc
-\def\cl{Intro to Text Mining and NLP }   % Define the class
+\def\cl{Learnt to Coordinate?}   % Define the class
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[utf8]{inputenc} % Unicode characters
 % \usepackage[ngerman]{babel} % New German language corrections
@@ -19,7 +19,7 @@
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage{graphicx}
-\graphicspath{{imgs/}}
+\graphicspath{latex/imgs/}
 \usepackage{pgfplots} % Plots
 \pgfplotsset{width=12cm,compat=newest}
 \usepackage{xcolor}
@@ -38,16 +38,16 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}                    % Eigener Seitenstil
 \fancyhf{}                           % Alle Kopf- und Fußzeilenfelder bereinigen
-\fancyhead[L]{DSDM - BSE}            % Kopfzeile links
+\fancyhead[L]{DSDM 2024-2025}            % Kopfzeile links
 \fancyhead[C]{\cl}     % Zentrierte Kopfzeile
-\fancyhead[R]{Final Project \nass}          % Kopfzeile rechts
+\fancyhead[R]{BSE}          % Kopfzeile rechts
 \renewcommand{\headrulewidth}{0.4pt} % Obere Trennlinie
 \fancyfoot[C]{\thepage}              % Seitennummer
 \usepackage{pdfpages}
 \usepackage{newclude}
 \usepackage{hyperref} %Links, z.B. direkt zum gewünschten Kapitel springen
 \hypersetup{
-    pdftitle    = {\cl - Assignment \nass},
+    pdftitle    = {\cl - Master thesis \nass},
     pdfsubject  = {This is a submission in the DSDM Masters at BSE.},
     pdfauthor   = {Group\gr},
     % pdfkeywords = {Ha11, Bachelor thesis},
@@ -108,3 +108,5 @@
 %\usepackage[all]{hypcap} %Positioning of linked objects after jump
 \setlength{\parskip}{0.3\baselineskip} % Adjust spacing between paragraphs
 \setlength{\parindent}{0pt} % Remove paragraph indentation if desired
+\usepackage{epigraph} % Nicely formatted quotes
+\setlength{\epigraphwidth}{0.9\textwidth}
