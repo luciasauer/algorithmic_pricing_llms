@@ -1,3 +1,4 @@
+#src/environment/environment.py
 import logging
 import numpy as np
 from src.environment.pricing_market_logic_multiproduct import (
@@ -8,49 +9,48 @@ from src.environment.pricing_market_logic_multiproduct import (
 )
 
 class CalvanoDemandEnvironment:
-    def __init__(self, name: str, description: str, nbr_agents: int, env_params: dict, logger: logging.Logger = None):
+    def __init__(self, name: str, description: str, logger: logging.Logger = None):
         self.name = name
         self.description = description
-        self.nbr_agents = nbr_agents
         self.logger = logger or logging.getLogger("experiment_logger")
 
-        self.a_0 = env_params.get("a_0", 0.0)
-        self.a = env_params.get("a", np.ones(nbr_agents))
-        self.mu = env_params.get("mu", 0.25)
-        self.alpha = env_params.get("alpha", np.ones(nbr_agents))
-        self.beta = env_params.get("beta", 100)
-        self.sigma = env_params.get("sigma", 0.0)
-        self.c = env_params.get("c", np.ones(nbr_agents))
-        self.group_idxs = env_params.get("group_idxs", [])
+        self.a_0 = None
+        self.a = None
+        self.mu = None
+        self.alpha = None
+        self.beta = None
+        self.sigma = None
+        self.c = None
+        self.group_idxs = None
 
         self.monopoly_prices = None
         self.nash_prices = None
-        self._compute_benchmarks()
+        self.round = 0
 
 
-    def compute_quantities_and_profits(self, prices: dict[str, float]) -> tuple[dict[str, float], dict[str, float]]:
+    def compute_quantities_and_profits(self, agent_order: list[tuple[str, int]], prices: dict[str, float]) -> tuple[dict[str, float], dict[str, float]]:
         try:
-            # Ensure ordering by agent index
-            agent_names = list(prices.keys())
-            price_values = [prices[name] for name in agent_names]
+            sorted_names = [name for name, _ in sorted(agent_order, key=lambda x: x[1])]
+            price_values = [prices[name] for name in sorted_names]
 
             quantities = get_quantities(
                 p=tuple(price_values), a0=self.a_0, a=self.a, mu=self.mu,
                 alpha=self.alpha, multiplier=self.beta, sigma=self.sigma, group_idxs=self.group_idxs,
             )
-
             profits = get_profits(
                 p=tuple(price_values), a0=self.a_0, a=self.a, mu=self.mu,
                 alpha=self.alpha, c=self.c, multiplier=self.beta, sigma=self.sigma, group_idxs=self.group_idxs,
             )
 
-            # Return results mapped back to agent names
-            quantities_dict = {name: q for name, q in zip(agent_names, quantities)}
-            profits_dict = {name: pi for name, pi in zip(agent_names, profits)}
-            return quantities_dict, profits_dict
+            return {
+                name: q for name, q in zip(sorted_names, quantities)
+            }, {
+                name: pi for name, pi in zip(sorted_names, profits)
+            }
+
         except Exception as e:
             self.logger.error(f"Error computing quantities and profits: {e}")
-            raise e
+            raise
     
     def _compute_benchmarks(self):
         try:
@@ -106,3 +106,13 @@ class CalvanoDemandEnvironment:
             "nash_quantities": self.nash_quantities if self.nash_quantities is not None else None,
             "nash_profits": self.nash_profits if self.nash_profits is not None else None,
         }
+
+    def register_time_series(self, c_series: np.ndarray):
+        """Supply full (num_agents, num_rounds) arrays of time-varying parameters"""
+        self.c_series = c_series
+
+    def set_round(self, round_num: int):
+        """Update time-varying parameters before using them"""
+        self.round = round_num
+        if hasattr(self, 'c_series') and self.c_series is not None:
+            self.c = self.c_series[:, round_num - 1]  # 0-indexed access

@@ -1,5 +1,7 @@
+# src/experiment/experiment.py
 import datetime
 import asyncio
+import numpy as np
 import polars as pl
 from typing import List
 from src.utils.logger import setup_logger
@@ -10,16 +12,51 @@ from src.plotting.plotting import plot_experiment_svg
 
 
 class Experiment:
-    def __init__(self, name: str, agents: List[Agent], num_rounds: int, environment=None):
+    def __init__(self, name: str, agents: List[Agent], num_rounds: int, environment, cost_series: np.ndarray = None, experiment_dir: str = None):
         self.name = name
         self.agents = agents
         self.num_rounds = num_rounds
+        self.cost_series = cost_series
         self.environment = environment
+        for idx, agent in enumerate(self.agents):
+            agent.env_index = idx
+            agent.environment = self.environment
+        assert all(agent.env_index is not None for agent in self.agents), "Some agents are missing env_index"
+
+        sorted_agents = sorted(self.agents, key=lambda ag: ag.env_index)       
+        env_params = {
+            "a_0": 0.0,
+            "a": np.array([agent.a for agent in sorted_agents]),
+            "alpha": np.array([agent.alpha for agent in sorted_agents]),
+            "c": np.array([agent.c for agent in sorted_agents]),
+            "mu": 0.25,
+            "beta": 100,
+            "sigma": 0.0,
+            "group_idxs": [1 for _ in sorted_agents],
+        }
+
+        # ✅ Overwrite the attributes in the existing environment object
+        self.environment.a_0 = env_params["a_0"]
+        self.environment.a = env_params["a"]
+        self.environment.alpha = env_params["alpha"]
+        self.environment.c = env_params["c"]
+        self.environment.mu = env_params["mu"]
+        self.environment.beta = env_params["beta"]
+        self.environment.sigma = env_params["sigma"]
+        self.environment.group_idxs = env_params["group_idxs"]
+        self.environment.nbr_agents = len(sorted_agents)
+        self.environment._compute_benchmarks()  # Compute benchmarks for the environment
 
         self.logger = setup_logger()
-        self.storage = StorageManager(n_agents=len(agents), logger=self.logger)
+        self.storage = StorageManager(n_agents=len(agents), logger=self.logger, experiment_dir=experiment_dir)
         self.prompt_manager = PromptManager(logger=self.logger)
         self.history = {agent.name: {} for agent in agents}
+
+        if self.cost_series is not None:
+            self.logger.info(f"agents {(len(agents), num_rounds)} cost series shape: {cost_series.shape}")
+            assert cost_series.shape == (len(agents), num_rounds), "Cost series shape mismatch"
+            environment.register_time_series(c_series=cost_series)
+        
 
     async def run(self):
         self._setup_experiment()
@@ -41,6 +78,14 @@ class Experiment:
             "agents_types": {agent.name: agent.type for agent in self.agents},
             "agents_prefixes": {agent.name: agent.prefix for agent in self.agents},
             "agents_prompts": {agent.name: agent.prompt_template for agent in self.agents},
+            "agent_environment_mapping": { agent.name: {
+                                                    "env_index": agent.env_index,
+                                                    "a": agent.a,
+                                                    "alpha": agent.alpha,
+                                                    "c": agent.c,
+                                                }
+                                                for agent in self.agents
+                                            },
             "num_rounds": self.num_rounds,
             "start_time": datetime.datetime.now().isoformat(),
         }
@@ -55,8 +100,9 @@ class Experiment:
         self.storage.save_metadata(metadata)
 
     async def _run_round(self, round_num: int):
+        self.environment.set_round(round_num) 
         prompts = {
-            agent.name: self.prompt_manager.generate_prompt(agent, self.history[agent.name])
+            agent.name: self.prompt_manager.generate_prompt(agent, self.history[agent.name], round_num)
             for agent in self.agents
         }
 
@@ -64,7 +110,8 @@ class Experiment:
         results = await asyncio.gather(*tasks)
 
         prices = self._store_agent_outputs(results, round_num)
-        quantities, profits = self.environment.compute_quantities_and_profits(prices)
+        agent_order = [(agent.name, agent.env_index) for agent in self.agents]
+        quantities, profits = self.environment.compute_quantities_and_profits(agent_order, prices)
         self._store_environment_outputs(round_num, prices, quantities, profits)
         df_history = self._create_environment_dataframe()
         self.storage.save_environment_parquet(df_history)
@@ -90,7 +137,7 @@ class Experiment:
         return prices
 
     def _store_environment_outputs(self, round_num, prices, quantities, profits):
-        for agent in self.agents:
+        for idx, agent in enumerate(self.agents):
             name = agent.name
             competitors_prices = {a: p for a, p in prices.items() if a != name}
 
@@ -100,6 +147,11 @@ class Experiment:
             market_data += f'- My quantity sold: {quantities[name]}\n'
             market_data += f'- My profit earned: {profits[name]}\n'
 
+            marginal_cost = agent.get_marginal_cost(round_num)
+            if self.cost_series is not None:
+                market_data += f'- Marginal cost: {marginal_cost}\n'
+
+            self.history[name][round_num]['marginal_cost'] = marginal_cost
             self.history[name][round_num]['quantity'] = quantities[name]
             self.history[name][round_num]['profit'] = profits[name]
             self.history[name][round_num]['market_data'] = market_data
@@ -113,16 +165,18 @@ class Experiment:
     def _create_environment_dataframe(self) -> pl.DataFrame:
         records = []
 
-        for agent in self.agents:
+        for agent_idx, agent in enumerate(self.agents):
             agent_name = agent.name
             for round_num, data in self.history[agent_name].items():
-                records.append({
+                record = {
                     "round": round_num,
                     "agent": agent_name,
                     "agent_type": agent.type,
                     "price": data.get("chosen_price"),
+                    "marginal_cost": agent.get_marginal_cost(round_num),
                     "quantity": data.get("quantity"),
                     "profit": data.get("profit"),
-                })
+                }
+                records.append(record)
 
         return pl.DataFrame(records)

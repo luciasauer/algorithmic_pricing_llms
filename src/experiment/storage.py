@@ -5,8 +5,10 @@ import polars as pl
 from pathlib import Path
 
 class StorageManager:
-    def __init__(self, n_agents: int, base_dir="experiments_runs", logger: logging.Logger = None):
-        self.base_dir = Path(base_dir)
+    def __init__(self, n_agents: int, base_dir="experiments_runs", experiment_dir = None, logger: logging.Logger = None):
+        self.base_dir = Path(base_dir) 
+        if experiment_dir:
+            self.base_dir = Path(experiment_dir)
         self.n_agents = n_agents
         self.experiment_path = None
         self.logger = logger or logging.getLogger("experiment_logger")

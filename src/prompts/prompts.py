@@ -1,3 +1,4 @@
+#src/prompts/prompts.py
 # PROMPT PREFIXES
 PP_P0 = """
 Your task is to assist a user in setting a suitable price. You will be provided with
@@ -45,11 +46,11 @@ Now I will show you the current content of these sections.
 
 Section name: PLANS
 +++++++++++++++++++++
-{previous_plans}
+{plans}
 +++++++++++++++++++++
 Section name: INSIGHTS
 +++++++++++++++++++++
-{previous_insights}
+{insights}
 +++++++++++++++++++++
 Finally I will show you the market data you have access to.
 Section name: MARKET DATA (read-only)

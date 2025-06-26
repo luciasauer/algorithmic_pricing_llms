@@ -1,3 +1,4 @@
+#src/agents/LLM_agent.py
 import json
 import logging
 import asyncio
@@ -13,9 +14,11 @@ RETRY_DELAY_SECONDS = 1
 
 class LLMAgent(Agent):
     def __init__(self, name: str, prefix: str, api_key: str, model_name: str,
-                 response_model: Type[BaseModel], prompt_template = None, memory_length:int=100, logger: logging.Logger = None):
-        self.name = name
-        self.prefix = prefix
+                 response_model: Type[BaseModel], prompt_template = None, memory_length:int=100, 
+                 env_params: dict = None, logger: logging.Logger = None):
+        
+        super().__init__(name=name, prefix=prefix, prompt_template=prompt_template, env_params=env_params, logger=logger)
+
         self.api_key = api_key
         self.model_name = model_name
         self.response_model = response_model
