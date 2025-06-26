@@ -139,11 +139,11 @@ class Experiment:
     def _store_environment_outputs(self, round_num, prices, quantities, profits):
         for idx, agent in enumerate(self.agents):
             name = agent.name
-            competitors_prices = {a: p for a, p in prices.items() if a != name}
+            competitors_prices = {a: round(p,2) for a, p in prices.items() if a != name}
 
             market_data = f'- My price: {round(prices[name],2)}\n'
             if competitors_prices:
-                market_data += f"- Competitor's prices: {round(competitors_prices,2)}\n"
+                market_data += f"- Competitor's prices: {competitors_prices}\n"
             market_data += f'- My quantity sold: {round(quantities[name],2)}\n'
             market_data += f'- My profit earned: {round(profits[name],2)}\n'
 
