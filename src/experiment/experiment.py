@@ -123,6 +123,7 @@ class Experiment:
                 save_path=svg_path,
                 show_quantities=True,
                 show_profits=True,
+                plot_references=False
             )
 
         self.storage.save_round_data(self.history)

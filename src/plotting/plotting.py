@@ -4,7 +4,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 def plot_experiment_svg(df: pl.DataFrame, metadata: dict, save_path: Path, 
-                        show_quantities: bool = False, show_profits: bool = False):
+                        show_quantities: bool = False, show_profits: bool = False, plot_references: bool = True):
     
     env_params = metadata.get("environment").get("environment_params")
     p_m = env_params.get("monopoly_prices")
@@ -42,7 +42,7 @@ def plot_experiment_svg(df: pl.DataFrame, metadata: dict, save_path: Path,
 
     # --- Price plot ---
     ax = axs[0]
-    if p_m is not None:
+    if p_m is not None and plot_references:
         ax.axhline(y=p_m[0], color='black', linestyle='--', alpha=0.6, label='$P^M$')
         ax.axhline(y=p_n[0], color='green', linestyle=':', alpha=0.9, label='$P^N$')
     for i, agent in enumerate(agents):
@@ -55,7 +55,7 @@ def plot_experiment_svg(df: pl.DataFrame, metadata: dict, save_path: Path,
     # --- Quantity plot ---
     if show_quantities:
         ax = axs[1 if not show_profits else 1]
-        if q_m is not None:
+        if q_m is not None and plot_references:
             ax.axhline(y=q_m[0], color='black', linestyle='--', alpha=0.6, label='$Q^M$')
             ax.axhline(y=q_n[0], color='green', linestyle=':', alpha=0.9, label='$Q^N$')
         for i, agent in enumerate(agents):
@@ -69,7 +69,7 @@ def plot_experiment_svg(df: pl.DataFrame, metadata: dict, save_path: Path,
     if show_profits:
         idx = 2 if show_quantities else 1
         ax = axs[idx]
-        if pi_m is not None:
+        if pi_m is not None and plot_references:
             ax.axhline(y=pi_m[0], color='black', linestyle='--', alpha=0.6, label='$\\pi^M$')
             ax.axhline(y=pi_n[0], color='green', linestyle=':', alpha=0.9, label='$\\pi^N$')
         for i, agent in enumerate(agents):
