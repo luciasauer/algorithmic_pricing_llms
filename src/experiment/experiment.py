@@ -141,19 +141,19 @@ class Experiment:
             name = agent.name
             competitors_prices = {a: p for a, p in prices.items() if a != name}
 
-            market_data = f'- My price: {prices[name]}\n'
+            market_data = f'- My price: {round(prices[name],2)}\n'
             if competitors_prices:
-                market_data += f"- Competitor's prices: {competitors_prices}\n"
-            market_data += f'- My quantity sold: {quantities[name]}\n'
-            market_data += f'- My profit earned: {profits[name]}\n'
+                market_data += f"- Competitor's prices: {round(competitors_prices,2)}\n"
+            market_data += f'- My quantity sold: {round(quantities[name],2)}\n'
+            market_data += f'- My profit earned: {round(profits[name],2)}\n'
 
             marginal_cost = agent.get_marginal_cost(round_num)
             if self.cost_series is not None:
                 market_data += f'- Marginal cost: {marginal_cost}\n'
 
-            self.history[name][round_num]['marginal_cost'] = marginal_cost
-            self.history[name][round_num]['quantity'] = quantities[name]
-            self.history[name][round_num]['profit'] = profits[name]
+            self.history[name][round_num]['marginal_cost'] = round(marginal_cost, 2)
+            self.history[name][round_num]['quantity'] = round(quantities[name],2)
+            self.history[name][round_num]['profit'] = round(profits[name],2)
             self.history[name][round_num]['market_data'] = market_data
 
     def _finalize_experiment(self):
