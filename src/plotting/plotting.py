@@ -25,9 +25,19 @@ def plot_experiment_svg(df: pl.DataFrame, metadata: dict, save_path: Path,
         axs = [axs]
 
     # Prepare data
+    df = df.with_columns(
+        pl.col("agent_type").str.replace("_agent", "").alias("agent_type")
+    )
+
     df_sorted = df.sort(["round", "agent"])
+    #concat agent with agent_type
+    df_sorted = (df_sorted
+                 .with_columns(
+        (pl.col("agent") + " (" + pl.col("agent_type") + ")").alias("agent")
+    ))
     rounds = df_sorted["round"].unique().to_list()
     agents = df_sorted["agent"].unique().to_list()
+    agents.sort()
     colors = ['blue', 'red', 'orange', 'purple', 'cyan', 'brown', 'magenta', 'gray']
 
     # --- Price plot ---
