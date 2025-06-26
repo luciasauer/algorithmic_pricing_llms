@@ -9,6 +9,8 @@ class PromptManager:
         self.logger = logger or logging.getLogger("experiment_logger")
 
     def generate_prompt(self, agent: Type[Agent], history: dict) -> str:
+        if not getattr(agent, "requires_prompt", True): #for fake agents
+            return ""
         prompt_body = agent.prompt_template
         prompt_fields = self._extract_prompt_fields(prompt_body)
         memory_fields = self._get_fields_to_remember(agent.response_model)

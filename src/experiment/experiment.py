@@ -38,6 +38,7 @@ class Experiment:
         metadata = {
             "name": self.name,
             "num_agents": len(self.agents),
+            "agents_types": {agent.name: agent.type for agent in self.agents},
             "agents_prefixes": {agent.name: agent.prefix for agent in self.agents},
             "agents_prompts": {agent.name: agent.prompt_template for agent in self.agents},
             "num_rounds": self.num_rounds,
@@ -118,6 +119,7 @@ class Experiment:
                 records.append({
                     "round": round_num,
                     "agent": agent_name,
+                    "agent_type": agent.type,
                     "price": data.get("chosen_price"),
                     "quantity": data.get("quantity"),
                     "profit": data.get("profit"),
