@@ -1,0 +1,146 @@
+\section{Literature Review}
+
+% Summarize and synthesize prior work in:
+% 
+% - Algorithmic collusion and reinforcement learning
+% 
+% - LLMs and agent-based simulations
+% 
+% - Empirical studies of gasoline markets
+% 
+% - Regulation and transparency effects in collusion 
+% 
+% Not just summaries  --  compare, contrast, and identify gaps you’re filling.
+
+This literature review synthesizes research across four interconnected domains to establish the theoretical and empirical foundation for investigating collusion among Large Language Model (LLM) agents in real-world market conditions. Building on the theoretical innovations of \textcite{fish_algorithmic_2025} and the empirical insights of \textcite{byrne_learning_2019}, this review demonstrates how algorithmic collusion research can be enhanced through integration with empirical market studies, particularly in gasoline retail markets where coordination mechanisms are well-documented and data is readily available.
+
+The synthesis addresses a critical gap: while theoretical studies demonstrate the capacity of LLM agents for autonomous collusion in controlled settings, and empirical studies reveal sophisticated coordination mechanisms in real markets, no research has combined these approaches to examine how LLM agents behave when exposed to actual market conditions and coordination patterns observed in empirical data.
+
+\subsection{Theoretical foundations of algorithmic collusion}
+
+The theoretical understanding of algorithmic collusion has evolved from early demonstrations of emergent coordination in simple learning algorithms to sophisticated analyses of Large Language Model agents capable of strategic reasoning. This evolution encompasses three critical phases that lay the groundwork for understanding how AI systems can autonomously develop and implement collaborative strategies. The progression begins with seminal contributions that proved algorithmic collusion was theoretically possible, advances through sophisticated analyses of modern AI approaches that reveal the mechanisms underlying algorithmic coordination, and culminates in empirical validation demonstrating that these theoretical possibilities manifest in actual market outcomes.
+
+\subsubsection*{Seminal contributions and core mechanisms}
+
+The theoretical foundation for algorithmic collusion was established by \textcite{calvano_artificial_2020} in their seminal \emph{American Economic Review} paper, which demonstrated that Q-learning algorithms can autonomously develop collusive strategies without explicit coordination. Using simulations of repeated Bertrand competition with logit demand, they found algorithms consistently reached supracompetitive prices sustained by sophisticated reward-punishment schemes featuring finite punishment phases followed by gradual returns to cooperation.
+
+This foundational work established three critical insights: first, that artificial intelligence can independently discover and implement classical collusive strategies; second, that no explicit communication or agreement is required for algorithmic coordination; and third, that these outcomes emerge from standard profit-maximization objectives rather than programmed collusive intent.
+
+\textcite{klein_autonomous_2021} extended this framework to sequential pricing environments using the Maskin-Tirole model, demonstrating that Q-learning algorithms converge to collusive equilibria when price sets are limited, and to supra-competitive asymmetric cycles when price flexibility increases. This work established the robustness of algorithmic collusion across different market structures and timing assumptions, while \textcite{calvano_algorithmic_2021} demonstrated that these results hold even under imperfect monitoring conditions, as adapted from \textcite{green_noncooperative_1984}.
+
+\subsubsection*{Advanced algorithmic approaches and emergent behaviors}
+
+Recent research has expanded beyond Q-learning to examine more sophisticated AI systems. 
+\textcite{calvano_algorithmic_2023} distinguished between \en{genuine} and \en{spurious} collusion, showing that algorithm design choices critically determine collusive outcomes, while \textcite{asker_artificial_2022, asker_impact_2024} analysis revealed that synchronous updating leads to competitive pricing, while asynchronous learning approaches result in monopolistic levels, highlighting how seemingly technical implementation decisions have profound competitive implications.
+
+The emergence of LLM agents represents a paradigm shift in algorithmic collusion research. \textcite{fish_algorithmic_2025} provided the first comprehensive analysis of Large Language Model pricing agents, revealing three critical findings: (1) Large Language Models (LLMs) demonstrate natural proficiency in pricing tasks, (2) autonomously reach supracompetitive prices in oligopoly settings, and (3) exhibit extreme sensitivity to prompt variations. Their off-path analysis revealed price-war avoidance as a key mechanism, while extensions to auction environments demonstrated the generalizability of LLM collusive behavior.
+
+This research is particularly significant because LLM agents operate through fundamentally different mechanisms than traditional reinforcement learning algorithms. Rather than learning through trial-and-error exploration, LLMs leverage pre-trained knowledge about markets, competition, and strategic behavior, enabling them to recognize and implement sophisticated coordination strategies more rapidly and with a better understanding of context.
+
+\subsubsection*{Empirical validation in real markets}
+
+The transition from theoretical possibility to empirical reality was confirmed by \textcite{assad_algorithmic_2024} in their study of German gasoline markets. Using structural break analysis to identify the adoption of algorithmic pricing, they found that algorithm deployment increased margins by 15\% in non-monopoly markets, with a 36\% increase when all firms in duopoly and triopoly markets adopted algorithmic pricing. Notably, markets with only partial adoption showed no significant margin changes, suggesting that coordination effects emerge only when all competitors use algorithms. Thus, this study provides the first concrete evidence that algorithmic pricing leads to supracompetitive outcomes in actual markets.
+
+Their methodology -- using headquarters-level adoption decisions as instrumental variables -- established a template for identifying algorithmic coordination in observational data. The German gasoline market setting is particularly valuable because it features high-frequency price changes, spatial competition, and documented coordination patterns that provide natural benchmarks for algorithmic behavior.
+
+\subsection{LLM agents and economic simulation advances}
+
+The integration of Large Language Models into economic simulation represents a paradigmatic shift from traditional agent-based modeling approaches, offering unprecedented capabilities for capturing sophisticated strategic behavior and economic reasoning. This advancement encompasses three interconnected developments that collectively demonstrate the superior potential of LLM agents for understanding market dynamics and strategic interaction. The transformation begins with methodological innovations that enable more realistic economic simulations, progresses through documented evidence of the emergence of spontaneous strategic behavior, and concludes with empirical demonstrations of LLM agents' advantages over conventional algorithmic approaches in capturing complex economic phenomena.
+
+\subsubsection*{Methodological innovations in agent-based modeling}
+
+The integration of LLMs into economic simulation represents a fundamental advancement in computational economics. \textcite{li_econagent_2024, li_large_2023} demonstrated LLM agents' superior performance in macroeconomic simulation through their EconAgent framework, which successfully reproduced key economic phenomena, including the Phillips curve and Okun's law -- relationships that traditional rule-based and reinforcement learning approaches failed to capture accurately.
+
+The methodological innovation stems from the multi-module architecture of LLM agents, which combines perception, memory, reflection, and action capabilities. This enables agents to process complex economic information, maintain decision histories, adapt strategies based on experience, and generate realistic economic choices -- capabilities that mirror human economic decision-making more closely than traditional algorithmic approaches.
+
+\textcite{gao_large_2024} provide a comprehensive survey of LLM-empowered agent-based modeling applications across cyber, physical, social, and hybrid domains. Their review demonstrates the versatility of LLM agents in simulating complex systems. It highlights the potential for these approaches to capture sophisticated social dynamics underlying economic decision-making, including information propagation and strategic interactions relevant to coordination and collusion.
+
+\subsubsection*{Strategic behavior and collision emergence}
+
+Recent research reveals that LLM agents spontaneously develop sophisticated strategic behaviors. \textcite[p.1]{lin_strategic_2025} found that LLM agents can \en{effectively monopolize specific commodities by dynamically adjusting their pricing and resource allocation strategies, thereby maximizing profitability without direct human input or explicit collusion commands}. In multi-commodity Cournot competition, the researchers observed that agents \en{effectively divide sales territories among each other and tacitly collude to discourage competition at the expense of the consumer} \parencite[p.2]{lin_strategic_2025}. Critically, \en{despite the absence of any explicit communication channel, agents never re-enter a market once they have exited} \parencite[p.6]{lin_strategic_2025} demonstrating \en{an implicit understanding of the long-term consequences} and suggesting \en{emergent collusive dynamics} \parencite[p.6]{lin_strategic_2025}.
+
+The implications for collusion research are profound. \textcite[p.8]{lin_strategic_2025} argue that \en{LLMs possess the reasoning capability to reach cooperative equilibria} and that this behavior is \en{particularly surprising given the absence of explicit coordination channels and the potential short-term profits available from market re-entry}. While traditional algorithms learn collusive strategies through iterative market interactions, LLM agents appear to demonstrate an inherent strategic understanding that enables the rapid recognition and implementation of coordination mechanisms. This represents a qualitative difference in how algorithmic collusion might emerge and persist in real markets.
+
+\subsubsection*{Comparative advantages over traditional approaches}
+
+Empirical validation demonstrates the superiority of LLM agents across multiple dimensions. Compared to rule-based agent-based models, LLM agents exhibit greater flexibility and adaptability to unforeseen circumstances. In comparison to reinforcement learning approaches, they demonstrate superior stability in macroeconomic indicators and better integration of domain-specific knowledge, without requiring extensive training periods.
+
+Most significantly for collusion research, LLM agents demonstrate a more sophisticated understanding of strategic interaction contexts. Traditional Q-learning algorithms discover collusive strategies through mechanical trial-and-error processes. At the same time, LLM agents appear to understand the strategic logic underlying coordination, enabling them to adapt collusive strategy to new market conditions and regulatory environments.
+
+\subsection{Empirical gasoline market coordination studies}
+
+The empirical literature on gasoline market coordination provides essential insights into how real-world coordination mechanisms emerge, persist, and adapt across different competitive environments, offering crucial benchmarks for evaluating algorithmic behavior in realistic market contexts. This rich empirical foundation spans three complementary research streams that collectively illuminate the sophisticated strategies firms employ to achieve and maintain coordination without explicit agreements. The analysis encompasses documented coordination mechanisms that reveal how firms naturally develop strategic relationships, advanced methodological approaches that enable precise detection and measurement of coordination effects, and technological innovations that are transforming traditional coordination patterns through information sharing and algorithmic implementation.
+
+\subsubsection*{Established coordination mechanisms and market dynamics}
+
+The empirical literature on gasoline market coordination offers crucial insights into how algorithmic agents might behave in real-world market contexts. \textcite{byrne_learning_2019} documented a three-year transition to coordinated equilibrium in Western Australian gasoline markets, revealing how firms use price leadership and experimentation to create focal points and enhance margins. Their 15-year station-level analysis demonstrated that coordination emerges gradually through learning processes that soften competition.
+
+This research provides an ideal empirical foundation for LLM agent studies because it documents the specific mechanisms through which coordination develops: dominant firms establish price leadership, experimentation creates focal points for coordination, and gradual learning processes enable sustained coordination without explicit communication. These mechanisms are precisely the types of strategic behaviors that LLM agents appear capable of recognizing and implementing.
+
+\textcite{clark_effect_2014} provided complementary evidence through their natural experiment study of a Quebec gasoline cartel collapse. Their findings that margins fell 30\% in target markets and 15\% in cyclical markets, while asymmetric price adjustments became more symmetric, demonstrate the substantial welfare effects of coordination and the importance of strategic mechanisms in maintaining supracompetitive pricing.
+
+\subsubsection*{Advanced empirical methodologies for coordination detection}
+
+The literature on the gasoline market has developed sophisticated approaches for detecting and measuring coordination that are directly applicable to algorithmic collusion research. \textcite{byrne_learning_2019} employed natural experiments with information-sharing regime changes to demonstrate that strategic ignorance can create price commitment mechanisms, resulting in higher price-cost margins. Their finding that asymmetric information sharing increases margins provides crucial insights into how algorithmic agents might use information strategically.
+
+Structural approaches to coordination analysis have been extensively developed. Houde (2012) combined Berry-Levinsohn-Pakes demand estimation with spatial competition models, specifying commuting paths as consumer "locations" in Hotelling-style models. This methodological innovation enables precise measurement of competition effects and market power -- potentially providing benchmarks for evaluating algorithmic pricing outcomes.
+
+The literature has also identified diverse coordination mechanisms across different market contexts. Studies across the United States, Canada, Australia, and Germany have documented Edgeworth cycles, price leadership patterns, simultaneous price increases, and calendar synchronization of price changes. This rich empirical foundation provides natural benchmarks for evaluating whether LLM agents reproduce realistic coordination patterns when exposed to actual market conditions.
+
+\subsubsection*{Information sharing and technological coordination}
+
+Recent research has investigated the impact of technological changes on coordination mechanisms. \textcite{assad_algorithmic_2024} demonstrated that algorithmic pricing adoption creates new forms of coordination that differ qualitatively from traditional strategic interaction. Their finding that margins increased 36\% when all duopoly participants adopted algorithms suggests that technological coordination can be more effective than traditional mechanisms.
+
+The information-sharing literature provides crucial insights for understanding LLM agent behavior. Multiple studies demonstrate that transparency and information availability can facilitate rather than prevent coordination, with strategic ignorance sometimes enhancing rather than reducing collusive outcomes. This literature is particularly relevant for LLM agents, which process vast amounts of market information and may develop sophisticated strategies for using information asymmetries strategically.
+
+\subsection{Regulatory challenges and transparency effects}
+
+The emergence of algorithmic collusion poses unprecedented challenges for regulatory frameworks designed around traditional models of strategic coordination, necessitating fundamental reconsiderations of antitrust enforcement and competition policy in the digital economy. These challenges manifest across three interconnected dimensions that collectively reveal the inadequacy of existing regulatory approaches and the urgent need for innovative enforcement strategies. The regulatory landscape encompasses traditional antitrust frameworks struggling to address autonomous algorithmic coordination, emerging detection methodologies that leverage technological advances to identify collusive patterns, and evolving policy approaches that seek to balance innovation incentives with consumer protection in algorithmic markets.
+
+\subsubsection*{Traditional antitrust frameworks and algorithmic challenges}
+
+The regulatory literature reveals fundamental challenges in applying traditional antitrust frameworks to algorithmic collusion. Current competition law requires evidence of agreement or concerted practices, creating enforcement gaps when algorithms achieve collusive outcomes through autonomous learning. \textcite{calvano_artificial_2020} demonstrated that Q-learning algorithms consistently learn collusive strategies without communication, highlighting the inadequacy of intent-based legal frameworks.
+
+European regulatory approaches have emphasized transparency and auditing requirements through the Digital Markets Act and Digital Services Act. However, research suggests that transparency mandates may paradoxically facilitate coordination by making pricing strategies more visible to competitors. This regulatory challenge is particularly acute for LLM agents, whose decision-making processes are largely opaque and whose behavior can be influenced by seemingly innocuous modifications to prompts.
+
+\subsubsection*{Detection methodologies and enforcement innovations}
+
+Emerging detection methodologies focus on algorithmic auditing and pattern recognition rather than traditional communication-based evidence. Research proposes \en{retraining tests} where unilateral algorithm changes can reveal collusive behavior patterns in observational data. Machine learning approaches have demonstrated success in identifying collusive patterns in public procurement with high accuracy across international datasets.
+
+The regulatory challenge is particularly acute for LLM agents because their strategic capabilities emerge from training on human-generated text rather than explicit programming. \textcite[p.24]{fish_algorithmic_2025} found that \en{seemingly innocuous instructions in broad lay terms, can quickly and robustly arrive at supracompetitive price levels, to the detriment of consumers}, creating unprecedented compliance challenges for firms deploying these systems.
+
+\subsubsection*{Policy implications and intervention strategies}
+
+Regulatory approaches increasingly emphasize proactive intervention rather than reactive enforcement. The EU's proposed New Competition Tool would enable market studies and tailored remedies, including mandatory algorithmic audits and diversity requirements for competitor algorithms. However, balancing innovation incentives with consumer protection remains challenging, particularly for beneficial algorithmic applications.
+
+The emergence of LLM agents creates urgent policy needs because these systems are being rapidly deployed in strategic business roles. Their autonomous collusion capabilities pose unique challenges for maintaining competitive markets, requiring new frameworks that can address the sophisticated strategic reasoning of AI systems while preserving beneficial applications.
+
+\subsection{Synthesis and research contributions}
+
+The convergence of theoretical advances in algorithmic collusion, empirical insights from real market coordination studies, and sophisticated LLM agent capabilities creates unprecedented opportunities for understanding how AI systems behave under actual competitive conditions, while simultaneously revealing critical gaps in current research that this research addresses. This synthesis reveals three interconnected contributions that collectively advance both theoretical understanding and practical applications of algorithmic collusion research. The integration encompasses bridging previously separate theoretical and empirical research streams to create comprehensive frameworks for analysis, developing methodological innovations that enable rigorous testing of algorithmic behavior under realistic market conditions, and establishing policy-relevant insights that inform regulatory approaches to AI-driven strategic behavior across diverse market contexts.
+
+\subsubsection*{Bridging theoretical and empirical approaches}
+
+This literature review reveals a critical gap: while theoretical studies demonstrate the collusive capabilities of LLM agents and empirical studies document sophisticated coordination mechanisms in real markets, no research has combined these approaches to examine LLM agent behavior under actual market conditions. The proposed thesis addresses this gap by applying \textcite{fish_algorithmic_2025} theoretical insights to \textcite{byrne_learning_2019} empirical context, investigating whether LLM agents reproduce realistic coordination patterns when exposed to actual gasoline market conditions.
+
+The gasoline market constitutes an ideal testing ground for several reasons. First, extensive empirical documentation of coordination mechanisms provides natural benchmarks for evaluating the behavior of LLM agents. Second, high-frequency price data and spatial competition dynamics create rich strategic environments for testing algorithmic coordination. Third, the combination of regulatory scrutiny and competitive pressure provides realistic constraints on strategic behavior.
+
+\subsubsection*{Methodological innovations and empirical opportunities}
+
+The synthesis of LLM capabilities with empirical market studies enables several methodological innovations. LLM agents can be exposed to actual price histories, market structures, and demand conditions to examine whether they discover and implement the exact coordination mechanisms documented in empirical studies. This approach enables testing whether algorithmic collusion findings from controlled laboratory settings can be extended to realistic market environments.
+
+Empirical validation opportunities include comparing LLM agent pricing patterns with documented coordination mechanisms, examining whether agents reproduce Edgeworth cycles and price leadership patterns, and testing how information asymmetries and market structure affect algorithmic coordination. The rich empirical foundation enables precise benchmarking of algorithmic behavior against human strategic interaction.
+
+\subsubsection*{Policy implications and regulatory insights}
+
+Therefore, this research has immediate policy relevance, as LLM agents are rapidly being deployed in pricing roles across various industries. Understanding how these agents behave under realistic market conditions provides crucial insights for the design and enforcement of regulatory strategies. The combination of theoretical capabilities and empirical validation enables a more precise assessment of consumer welfare effects and competitive harm.
+
+The regulatory implications extend beyond gasoline markets to any industry where LLM agents might be deployed for strategic decision-making. The research provides a framework for evaluating algorithmic collusion risks in different market contexts and for designing interventions that preserve beneficial AI applications while preventing anticompetitive outcomes.
+
+\subsection{Bottomline}
+
+This literature review establishes the theoretical and empirical foundation for investigating LLM agent collusion in real-world market contexts. The synthesis demonstrates how advances in algorithmic collusion theory, empirical market studies, and LLM capabilities create unprecedented opportunities for understanding how sophisticated AI agents behave under actual competitive conditions.
+
+The proposed research addresses a critical gap in current knowledge by combining theoretical insights from \textcite{fish_algorithmic_2025} on LLM collusion with \textcite{byrne_learning_2019} empirical analysis of gasoline market coordination. This synthesis enables testing whether LLM agents' demonstrated collusive capabilities extend to realistic market environments and whether they reproduce the sophisticated coordination mechanisms documented in empirical research.
+
+The implications extend beyond academic interest, as LLM agents are rapidly being deployed in strategic business roles where their autonomous collusion capabilities could significantly impact market competition and consumer welfare. Understanding the behavior of these systems under realistic conditions is essential for developing appropriate regulatory frameworks and maintaining competitive markets in the algorithmic economy.

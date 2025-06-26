@@ -1,13 +1,13 @@
 % Here starts the preamble
 \documentclass[11pt]{article}
-\input{LaTex/packages}
-\input{LaTex/commands}
+\input{latex/packages}
+\input{latex/commands}
 
 \begin{document}
 \pdfbookmark[0]{Titel page}{Titel page}
 \begin{titlepage}
 	\centering
-	\includesvg[width=0.75\textwidth]{LaTex/imgs/BSE Barcelona Graduate School of Economics.svg}\par\vspace{0.75cm}
+	\includesvg[width=0.75\textwidth]{latex/imgs/BSE Barcelona Graduate School of Economics.svg}\par\vspace{0.75cm}
 	{\huge\bfseries Bla\par}
     {\large\bfseries Blan\par}
 	\vspace{0.25cm}
@@ -31,16 +31,22 @@
 
 \newpage
 \addtocounter{page}{-1}
-\include*{LaTex/chapters/part1}
-\include*{LaTex/chapters/part2}
-\include*{LaTex/chapters/part3}
-\include*{LaTex/chapters/part4}
-\include*{LaTex/chapters/part5}
+\include*{latex/chapters/part1}
+\newpage
+\include*{latex/chapters/part2}
+\newpage
+\include*{latex/chapters/part3}
+\newpage
+\include*{latex/chapters/part4}
+\newpage
+\include*{latex/chapters/part5}
+\newpage
+\include*{latex/chapters/part6}
 
 \newpage
 \printbibliography[heading=bibintoc,title={References}]
 
 \newpage
-\include{LaTex/appendix}
+\include{latex/appendix}
 
 \end{document}   
