@@ -8,6 +8,8 @@ class FakeAgent(Agent):
         super().__init__(name=name, **kwargs)
         
         assert len(time_series_data) >= nbr_rounds, "Time series can't be smaller than the number of rounds"
+        self.model_name = "fake_agent"
+        self.memory_length = -1
         self.time_series_data = time_series_data
         self.current_index = 0
 
