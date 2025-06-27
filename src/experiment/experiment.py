@@ -85,6 +85,8 @@ class Experiment:
             "agents_types": {agent.name: agent.type for agent in self.agents},
             "agents_prefixes": {agent.name: agent.prefix for agent in self.agents},
             "agents_prompts": {agent.name: agent.prompt_template for agent in self.agents},
+            "agents_memory_length": {agent.name: agent.memory_length for agent in self.agents},
+            "agents_models": {agent.name: agent.model_name for agent in self.agents},
             "agent_environment_mapping": { agent.name: {
                                                     "env_index": agent.env_index,
                                                     "a": agent.a,
