@@ -85,3 +85,84 @@ def plot_experiment_svg(df: pl.DataFrame, metadata: dict, save_path: Path,
     plt.tight_layout()
     fig.savefig(str(save_path.with_suffix(".svg")), format="svg")
     plt.close(fig)
+
+
+def plot_real_data_svg(df: pl.DataFrame,  metadata: dict, save_path: Path):
+    from sklearn.preprocessing import normalize
+    participants = ["BP", "Caltex", "Coles", "Woolworths"]
+    shares = [0.22, 0.16, 0.14, 0.16]
+    shares_norm = normalize(np.array(shares).reshape(1, -1), norm="l1").tolist()[0]
+    market_shares = [{'agent':k, 'market_share':v} for k, v in zip(participants, shares_norm)]
+    #create a df of market 
+    market_shares_df = pl.DataFrame(market_shares)
+    # Prepare data
+    df = (
+        df
+        .join(market_shares_df, how='left', on='agent')
+        .with_columns(
+            pl.col("agent_type").str.replace("_agent", "").alias("agent_type"),
+            (((pl.col("price") / pl.col("marginal_cost")) - 1) * 100).alias("markup"),
+            ((pl.col("price") - pl.col("marginal_cost")) * pl.col("market_share")).alias("profit"),
+        )
+        .sort(["round", "agent"])
+        .with_columns(
+            (pl.col("agent") + " (" + pl.col("agent_type") + ")").alias("agent")
+            )
+        
+        )
+    marginal_cost = df.group_by(['round']).agg(pl.col('marginal_cost').min())['marginal_cost'].to_numpy().flatten()
+                 
+    rounds = df["round"].unique().to_list()
+    agents = df["agent"].unique().to_list()
+    agents.sort()
+    colors = ['blue', 'red', 'orange', 'purple', 'cyan', 'brown', 'magenta', 'gray']
+
+    fig, axs = plt.subplots(3, 1, figsize=(12, 3 * 3), sharex=True)
+    if not isinstance(axs, (list, np.ndarray)):
+        axs = [axs]
+    # --- Price plot ---
+    ax = axs[0]
+    for i, agent in enumerate(agents):
+        linestyle = ':' if "fake" in agent.lower() and 'bp' not in agent.lower() else '-'
+        prices = df.filter(pl.col("agent") == agent).sort("round")["price"].to_list()
+        ax.plot(rounds, prices, label=agent, color=colors[i % len(colors)], linestyle=linestyle)
+    ax.plot(rounds, marginal_cost, label="TGP", color="grey", linestyle="--", alpha=0.7)
+    ax.set_ylabel("Price")
+    ax.legend(loc='upper left')
+    ax.grid(True)
+
+    # --- PRofit plot --- NOTE! Later on, split them in plots per agent 
+    ax = axs[1]
+    for i, agent in enumerate(agents):
+        linestyle = ':' if "fake" in agent.lower() and 'bp' not in agent.lower() else '-'
+        profit = df.filter(pl.col("agent") == agent).sort("round")["profit"].to_list()
+        ax.plot(rounds, profit, label=agent, color=colors[i % len(colors)], linestyle=linestyle)
+    #add a trend line for the markup
+    # trend = np.polyfit(rounds, df["markup"].to_numpy().flatten(), 1)
+    # trend_line = np.polyval(trend, rounds)
+    # ax.plot(rounds, trend_line, label="Trend", color="black", alpha=0.5)
+    ax.set_ylabel("Profit")
+    ax.set_xlabel("Round")
+    ax.legend(loc='upper left')
+    ax.grid(True)
+
+    # --- Markup plot --- NOTE! Later on, split them in plots per agent 
+    ax = axs[2]
+    for i, agent in enumerate(agents):
+        linestyle = ':' if "fake" in agent.lower() and 'bp' not in agent.lower() else '-'
+        markup = df.filter(pl.col("agent") == agent).sort("round")["markup"].to_list()
+        ax.plot(rounds, markup, label=agent, color=colors[i % len(colors)], linestyle=linestyle)
+    #add a trend line for the markup
+    # trend = np.polyfit(rounds, df["markup"].to_numpy().flatten(), 1)
+    # trend_line = np.polyval(trend, rounds)
+    # ax.plot(rounds, trend_line, label="Trend", color="black", alpha=0.5)
+    ax.set_ylabel("Markup (%)")
+    ax.set_xlabel("Round")
+    ax.legend(loc='upper left')
+    ax.grid(True)
+
+    plt.suptitle(f"Experiment: {metadata.get('name', 'Unknown')}",
+                 fontsize=16, fontweight='bold')
+    plt.tight_layout()
+    fig.savefig(str(save_path.with_suffix(".svg")), format="svg")
+    plt.close(fig)

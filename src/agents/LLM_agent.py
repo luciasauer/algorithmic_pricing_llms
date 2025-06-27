@@ -36,6 +36,7 @@ class LLMAgent(Agent):
     async def act(self, prompt: str) -> Dict:
         async with Mistral(api_key=self.api_key) as client:
             for attempt in range(1, MAX_RETRIES + 1):
+                self.logger.info(f"🔄 Attempt {attempt} for agent {self.name}")
                 try:
                     response = await client.chat.complete_async(
                         model=self.model_name,

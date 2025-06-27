@@ -1,6 +1,7 @@
 # src/experiment/experiment.py
 import datetime
 import asyncio
+import logging
 import numpy as np
 import polars as pl
 from typing import List
@@ -8,16 +9,18 @@ from src.utils.logger import setup_logger
 from src.agents.base_agent import Agent
 from src.experiment.storage import StorageManager
 from src.prompts.prompt_manager import PromptManager
-from src.plotting.plotting import plot_experiment_svg
+from src.plotting.plotting import plot_experiment_svg, plot_real_data_svg
 
 
 class Experiment:
-    def __init__(self, name: str, agents: List[Agent], num_rounds: int, environment, cost_series: np.ndarray = None, experiment_dir: str = None):
+    def __init__(self, name: str, agents: List[Agent], num_rounds: int, environment, 
+                 cost_series: np.ndarray = None, experiment_dir: str = None, experiment_plot: bool = True):
         self.name = name
         self.agents = agents
         self.num_rounds = num_rounds
         self.cost_series = cost_series
         self.environment = environment
+        self.experiment_plot = experiment_plot
         for idx, agent in enumerate(self.agents):
             agent.env_index = idx
             agent.environment = self.environment
@@ -117,14 +120,17 @@ class Experiment:
         self.storage.save_environment_parquet(df_history)
         metadata = self.storage.load_metadata()
         svg_path = self.storage.experiment_path / "results_plot.svg"
-        plot_experiment_svg(
-                df=df_history,
-                metadata=metadata,
-                save_path=svg_path,
-                show_quantities=True,
-                show_profits=True,
-                plot_references=False
-            )
+        if self.experiment_plot:
+            plot_experiment_svg(
+                    df=df_history,
+                    metadata=metadata,
+                    save_path=svg_path,
+                    show_quantities=True,
+                    show_profits=True,
+                    plot_references=True
+                )
+        else:
+            plot_real_data_svg(df=df_history,  metadata=metadata, save_path=svg_path,)
 
         self.storage.save_round_data(self.history)
 
@@ -162,6 +168,12 @@ class Experiment:
         metadata["end_time"] = datetime.datetime.now().isoformat()
         self.storage.save_metadata(metadata)
         self.logger.info("✅ Experiment completed.\n")
+            # Clean up file handlers to ensure proper flush and release
+        for handler in self.logger.handlers[:]:
+            handler.flush()
+            if isinstance(handler, logging.FileHandler):
+                handler.close()
+                self.logger.removeHandler(handler)
     
     def _create_environment_dataframe(self) -> pl.DataFrame:
         records = []
