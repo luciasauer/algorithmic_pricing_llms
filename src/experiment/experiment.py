@@ -14,13 +14,15 @@ from src.plotting.plotting import plot_experiment_svg, plot_real_data_svg
 
 class Experiment:
     def __init__(self, name: str, agents: List[Agent], num_rounds: int, environment, 
-                 cost_series: np.ndarray = None, experiment_dir: str = None, experiment_plot: bool = True):
+                 cost_series: np.ndarray = None, experiment_dir: str = None, 
+                 initial_real_data: dict[str, list[dict]] = None, experiment_plot: bool = True):
         self.name = name
         self.agents = agents
         self.num_rounds = num_rounds
         self.cost_series = cost_series
         self.environment = environment
         self.experiment_plot = experiment_plot
+        self.initial_real_data = initial_real_data or {}
         for idx, agent in enumerate(self.agents):
             agent.env_index = idx
             agent.environment = self.environment
@@ -63,6 +65,8 @@ class Experiment:
 
     async def run(self):
         self._setup_experiment()
+        if self.initial_real_data:
+            self._inject_initial_real_data()
         for round_num in range(1, self.num_rounds + 1):
             self.logger.info(f"--- Round {round_num} ---")
             await self._run_round(round_num)
@@ -168,28 +172,86 @@ class Experiment:
         metadata["end_time"] = datetime.datetime.now().isoformat()
         self.storage.save_metadata(metadata)
         self.logger.info("✅ Experiment completed.\n")
-            # Clean up file handlers to ensure proper flush and release
         for handler in self.logger.handlers[:]:
             handler.flush()
             if isinstance(handler, logging.FileHandler):
                 handler.close()
                 self.logger.removeHandler(handler)
-    
+
     def _create_environment_dataframe(self) -> pl.DataFrame:
         records = []
 
-        for agent_idx, agent in enumerate(self.agents):
+        for agent in self.agents:
             agent_name = agent.name
             for round_num, data in self.history[agent_name].items():
+                # Use marginal cost from history if it's already injected
+                marginal_cost = data.get("marginal_cost", agent.get_marginal_cost(round_num))
+
                 record = {
                     "round": round_num,
                     "agent": agent_name,
                     "agent_type": agent.type,
                     "price": data.get("chosen_price"),
-                    "marginal_cost": agent.get_marginal_cost(round_num),
+                    "marginal_cost": marginal_cost,
                     "quantity": data.get("quantity"),
                     "profit": data.get("profit"),
                 }
+
+                if data.get("is_initial_history"):
+                    record["is_initial_history"] = True
+
                 records.append(record)
 
         return pl.DataFrame(records)
+
+    def _inject_initial_real_data(self):
+        """
+        Injects real price data into self.history and computes env outcomes.
+        Assumes real_data is a dict: agent_name -> list[{"round": int, "chosen_price": float}]
+        """
+        self.logger.info("📜 Injecting real data as initial memory.")
+        rounds_to_use = sorted(set(r["round"] for agent_data in self.initial_real_data.values() for r in agent_data))
+
+        for round_num in rounds_to_use:
+            # Gather prices from all agents
+            prices = {
+                agent_name: next((entry["chosen_price"] for entry in agent_data if entry["round"] == round_num), None)
+                for agent_name, agent_data in self.initial_real_data.items()
+            }
+
+            # Skip round if any agent has no data
+            if any(price is None for price in prices.values()):
+                self.logger.error(f"Skipping round {round_num}: incomplete data")
+                raise ValueError(f"Skipping round {round_num}: incomplete data")
+
+            agent_order = [(agent.name, agent.env_index) for agent in self.agents]
+            quantities, profits = self.environment.compute_quantities_and_profits(agent_order, prices)
+
+            for agent in self.agents:
+                name = agent.name
+                agent_entries = self.initial_real_data.get(name, [])
+                entry = next((e for e in agent_entries if e["round"] == round_num), None)
+                if entry is None:
+                    continue
+
+                price = entry["chosen_price"]
+                quantity = quantities[name]
+                profit = profits[name]
+                marginal_cost = entry.get("marginal_cost", agent.get_marginal_cost(1))
+
+                self.history[name][round_num] = {
+                    "chosen_price": price,
+                    "quantity": quantity,
+                    "profit": profit,
+                    "marginal_cost": marginal_cost,
+                    "market_data": (
+                        f'- My price: {round(price,2)}\n'
+                        f"- Competitor's prices: { {k: round(v,2) for k, v in prices.items() if k != name} }\n"
+                        f'- My quantity sold: {round(quantity,2)}\n'
+                        f'- My profit earned: {round(profit,2)}\n'
+                        f'- Marginal cost: {round(marginal_cost,2)}\n'
+                    ),
+                    "is_initial_history": True
+                }
+
+        self.logger.info("✅ Finished injecting real data.\n")
