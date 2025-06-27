@@ -121,7 +121,12 @@ class Experiment:
         prices = self._store_agent_outputs(results, round_num)
         agent_order = [(agent.name, agent.env_index) for agent in self.agents]
         quantities, profits = self.environment.compute_quantities_and_profits(agent_order, prices)
-        self._store_environment_outputs(round_num, prices, quantities, profits)
+        if hasattr(self.environment, 'compute_monopoly_prices_for_round'):
+            monopoly_prices = self.environment.compute_monopoly_prices_for_round(round_num)
+        else:
+            monopoly_prices = None
+
+        self._store_environment_outputs(round_num, prices, quantities, profits, monopoly_prices)
         df_history = self._create_environment_dataframe()
         self.storage.save_environment_parquet(df_history)
         metadata = self.storage.load_metadata()
@@ -149,7 +154,7 @@ class Experiment:
             prices[name] = output["chosen_price"]
         return prices
 
-    def _store_environment_outputs(self, round_num, prices, quantities, profits):
+    def _store_environment_outputs(self, round_num, prices, quantities, profits, monopoly_prices):
         for idx, agent in enumerate(self.agents):
             name = agent.name
             competitors_prices = {a: round(p,2) for a, p in prices.items() if a != name}
@@ -168,6 +173,8 @@ class Experiment:
             self.history[name][round_num]['quantity'] = round(quantities[name],2)
             self.history[name][round_num]['profit'] = round(profits[name],2)
             self.history[name][round_num]['market_data'] = market_data
+            mon_price = round(monopoly_prices[idx], 2) if monopoly_prices else None
+            self.history[name][round_num]['monopoly_price'] = mon_price
 
     def _finalize_experiment(self):
         metadata = self.storage.load_metadata()
@@ -197,13 +204,10 @@ class Experiment:
                     "marginal_cost": marginal_cost,
                     "quantity": data.get("quantity"),
                     "profit": data.get("profit"),
+                    "monopoly_price": data.get("monopoly_price", -1.0),
+                    "initial_history": data.get("is_initial_history", False),
                 }
-
-                if data.get("is_initial_history"):
-                    record["is_initial_history"] = True
-
                 records.append(record)
-
         return pl.DataFrame(records)
 
     def _inject_initial_real_data(self):
@@ -253,6 +257,7 @@ class Experiment:
                         f'- My profit earned: {round(profit,2)}\n'
                         f'- Marginal cost: {round(marginal_cost,2)}\n'
                     ),
+                    'monopoly_price': -1.0,
                     "is_initial_history": True
                 }
 
