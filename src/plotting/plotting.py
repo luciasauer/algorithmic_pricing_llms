@@ -102,7 +102,7 @@ def plot_real_data_svg(df: pl.DataFrame,  metadata: dict, save_path: Path):
         .with_columns(
             pl.col("agent_type").str.replace("_agent", "").alias("agent_type"),
             (((pl.col("price") / pl.col("marginal_cost")) - 1) * 100).alias("markup"),
-            ((pl.col("price") - pl.col("marginal_cost")) * pl.col("market_share")).alias("profit"),
+            ((pl.col("price") - pl.col("marginal_cost")) * pl.col("market_share")).alias("profit_real"),
         )
         .sort(["round", "agent"])
         .with_columns(
@@ -117,7 +117,10 @@ def plot_real_data_svg(df: pl.DataFrame,  metadata: dict, save_path: Path):
     agents.sort()
     colors = ['blue', 'red', 'orange', 'purple', 'cyan', 'brown', 'magenta', 'gray']
 
-    fig, axs = plt.subplots(3, 1, figsize=(12, 3 * 3), sharex=True)
+    #ADD A PLOT IF THERE ARE REAL AGENTS
+    real_agents = [agent for agent in agents if "fake" not in agent.lower()]
+
+    fig, axs = plt.subplots(3 + int(len(real_agents)>0), 1, figsize=(12, 3 * (3+int(len(real_agents)>0))), sharex=True)
     if not isinstance(axs, (list, np.ndarray)):
         axs = [axs]
     # --- Price plot ---
@@ -131,23 +134,34 @@ def plot_real_data_svg(df: pl.DataFrame,  metadata: dict, save_path: Path):
     ax.legend(loc='upper left')
     ax.grid(True)
 
-    # --- PRofit plot --- NOTE! Later on, split them in plots per agent 
-    ax = axs[1]
+    if real_agents:
+        # --- Market share plot ---
+        ax = axs[1]
+        for i, agent in enumerate(agents):
+            if "fake" in agent.lower():
+                continue
+            market_share = df.filter(pl.col("agent") == agent).sort("round")["profit"].to_list()
+            ax.plot(rounds, market_share, label=agent, color=colors[i % len(colors)])
+        ax.set_ylabel("Environment Response")
+        ax.legend(loc='upper left')
+        ax.grid(True)
+
+    # --- Profit plot --- NOTE! Later on, split them in plots per agent 
+    ax = axs[1+int(len(real_agents)>0)]
     for i, agent in enumerate(agents):
         linestyle = ':' if "fake" in agent.lower() and 'bp' not in agent.lower() else '-'
-        profit = df.filter(pl.col("agent") == agent).sort("round")["profit"].to_list()
+        profit = df.filter(pl.col("agent") == agent).sort("round")["profit_real"].to_list()
         ax.plot(rounds, profit, label=agent, color=colors[i % len(colors)], linestyle=linestyle)
     #add a trend line for the markup
     # trend = np.polyfit(rounds, df["markup"].to_numpy().flatten(), 1)
     # trend_line = np.polyval(trend, rounds)
     # ax.plot(rounds, trend_line, label="Trend", color="black", alpha=0.5)
     ax.set_ylabel("Profit")
-    ax.set_xlabel("Round")
     ax.legend(loc='upper left')
     ax.grid(True)
 
     # --- Markup plot --- NOTE! Later on, split them in plots per agent 
-    ax = axs[2]
+    ax = axs[2+int(len(real_agents)>0)]
     for i, agent in enumerate(agents):
         linestyle = ':' if "fake" in agent.lower() and 'bp' not in agent.lower() else '-'
         markup = df.filter(pl.col("agent") == agent).sort("round")["markup"].to_list()
