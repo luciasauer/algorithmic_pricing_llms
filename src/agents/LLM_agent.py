@@ -10,7 +10,7 @@ from pydantic import BaseModel, ValidationError, create_model
 from src.agents.base_agent import Agent
 
 MAX_RETRIES = 10
-RETRY_DELAY_SECONDS = 1
+RETRY_DELAY_SECONDS = 2
 
 class LLMAgent(Agent):
     def __init__(self, name: str, prefix: str, api_key: str, model_name: str,
@@ -36,6 +36,7 @@ class LLMAgent(Agent):
     async def act(self, prompt: str) -> Dict:
         async with Mistral(api_key=self.api_key) as client:
             for attempt in range(1, MAX_RETRIES + 1):
+                self.logger.info(f"🔄 Attempt {attempt} for agent {self.name}")
                 try:
                     response = await client.chat.complete_async(
                         model=self.model_name,

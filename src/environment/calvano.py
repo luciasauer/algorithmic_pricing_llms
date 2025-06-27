@@ -116,3 +116,21 @@ class CalvanoDemandEnvironment:
         self.round = round_num
         if hasattr(self, 'c_series') and self.c_series is not None:
             self.c = self.c_series[:, round_num - 1]  # 0-indexed access
+    
+    def compute_monopoly_prices_for_round(self, round_num: int) -> np.ndarray:
+        """Returns the monopoly prices for each agent, based on time-varying costs (if available)."""
+        if not hasattr(self, 'c_series'):
+            raise ValueError("c_series not registered — can't compute round-specific monopoly prices.")
+
+        current_c = self.c_series[:, round_num - 1]  # 0-indexed
+        monopoly_prices = get_monopoly_prices(
+            a0=self.a_0,
+            a=self.a,
+            mu=self.mu,
+            alpha=self.alpha,
+            c=current_c,
+            multiplier=self.beta,
+            sigma=self.sigma,
+            group_idxs=self.group_idxs,
+        )
+        return monopoly_prices

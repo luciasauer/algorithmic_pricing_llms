@@ -13,7 +13,7 @@ from src.experiment.experiment import Experiment
 from src.prompts.prompts import GENERAL_PROMPT, P1, P2
 from src.prompts.prompts_models import create_pricing_response_model
 
-from src.environment.environment import CalvanoDemandEnvironment
+from src.environment.calvano import CalvanoDemandEnvironment
 from pathlib import Path
 
 current_file_path = Path(__file__).resolve()
