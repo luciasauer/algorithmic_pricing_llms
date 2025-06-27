@@ -3,20 +3,76 @@
 \subsection{Part 1: Simulation Design (Synthetic Setting)}
 
 Agent architecture (LLMs, prompt engineering)
-
 Pricing game structure (monopoly, duopoly, oligopoly)
-
 Demand and profit functions (Calvano-style)
-
 Evaluation criteria (price stability, margins, convergence)
 
 \subsection{Part 2: Real Data Application (FuelWatch)
 Data description (sources, preprocessing)}
 
-\subsubsection{Estimating a demand function}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Estimating a demand function}
 Estimating demand (logit, marginal cost via TGP)
 
+We employ the Calvano demand function, which has become the standard framework for studying algorithmic pricing and collusion in the industrial organization literature \parencite{calvano_artificial_2020, fish_algorithmic_2025}. This logit demand specification provides a tractable yet realistic framework for analyzing pricing behavior in differentiated product markets, making it particularly suitable for experiments involving algorithmic pricing agents.
+
+\subsubsection*{The Calvano Demand Function}
+
+Following \textcite{calvano_artificial_2020, fish_algorithmic_2025}, we specify demand using a multinomial logit model. If firms $i = 1, \ldots, n$ set prices $p_1, \ldots, p_n$, then the demand for firm $i$'s product is given by:
+
+\begin{equation}
+    q_i = \beta \times \frac{e^{\frac{a_i - p_i/\alpha}{\mu}}}{\sum_{j=1}^{n} e^{\frac{a_j - p_j/\alpha}{\mu}} + e^{\frac{a_0}{\mu}}}
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $\mu > 0$ captures the degree of horizontal product differentiation between firms
+    \item $a_i$ represents firm-specific brand effects or vertical differentiation parameters
+    \item $a_0$ captures aggregate demand and serves as the utility of the outside option
+    \item $\alpha$ and $\beta$ are scaling parameters that do not affect the economic analysis
+\end{itemize}
+
+This demand specification is theoretically grounded in random utility maximization, where consumer $k$ derives utility $U_{ik} = a_i - p_i/\alpha + \epsilon_{ik}$ from purchasing product $i$, with $\epsilon_{ik}$ following a Type I Extreme Value distribution scaled by parameter $\mu$ \parencite{berry_estimating_1994, train_discrete_2009}.
+
+\subsubsection*{Parameter Estimation via Berry Inversion}
+
+To calibrate the demand function to empirical market conditions, we estimate the brand effect parameters $\{a_i\}$ using the Berry inversion methodology \parencite{berry_estimating_1994}. This approach leverages the fundamental insight that, in equilibrium, predicted market shares from the demand model should equal observed market shares.
+
+We utilize market share data from \textcite{byrne_learning_2019}, who document stable market shares in the Perth retail gasoline market over the period 2005-2015. Specifically, we use the observed market shares: BP (22\%), Caltex (16\%), Coles Express (16\%), and Caltex Woolworths (14\%). These market shares represent long-run equilibrium outcomes and are particularly suitable for our analysis, given their stability over the sample period and the institutional features of the Perth market, which closely resemble the oligopolistic settings typically studied in algorithmic collusion research.
+
+The Berry inversion proceeds as follows. For any candidate values of the structural parameters, the model generates predicted market shares $\hat{s}_i(\boldsymbol{a}, \mu, \alpha, \beta)$ for each firm $i$. The Berry inversion method exploits the one-to-one mapping between market shares and mean utilities (brand effects) in logit models. Given observed market shares $s_i^{obs}$ and values for the remaining parameters, we can uniquely recover the brand effects as:
+\begin{equation}
+    a_i = \mu \left[ \ln(s_i^{obs}) - \ln(s_0^{obs}) \right] + a_0
+\end{equation}
+where $s_0^{obs} = 1 - \sum_{j=1}^{n} s_j^{obs}$ represents the market share of the outside option.
+
+In practice, we normalize the brand effect of the smallest firm (Caltex Woolworths) to zero and express all other brand effects relative to this baseline:
+
+\begin{equation}
+    a_i = \mu \ln\left(\frac{s_i^{obs}}{s_{Caltex\ Woolworths}^{obs}}\right) + 2
+\end{equation}
+where we add a constant of 2 to center the brand effects around economically reasonable values, following the convention established in the algorithmic collusion literature \parencite{fish_algorithmic_2025}.
+
+\subsubsection*{Parameter Calibration}
+
+We adopt the remaining parameter values from the established literature on algorithmic collusion. Specifically, following \textcite{fish_algorithmic_2025} who build upon \textcite{calvano_artificial_2020}, we set:
+
+\begin{itemize}
+    \item $\mu = 0.25$: This value captures moderate product differentiation, consistent with the gasoline retail setting where products are relatively homogeneous but firms maintain some degree of market power through location and brand loyalty
+    \item $a_0 = 0$: Normalizes the outside option utility to zero, assuming that consumers can only choose from the available options on the market
+    \item $\alpha = 1$: Currency scaling parameter (noting that \textcite{fish_algorithmic_2025} vary this parameter across $\{1, 3.2, 10\}$ to test robustness to different currency units)
+    \item $\beta = 100$: Quantity scaling parameter chosen for interpretability
+\end{itemize}
+
+The parameter $\mu = 0.25$ is particularly important as it governs the substitutability between products and hence the intensity of price competition. This value has been validated through extensive simulation studies in the algorithmic collusion literature and provides a realistic degree of product differentiation for retail gasoline markets \parencite{calvano_artificial_2020}.
+
+This parametrization yields the following estimated brand effects: $a_{BP} = 2.45$, $a_{Caltex} = 2.13$, $a_{Coles\ Express} = 2.13$, and $a_{Caltex\ Woolworths} = 2.00$. These values reflect BP's market leadership position and are consistent with the observed market structure in Perth, where BP operates as the largest retailer with the strongest brand presence.
+
+The use of empirically grounded parameters enhances the external validity of our algorithmic pricing experiments by ensuring that the economic environment reflects realistic market conditions rather than purely stylized settings. This approach adheres to best practices in experimental industrial organization by calibrating artificial market environments to resemble real-world market structures closely.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Simulation setup}
 Simulation setup with BP leader prices
 
+\subsubsection*{Firm counterfactuals}
 Counterfactual setups (1, 2, and 3 simulated firms)
