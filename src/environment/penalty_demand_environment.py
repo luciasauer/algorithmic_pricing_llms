@@ -19,7 +19,13 @@ class PenaltyDemandEnvironment:
             sorted_agents = sorted(agent_order, key=lambda x: x[1])
             sorted_names = [name for name, _ in sorted_agents]
             price_values = np.array([prices[name] for name in sorted_names])
-            cost_values = np.array([self.c[idx] for _, idx in sorted_agents])
+            if self.c_series is not None:
+                cost_values = np.array([self.c_series[idx][self.round -1] for _, idx in sorted_agents])
+                self.logger.info(f"ROUND MARGINAL COST: {cost_values}")
+            else:
+                cost_values = np.array([self.c[idx] for _, idx in sorted_agents])
+
+            # cost_values = np.array([self.c[idx] for _, idx in sorted_agents]) #NOTE! CHANGE THIS!
 
             # Compute average competitor price for each agent
             profits = {}
@@ -34,7 +40,7 @@ class PenaltyDemandEnvironment:
 
                 # s_i = 1 by default unless you want custom logic
                 penalty = np.exp(-self.penalty_lambda * abs(P_i - P_others_avg))
-                profit = (P_i - MC_i) * 1.0 * penalty
+                profit = (P_i - MC_i) * 1.0 * penalty #NOTE!CHANGE THIS!
 
                 profits[name] = float(profit)
                 quantities[name] = penalty  # you can also model s_i as this
