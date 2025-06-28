@@ -1,6 +1,7 @@
-#experiments_fuels/only_one_agent.py
+# experiments_fuels/only_one_agent.py
 import os
 import sys
+import json
 import asyncio
 import numpy as np
 import polars as pl
@@ -24,61 +25,101 @@ API_KEY = os.getenv("MISTRAL_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
 
 
-marginal_costs = pl.read_parquet('experiments_fuels/data/marginal_costs.parquet')['tgpmin'].to_numpy().flatten() /100
-bp_prices = pl.read_parquet('experiments_fuels/data/bp_prices.parquet')['avg_price'].to_numpy().flatten()/100
-caltex_prices = pl.read_parquet('experiments_fuels/data/caltex_prices.parquet')['avg_price'].to_numpy().flatten()/100
-coles_prices = pl.read_parquet('experiments_fuels/data/coles_prices.parquet')['avg_price'].to_numpy().flatten()/100
-woolworths_prices = pl.read_parquet('experiments_fuels/data/woolworths_prices.parquet')['avg_price'].to_numpy().flatten()/100
-gull_prices = pl.read_parquet('experiments_fuels/data/gull_prices.parquet')['avg_price'].to_numpy().flatten()/100
+marginal_costs = (
+    pl.read_parquet("experiments_fuels/data/marginal_costs.parquet")["tgpmin"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
+bp_prices = (
+    pl.read_parquet("experiments_fuels/data/bp_prices.parquet")["avg_price"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
+caltex_prices = (
+    pl.read_parquet("experiments_fuels/data/caltex_prices.parquet")["avg_price"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
+coles_prices = (
+    pl.read_parquet("experiments_fuels/data/coles_prices.parquet")["avg_price"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
+woolworths_prices = (
+    pl.read_parquet("experiments_fuels/data/woolworths_prices.parquet")["avg_price"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
+gull_prices = (
+    pl.read_parquet("experiments_fuels/data/gull_prices.parquet")["avg_price"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
 
 
-MEMORY_LENGTH = 100 
+MEMORY_LENGTH = 100
 N_ROUNDS = len(marginal_costs)
 N_RUNS = 1
 ALPHAS_TO_TRY = [1]
-import json
+
 with open("experiments_fuels/data/initial_real_data.json", "r") as f:
     initial_real_data = json.load(f)
 
 
 async def main(alpha=1):
-
-    PricingAgentResponse = create_pricing_response_model(include_wtp=True, wtp_value=2 * alpha)
-    cost_series = np.tile(marginal_costs, (4, 1))  #NOTE! SHOULD BE IN THE SAME ORDER AS AGENTS
+    PricingAgentResponse = create_pricing_response_model(
+        include_wtp=True, wtp_value=2 * alpha
+    )
+    cost_series = np.tile(
+        marginal_costs, (4, 1)
+    )  # NOTE! SHOULD BE IN THE SAME ORDER AS AGENTS
 
     print("marginal_costs.shape:", getattr(cost_series, "shape", type(marginal_costs)))
     print("cost_series.shape:", cost_series.shape)
     # print("Expected shape:", (len(agents), N_ROUNDS))
 
-    #NOTE! BRAND EFFECTS!
-    #(2.45, 2.13, 2.13, 2.0)
-    #MARKET SHARES NORMALIZED TO 1
+    # NOTE! BRAND EFFECTS!
+    # (2.45, 2.13, 2.13, 2.0)
+    # MARKET SHARES NORMALIZED TO 1
     # (0.22, 0.16, 0.16, 0.14)
     # (0.323, 0.235, 0.235, 0.207)
 
     # Load from config or pass manually
     agents = [
-        FakeAgent("BP", 
-                  time_series_data=bp_prices, 
-                  nbr_rounds=N_RUNS, 
-                  env_params={"a": 2.45, "alpha": 1.0, "c": 1.0, "market_share": 0.22},),
-        FakeAgent("Caltex", 
-                  time_series_data=caltex_prices, 
-                  nbr_rounds=N_RUNS, 
-                  env_params={"a": 2.13, "alpha": 1.0, "c": 1., "market_share": 0.235},),
-        FakeAgent("Woolworths", 
-                  time_series_data=woolworths_prices, 
-                  nbr_rounds=N_RUNS, 
-                  env_params={"a": 2.13, "alpha": 1.0, "c": 1.0, "market_share": 0.235},),
-        LLMAgent("Coles", 
-              prefix=P1C,
-              api_key=API_KEY, 
-              model_name=MODEL_NAME, 
-              response_model=PricingAgentResponse, 
-              memory_length=MEMORY_LENGTH, 
-              prompt_template=GENERAL_PROMPT,
-              env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.207},
-              ),
+        FakeAgent(
+            "BP",
+            time_series_data=bp_prices,
+            nbr_rounds=N_RUNS,
+            env_params={"a": 2.45, "alpha": 1.0, "c": 1.0, "market_share": 0.22},
+        ),
+        FakeAgent(
+            "Caltex",
+            time_series_data=caltex_prices,
+            nbr_rounds=N_RUNS,
+            env_params={"a": 2.13, "alpha": 1.0, "c": 1.0, "market_share": 0.235},
+        ),
+        FakeAgent(
+            "Woolworths",
+            time_series_data=woolworths_prices,
+            nbr_rounds=N_RUNS,
+            env_params={"a": 2.13, "alpha": 1.0, "c": 1.0, "market_share": 0.235},
+        ),
+        LLMAgent(
+            "Coles",
+            prefix=P1C,
+            api_key=API_KEY,
+            model_name=MODEL_NAME,
+            response_model=PricingAgentResponse,
+            memory_length=MEMORY_LENGTH,
+            prompt_template=GENERAL_PROMPT,
+            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.207},
+        ),
     ]
 
     env = CalvanoDemandEnvironment(
@@ -86,17 +127,17 @@ async def main(alpha=1):
         description="Oligopoly environment with Calvano 2020 demand",
     )
 
-    experiment = Experiment(name="oligopoly_experiment_one_agent_all_a2", 
-                            agents=agents, 
-                            num_rounds=N_ROUNDS, 
-                            environment=env,
-                            cost_series=cost_series,
-                            initial_real_data=initial_real_data,
-                            experiment_dir=current_file_path.parent / "experiments_runs",
-                            experiment_plot=False
-                            )
+    experiment = Experiment(
+        name="oligopoly_experiment_one_agent_all_a2",
+        agents=agents,
+        num_rounds=N_ROUNDS,
+        environment=env,
+        cost_series=cost_series,
+        initial_real_data=initial_real_data,
+        experiment_dir=current_file_path.parent / "experiments_runs",
+        experiment_plot=False,
+    )
     await experiment.run()
-
 
 
 if __name__ == "__main__":

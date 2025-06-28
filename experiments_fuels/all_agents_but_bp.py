@@ -1,8 +1,9 @@
-# experiments_fuels/run_experiment.py
+# experiments_fuels/only_one_agent.py
 import os
 import sys
 import asyncio
 import numpy as np
+import polars as pl
 from dotenv import load_dotenv
 
 # Add project root to sys.path
@@ -21,52 +22,83 @@ current_file_path = Path(__file__).resolve()
 load_dotenv()
 API_KEY = os.getenv("MISTRAL_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
+print("MODEL_NAME:", MODEL_NAME)
 
-MEMORY_LENGTH = 100
-N_ROUNDS = 300
-N_RUNS = 7
-ALPHAS_TO_TRY = [1, 3.2, 10]
+
+marginal_costs = (
+    pl.read_parquet("experiments_fuels/data/marginal_costs.parquet")["tgpmin"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
+bp_prices = (
+    pl.read_parquet("experiments_fuels/data/bp_prices.parquet")["avg_price"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
+
+MEMORY_LENGTH = 21
+N_ROUNDS = len(marginal_costs)
+N_RUNS = 1
+ALPHAS_TO_TRY = [1]
+import json
+
+with open("experiments_fuels/data/initial_real_data.json", "r") as f:
+    initial_real_data = json.load(f)
 
 
 async def main(alpha=1):
     PricingAgentResponse = create_pricing_response_model(
-        include_wtp=True, wtp_value=4.51 * alpha
+        include_wtp=True, wtp_value=2 * alpha
     )
-    cost_series = np.array(
-        [
-            np.linspace(1.0, 2.0, N_RUNS),  # Firm A
-            np.linspace(1.2, 1.8, N_RUNS),  # Firm B
-            np.ones(N_RUNS) * 1.5,  # Firm C
-        ]
-    )
+    cost_series = np.tile(
+        marginal_costs, (4, 1)
+    )  # NOTE! SHOULD BE IN THE SAME ORDER AS AGENTS
 
+    print("marginal_costs.shape:", getattr(cost_series, "shape", type(marginal_costs)))
+    print("cost_series.shape:", cost_series.shape)
+    # print("Expected shape:", (len(agents), N_ROUNDS))
+
+    # NOTE! BRAND EFFECTS!
+    # (2.45, 2.13, 2.13, 2.0)
     # Load from config or pass manually
     agents = [
-        LLMAgent(
-            "Firm A",
-            prefix=P1,
-            api_key=API_KEY,
-            model_name=MODEL_NAME,
-            response_model=PricingAgentResponse,
-            memory_length=MEMORY_LENGTH,
-            prompt_template=GENERAL_PROMPT,
-            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0},
-        ),
-        LLMAgent(
-            "Firm B",
-            prefix=P1,
-            api_key=API_KEY,
-            model_name=MODEL_NAME,
-            response_model=PricingAgentResponse,
-            memory_length=MEMORY_LENGTH,
-            prompt_template=GENERAL_PROMPT,
-            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0},
-        ),
         FakeAgent(
-            "Firm C",
-            time_series_data=np.array([2] * (N_RUNS)),
+            "BP",
+            time_series_data=bp_prices,
             nbr_rounds=N_RUNS,
-            env_params={"a": 1.0, "alpha": 1.0, "c": 1.0},
+            env_params={"a": 2.45, "alpha": 1.0, "c": 1.0},
+        ),
+        LLMAgent(
+            "Caltex",
+            prefix=P1,
+            api_key=API_KEY,
+            model_name=MODEL_NAME,
+            response_model=PricingAgentResponse,
+            memory_length=MEMORY_LENGTH,
+            prompt_template=GENERAL_PROMPT,
+            env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},
+        ),
+        LLMAgent(
+            "Woolworths",
+            prefix=P1,
+            api_key=API_KEY,
+            model_name=MODEL_NAME,
+            response_model=PricingAgentResponse,
+            memory_length=MEMORY_LENGTH,
+            prompt_template=GENERAL_PROMPT,
+            env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},
+        ),
+        LLMAgent(
+            "Coles",
+            prefix=P1,
+            api_key=API_KEY,
+            model_name=MODEL_NAME,
+            response_model=PricingAgentResponse,
+            memory_length=MEMORY_LENGTH,
+            prompt_template=GENERAL_PROMPT,
+            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0},
         ),
     ]
 
@@ -76,12 +108,14 @@ async def main(alpha=1):
     )
 
     experiment = Experiment(
-        name="oligopoly_setting",
+        name="oligopoly_setting_all_agents_but_BP_P1_memory_21",
         agents=agents,
-        num_rounds=N_RUNS,
+        num_rounds=N_ROUNDS,
         environment=env,
         cost_series=cost_series,
+        initial_real_data=initial_real_data,
         experiment_dir=current_file_path.parent / "experiments_runs",
+        experiment_plot=False,
     )
     await experiment.run()
 

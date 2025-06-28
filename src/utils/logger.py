@@ -1,17 +1,23 @@
-#src/utils/logger.py
+# src/utils/logger.py
 import sys
 import logging
 from pathlib import Path
+
 
 def setup_logger(name="experiment_logger", log_file: Path = None, level=logging.INFO):
     logger = logging.getLogger(name)
     logger.setLevel(level)
     logger.propagate = False
 
-    formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S")
+    formatter = logging.Formatter(
+        "[%(asctime)s] [%(levelname)s] %(message)s", "%H:%M:%S"
+    )
 
     # Prevent duplicate handlers
-    has_stream = any(isinstance(h, logging.StreamHandler) and not isinstance(h, logging.FileHandler) for h in logger.handlers)
+    has_stream = any(
+        isinstance(h, logging.StreamHandler) and not isinstance(h, logging.FileHandler)
+        for h in logger.handlers
+    )
     has_file = any(isinstance(h, logging.FileHandler) for h in logger.handlers)
 
     # Console

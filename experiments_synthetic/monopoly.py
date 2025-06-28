@@ -1,8 +1,7 @@
-#experiments_synthetic/run_experiment.py
+# experiments_synthetic/run_experiment.py
 import os
 import sys
 import asyncio
-import numpy as np
 from dotenv import load_dotenv
 
 # Add project root to sys.path
@@ -22,25 +21,27 @@ load_dotenv()
 API_KEY = os.getenv("MISTRAL_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
 
-MEMORY_LENGTH = 100 
+MEMORY_LENGTH = 100
 N_ROUNDS = 300
 N_RUNS = 1
 ALPHAS_TO_TRY = [1, 3.2, 10]
 
 
 async def main(alpha=1):
-
-    PricingAgentResponse = create_pricing_response_model(include_wtp=True, wtp_value=4.51 * alpha)
+    PricingAgentResponse = create_pricing_response_model(
+        include_wtp=True, wtp_value=4.51 * alpha
+    )
     agents = [
-        LLMAgent("Firm A", 
-              prefix=PP_P0,
-              api_key=API_KEY, 
-              model_name=MODEL_NAME, 
-              response_model=PricingAgentResponse, 
-              memory_length=MEMORY_LENGTH, 
-              prompt_template=GENERAL_PROMPT,
-              env_params={"a": 2.0, "alpha": alpha, "c": 1.0},
-              ),
+        LLMAgent(
+            "Firm A",
+            prefix=PP_P0,
+            api_key=API_KEY,
+            model_name=MODEL_NAME,
+            response_model=PricingAgentResponse,
+            memory_length=MEMORY_LENGTH,
+            prompt_template=GENERAL_PROMPT,
+            env_params={"a": 2.0, "alpha": alpha, "c": 1.0},
+        ),
     ]
 
     env = CalvanoDemandEnvironment(
@@ -48,14 +49,14 @@ async def main(alpha=1):
         description="Monopoly environment with Calvano 2020 demand",
     )
 
-    experiment = Experiment(name="monopoly_setting", 
-                            agents=agents, 
-                            num_rounds=N_ROUNDS, 
-                            environment=env,
-                            experiment_dir=current_file_path.parent / "experiments_runs",
-                            )
+    experiment = Experiment(
+        name="monopoly_setting",
+        agents=agents,
+        num_rounds=N_ROUNDS,
+        environment=env,
+        experiment_dir=current_file_path.parent / "experiments_runs",
+    )
     await experiment.run()
-
 
 
 if __name__ == "__main__":

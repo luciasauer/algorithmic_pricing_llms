@@ -112,6 +112,7 @@ dependencies = [
     { name = "openai" },
     { name = "pandas" },
     { name = "polars" },
+    { name = "pre-commit" },
     { name = "pyarrow" },
     { name = "pydantic" },
     { name = "requests" },
@@ -135,6 +136,7 @@ requires-dist = [
     { name = "openai", specifier = ">=1.86.0" },
     { name = "pandas", specifier = ">=2.3.0" },
     { name = "polars", specifier = ">=1.30.0" },
+    { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "pyarrow", specifier = ">=20.0.0" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "requests", specifier = ">=2.32.4" },
@@ -1407,7 +1409,7 @@ wheels = [
 
 [[package]]
 name = "openai"
-version = "1.92.3"
+version = "1.93.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1419,9 +1421,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8b/bd/6c123e53d6727dc39086346df1161c8b6bb50e4cc0f2e9075cae909049b6/openai-1.92.3.tar.gz", hash = "sha256:6b707bc926a9fffab262dbd1eb4be29c36d627b9012633a66ccdbe2d615a9532", size = 485647, upload-time = "2025-06-27T17:06:55.96Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e4/d7/e91c6a9cf71726420cddf539852ee4c29176ebb716a702d9118d0409fd8e/openai-1.93.0.tar.gz", hash = "sha256:988f31ade95e1ff0585af11cc5a64510225e4f5cd392698c675d0a9265b8e337", size = 486573, upload-time = "2025-06-27T21:21:39.421Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ea/60/4956baa677a569a247336c7edff4b3b6aab7a54119e2342d391d1d370446/openai-1.92.3-py3-none-any.whl", hash = "sha256:979f00c097d023a28f22c63373a646a675e4b9e1fad586e2424bf7274a2689f2", size = 753350, upload-time = "2025-06-27T17:06:53.547Z" },
+    { url = "https://files.pythonhosted.org/packages/64/46/a10d9df4673df56f71201d129ba1cb19eaff3366d08c8664d61a7df52e65/openai-1.93.0-py3-none-any.whl", hash = "sha256:3d746fe5498f0dd72e0d9ab706f26c91c0f646bf7459e5629af8ba7c9dbdf090", size = 755038, upload-time = "2025-06-27T21:21:37.532Z" },
 ]
 
 [[package]]

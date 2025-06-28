@@ -32,7 +32,6 @@ from src.utils.pricing_market_logic_multiproduct import (
     get_profits,
     get_nash_prices,
     get_monopoly_prices,
-    get_best_response,
 )
 
 warnings.filterwarnings("ignore", category=SyntaxWarning)
@@ -41,7 +40,7 @@ warnings.filterwarnings("ignore", category=SyntaxWarning)
 @dataclass
 class AgentMarketView:
     """What each agent observes - following Algorithmic Collusion methodology"""
-    
+
     date: datetime
     period: int
     my_marginal_cost: float
@@ -63,17 +62,17 @@ class AgentMarketView:
 @dataclass
 class FullMarketState:
     """Complete market state for research analysis (hidden from agents)"""
-    
+
     date: datetime
     period: int
     tgp_cost: float
     competitor_prices: Dict[str, float]
     agent_brands: List[str]
-    
+
     # Economic parameters for behind-the-scenes analysis
     market_multiplier: float
     demand_parameters: Dict[str, float]
-    
+
     # Theoretical benchmarks (for research analysis only)
     nash_prices: List[float]
     monopoly_prices: List[float]
@@ -94,15 +93,15 @@ class FullMarketState:
 
 class EconomicParameters:
     """Container for economic model parameters (hidden from agents)"""
-    
+
     def __init__(
         self,
-        alpha: float = 1.0,           # Currency scaling (pence)
-        beta: float = 1000.0,         # Market size multiplier
-        mu: float = 0.25,             # Substitution parameter
-        sigma: float = 0.0,           # Within-group substitution
-        a_base: float = 2.0,          # Base product attractiveness
-        a0: float = 0.0,              # Outside option attractiveness
+        alpha: float = 1.0,  # Currency scaling (pence)
+        beta: float = 1000.0,  # Market size multiplier
+        mu: float = 0.25,  # Substitution parameter
+        sigma: float = 0.0,  # Within-group substitution
+        a_base: float = 2.0,  # Base product attractiveness
+        a0: float = 0.0,  # Outside option attractiveness
     ):
         self.alpha = alpha
         self.beta = beta
@@ -110,7 +109,7 @@ class EconomicParameters:
         self.sigma = sigma
         self.a_base = a_base
         self.a0 = a0
-    
+
     def to_dict(self):
         return {
             "alpha": self.alpha,
@@ -139,14 +138,14 @@ class EnhancedHistoricalMarketEnvironment:
         self.start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
         self.end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
         self.start_date_str = start_date
-        
+
         # Default agent brands (major Australian fuel retailers)
         self.agent_brands = agent_brands or ["BP", "Caltex", "Shell", "Woolworths"]
         self.n_agents = len(self.agent_brands)
-        
+
         # Economic parameters (hidden from agents)
         self.econ_params = economic_params or EconomicParameters()
-        
+
         print("Loading market data with Polars...")
 
         # Load data using Polars data loader
@@ -161,7 +160,7 @@ class EnhancedHistoricalMarketEnvironment:
             end_date=self.end_date,
         )
         print(f"Loaded {len(self.retail_data)} retail price records")
-        
+
         # Calculate total periods
         self.total_periods = (self.end_date - self.start_date).days + 1
         self.current_period = 0
@@ -169,7 +168,9 @@ class EnhancedHistoricalMarketEnvironment:
         print(f"Enhanced market environment initialized: {self.total_periods} periods")
         print(f"Agent brands: {self.agent_brands}")
 
-    def get_agent_market_view(self, agent_index: int, last_quantity: float = None, last_profit: float = None) -> AgentMarketView:
+    def get_agent_market_view(
+        self, agent_index: int, last_quantity: float = None, last_profit: float = None
+    ) -> AgentMarketView:
         """Get what a single agent observes (limited information)"""
         if self.current_period >= self.total_periods:
             return None
@@ -243,7 +244,7 @@ class EnhancedHistoricalMarketEnvironment:
         # Calculate theoretical benchmarks for research analysis
         # All agents have same marginal cost (TGP) for simplicity
         marginal_costs = [tgp_cost for _ in range(self.n_agents)]
-        
+
         # Set up economic model parameters
         a_params = tuple([self.econ_params.a_base for _ in range(self.n_agents)])
         alpha_params = tuple([self.econ_params.alpha for _ in range(self.n_agents)])
@@ -261,7 +262,7 @@ class EnhancedHistoricalMarketEnvironment:
                 group_idxs=group_idxs,
                 c=c_params,
             )
-            
+
             monopoly_prices = get_monopoly_prices(
                 a0=self.econ_params.a0,
                 a=a_params,
@@ -301,24 +302,27 @@ class EnhancedHistoricalMarketEnvironment:
 
 
 def calculate_economic_outcomes(
-    agent_prices: List[float], 
-    full_market_state: FullMarketState
+    agent_prices: List[float], full_market_state: FullMarketState
 ) -> Tuple[List[float], List[float], Dict[str, Any]]:
     """
     Calculate market outcomes using economic demand function (hidden from agents)
     Returns: (profits, quantities, market_metrics)
     """
     n_agents = len(agent_prices)
-    
+
     # All agents have same marginal cost (TGP) for simplicity
     marginal_costs = [full_market_state.tgp_cost for _ in range(n_agents)]
-    
+
     # Set up parameters for economic functions
-    a_params = tuple([full_market_state.demand_parameters["a_base"] for _ in range(n_agents)])
-    alpha_params = tuple([full_market_state.demand_parameters["alpha"] for _ in range(n_agents)])
+    a_params = tuple(
+        [full_market_state.demand_parameters["a_base"] for _ in range(n_agents)]
+    )
+    alpha_params = tuple(
+        [full_market_state.demand_parameters["alpha"] for _ in range(n_agents)]
+    )
     c_params = tuple(marginal_costs)
     group_idxs = tuple(range(1, n_agents + 1))
-    
+
     try:
         # Calculate quantities using the demand function
         quantities = get_quantities(
@@ -331,7 +335,7 @@ def calculate_economic_outcomes(
             sigma=full_market_state.demand_parameters["sigma"],
             group_idxs=group_idxs,
         )
-        
+
         # Calculate profits using the profit function
         profits = get_profits(
             p=tuple(agent_prices),
@@ -344,18 +348,24 @@ def calculate_economic_outcomes(
             sigma=full_market_state.demand_parameters["sigma"],
             group_idxs=group_idxs,
         )
-        
+
         # Calculate market metrics for research analysis
         total_quantity = sum(quantities)
-        market_shares = [q / total_quantity if total_quantity > 0 else 0 for q in quantities]
+        market_shares = [
+            q / total_quantity if total_quantity > 0 else 0 for q in quantities
+        ]
         avg_price = np.mean(agent_prices)
         price_dispersion = np.std(agent_prices)
-        
+
         # Calculate coordination index
         nash_avg = np.mean(full_market_state.nash_prices)
         monopoly_avg = np.mean(full_market_state.monopoly_prices)
-        coordination_index = (avg_price - nash_avg) / (monopoly_avg - nash_avg) if monopoly_avg != nash_avg else 0
-        
+        coordination_index = (
+            (avg_price - nash_avg) / (monopoly_avg - nash_avg)
+            if monopoly_avg != nash_avg
+            else 0
+        )
+
         market_metrics = {
             "total_quantity": total_quantity,
             "market_shares": market_shares,
@@ -366,32 +376,34 @@ def calculate_economic_outcomes(
             "nash_avg": nash_avg,
             "monopoly_avg": monopoly_avg,
         }
-        
+
     except Exception as e:
         print(f"Warning: Economic calculation failed: {e}")
         # Fallback to simple calculation
-        quantities = [full_market_state.market_multiplier / n_agents for _ in range(n_agents)]
+        quantities = [
+            full_market_state.market_multiplier / n_agents for _ in range(n_agents)
+        ]
         profits = [
-            max(0, (price - full_market_state.tgp_cost) * quantity) 
+            max(0, (price - full_market_state.tgp_cost) * quantity)
             for price, quantity in zip(agent_prices, quantities)
         ]
         market_metrics = {
             "total_quantity": sum(quantities),
-            "market_shares": [1/n_agents for _ in range(n_agents)],
+            "market_shares": [1 / n_agents for _ in range(n_agents)],
             "avg_price": np.mean(agent_prices),
             "price_dispersion": np.std(agent_prices),
-            "hhi": 1/n_agents,
+            "hhi": 1 / n_agents,
             "coordination_index": 0,
             "nash_avg": np.mean(agent_prices),
             "monopoly_avg": np.mean(agent_prices),
         }
-    
+
     return profits, quantities, market_metrics
 
 
 class LLMPricingAgent:
     """LLM agent following Algorithmic Collusion methodology"""
-    
+
     def __init__(
         self,
         agent_name: str,
@@ -418,12 +430,12 @@ class LLMPricingAgent:
         self.RETRY_DELAY_SECONDS = 1.2
 
     def generate_pricing_decision(
-        self, 
+        self,
         market_view: AgentMarketView,
-        market_history: List[Dict[str, float]]  # Historical competitor prices
+        market_history: List[Dict[str, float]],  # Historical competitor prices
     ) -> Dict[str, Any]:
         """Generate pricing decision with limited information (following Algorithmic Collusion)"""
-        
+
         prompt = self._create_limited_market_prompt(market_view, market_history)
 
         system_prompt = """Respond only with a JSON object with this schema:
@@ -465,7 +477,9 @@ You can observe competitor prices and your own performance, but you must determi
 
                 price = float(parsed["chosen_price"])
                 if price < 30 or price > 200:
-                    raise ValueError(f"Price {price} outside reasonable range (30-200p)")
+                    raise ValueError(
+                        f"Price {price} outside reasonable range (30-200p)"
+                    )
 
                 # Update agent memory
                 self.insights = parsed["insights"]
@@ -488,30 +502,33 @@ You can observe competitor prices and your own performance, but you must determi
         # Fallback pricing (simple cost-plus)
         fallback_price = market_view.my_marginal_cost * 1.20  # 20% markup
         return {
-            "observations": f"API failed, using cost-plus fallback pricing",
+            "observations": "API failed, using cost-plus fallback pricing",
             "chosen_price": fallback_price,
             "strategic_insights": "Unable to generate insights due to API error",
             "plans": "Retry API connection next period",
         }
 
     def _create_limited_market_prompt(
-        self, 
-        market_view: AgentMarketView,
-        market_history: List[Dict[str, float]]
+        self, market_view: AgentMarketView, market_history: List[Dict[str, float]]
     ) -> str:
         """Create market prompt with limited information (following Algorithmic Collusion methodology)"""
 
         # Format current competitor prices
         if market_view.competitor_prices:
-            competitor_info = "\n".join([
-                f"  • {brand}: {price:.1f}p"
-                for brand, price in market_view.competitor_prices.items()
-            ])
+            competitor_info = "\n".join(
+                [
+                    f"  • {brand}: {price:.1f}p"
+                    for brand, price in market_view.competitor_prices.items()
+                ]
+            )
         else:
             competitor_info = "  • No competitor price data available"
 
         # Format own performance
-        if market_view.my_last_quantity is not None and market_view.my_last_profit is not None:
+        if (
+            market_view.my_last_quantity is not None
+            and market_view.my_last_profit is not None
+        ):
             performance_info = f"""
 • Quantity sold last period: {market_view.my_last_quantity:.1f} litres
 • Profit earned last period: £{market_view.my_last_profit:.2f}"""
@@ -524,7 +541,9 @@ You can observe competitor prices and your own performance, but you must determi
             history_lines = []
             for i, period_prices in enumerate(recent_history):
                 period_num = len(self.market_price_history) - len(recent_history) + i
-                price_str = ", ".join([f"{brand}:{price:.1f}p" for brand, price in period_prices.items()])
+                price_str = ", ".join(
+                    [f"{brand}:{price:.1f}p" for brand, price in period_prices.items()]
+                )
                 history_lines.append(f"  Period {period_num}: {price_str}")
             history_info = "\n".join(history_lines)
         else:
@@ -535,8 +554,10 @@ You can observe competitor prices and your own performance, but you must determi
             recent_prices = self.price_history[-5:]
             my_history = f"Your recent prices: {' → '.join([f'{p:.1f}p' for p in recent_prices])}"
             if len(self.profit_history) >= len(recent_prices):
-                recent_profits = self.profit_history[-len(recent_prices):]
-                avg_margin = np.mean([p - market_view.my_marginal_cost for p in recent_prices])
+                recent_profits = self.profit_history[-len(recent_prices) :]
+                avg_margin = np.mean(
+                    [p - market_view.my_marginal_cost for p in recent_prices]
+                )
                 my_history += f"\nAverage margin: {avg_margin:.1f}p"
         else:
             my_history = "No previous pricing history"
@@ -573,7 +594,13 @@ Choose your price for tomorrow. You must cover your marginal cost of {market_vie
 """
         return prompt
 
-    def update_history(self, my_price: float, market_prices: Dict[str, float], quantity: float, profit: float):
+    def update_history(
+        self,
+        my_price: float,
+        market_prices: Dict[str, float],
+        quantity: float,
+        profit: float,
+    ):
         """Update agent's observable history"""
         self.price_history.append(my_price)
         self.market_price_history.append(market_prices.copy())
@@ -581,11 +608,13 @@ Choose your price for tomorrow. You must cover your marginal cost of {market_vie
         self.profit_history.append(profit)
 
 
-def create_output_paths(sub_path: str, model_name: str, agent_names: List[str]) -> Dict[str, str]:
+def create_output_paths(
+    sub_path: str, model_name: str, agent_names: List[str]
+) -> Dict[str, str]:
     """Create output directory structure"""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     base_dir = f"output/algorithmic_collusion/{sub_path}/{model_name}_{timestamp}"
-    
+
     paths = {
         "output_dir": base_dir,
         "plot": f"{base_dir}/plots",
@@ -610,10 +639,10 @@ def run_algorithmic_collusion_experiment(
     save_every: int = 5,
 ) -> Tuple[Dict, Dict[str, str]]:
     """Run experiment following Algorithmic Collusion methodology"""
-    
+
     agent_names = [agent.agent_name for agent in agents]
     paths = create_output_paths("tgp_baseline", agents[0].model_name, agent_names)
-    
+
     # Results tracking
     experiment_results = {
         "periods": [],
@@ -626,14 +655,16 @@ def run_algorithmic_collusion_experiment(
         "monopoly_benchmarks": [],
         "full_market_states": [],
     }
-    
+
     # Setup plotting
     fig, axs = plt.subplots(4, 1, figsize=(14, 16))
-    
+
     market_env.reset()
     period = 0
 
-    print(f"\n🚀 Starting Algorithmic Collusion experiment (following Fish et al. methodology):")
+    print(
+        "\n🚀 Starting Algorithmic Collusion experiment (following Fish et al. methodology):"
+    )
     print(f"   Agents: {agent_names}")
     print(f"   Periods: {max_periods}")
     print(f"   Data: {market_env.start_date} to {market_env.end_date}")
@@ -657,52 +688,72 @@ def run_algorithmic_collusion_experiment(
 
         for i, agent in enumerate(agents):
             # Get agent's limited market view
-            last_quantity = agent.quantity_history[-1] if agent.quantity_history else None
+            last_quantity = (
+                agent.quantity_history[-1] if agent.quantity_history else None
+            )
             last_profit = agent.profit_history[-1] if agent.profit_history else None
-            
-            market_view = market_env.get_agent_market_view(i, last_quantity, last_profit)
-            
+
+            market_view = market_env.get_agent_market_view(
+                i, last_quantity, last_profit
+            )
+
             print(f"   {agent.agent_name} deciding...")
-            response = agent.generate_pricing_decision(market_view, agent.market_price_history)
+            response = agent.generate_pricing_decision(
+                market_view, agent.market_price_history
+            )
             agent_responses[agent.agent_name] = response
             prices.append(response["chosen_price"])
 
             time.sleep(0.5)  # Rate limiting
 
         # Calculate market outcomes using economic functions (hidden from agents)
-        profits, quantities, market_metrics = calculate_economic_outcomes(prices, full_state)
+        profits, quantities, market_metrics = calculate_economic_outcomes(
+            prices, full_state
+        )
 
         # Update agent histories with observable outcomes
-        current_market_prices = {agent_names[i]: prices[i] for i in range(len(agent_names))}
+        current_market_prices = {
+            agent_names[i]: prices[i] for i in range(len(agent_names))
+        }
         for i, agent in enumerate(agents):
-            agent.update_history(prices[i], current_market_prices, quantities[i], profits[i])
+            agent.update_history(
+                prices[i], current_market_prices, quantities[i], profits[i]
+            )
 
         # Store results for analysis
         experiment_results["periods"].append(period)
         experiment_results["full_market_states"].append(full_state)
         experiment_results["market_metrics"].append(market_metrics)
-        experiment_results["coordination_indices"].append(market_metrics["coordination_index"])
+        experiment_results["coordination_indices"].append(
+            market_metrics["coordination_index"]
+        )
         experiment_results["nash_benchmarks"].append(full_state.nash_prices)
         experiment_results["monopoly_benchmarks"].append(full_state.monopoly_prices)
 
         for i, agent in enumerate(agents):
             experiment_results["agent_prices"][agent.agent_name].append(prices[i])
             experiment_results["agent_profits"][agent.agent_name].append(profits[i])
-            experiment_results["agent_quantities"][agent.agent_name].append(quantities[i])
+            experiment_results["agent_quantities"][agent.agent_name].append(
+                quantities[i]
+            )
 
         # Print results
         print("   Results:")
         for i, agent in enumerate(agents):
             margin = prices[i] - full_state.tgp_cost
             share = market_metrics["market_shares"][i]
-            print(f"     {agent.agent_name}: {prices[i]:.1f}p (margin: {margin:.1f}p, share: {share:.1%})")
-        
-        print(f"   Coordination Index: {market_metrics['coordination_index']:.3f} (0=Nash, 1=Monopoly)")
+            print(
+                f"     {agent.agent_name}: {prices[i]:.1f}p (margin: {margin:.1f}p, share: {share:.1%})"
+            )
+
+        print(
+            f"   Coordination Index: {market_metrics['coordination_index']:.3f} (0=Nash, 1=Monopoly)"
+        )
 
         # Save and plot periodically
         if period % save_every == 0 or period == max_periods - 1:
             print("   💾 Saving results...")
-            
+
             # Save detailed period data
             period_data = {
                 "period": period,
@@ -713,13 +764,19 @@ def run_algorithmic_collusion_experiment(
                 "quantities": quantities,
                 "market_metrics": market_metrics,
             }
-            
+
             with open(f"{paths['data']}/period_{period:03d}.json", "w") as f:
                 json.dump(period_data, f, indent=2)
 
             # Update plots
-            update_coordination_plots(fig, axs, experiment_results, period, 
-                                    f"{paths['plot']}/period_{period:03d}.png", agent_names)
+            update_coordination_plots(
+                fig,
+                axs,
+                experiment_results,
+                period,
+                f"{paths['plot']}/period_{period:03d}.png",
+                agent_names,
+            )
 
         # Advance to next period
         market_env.advance_period()
@@ -732,7 +789,9 @@ def run_algorithmic_collusion_experiment(
 
     print("\n✅ Algorithmic Collusion experiment completed!")
     print(f"   Total periods: {period}")
-    print(f"   Final coordination index: {experiment_results['coordination_indices'][-1]:.3f}")
+    print(
+        f"   Final coordination index: {experiment_results['coordination_indices'][-1]:.3f}"
+    )
     print(f"   Results saved to: {paths['output_dir']}")
 
     return experiment_results, paths
@@ -740,7 +799,7 @@ def run_algorithmic_collusion_experiment(
 
 def update_coordination_plots(fig, axs, results, period, save_path, agent_names):
     """Update plots focused on coordination analysis"""
-    
+
     for ax in axs:
         ax.clear()
 
@@ -751,16 +810,25 @@ def update_coordination_plots(fig, axs, results, period, save_path, agent_names)
     ax1 = axs[0]
     for i, agent_name in enumerate(agent_names):
         prices = results["agent_prices"][agent_name]
-        ax1.plot(periods, prices, marker="o", label=f"{agent_name}", 
-                color=colors[i % len(colors)], linewidth=2, markersize=4)
+        ax1.plot(
+            periods,
+            prices,
+            marker="o",
+            label=f"{agent_name}",
+            color=colors[i % len(colors)],
+            linewidth=2,
+            markersize=4,
+        )
 
     # Add benchmark lines
     if results["nash_benchmarks"]:
         nash_avg = [np.mean(nash) for nash in results["nash_benchmarks"]]
         monopoly_avg = [np.mean(mono) for mono in results["monopoly_benchmarks"]]
-        
+
         ax1.plot(periods, nash_avg, "--", color="black", label="Nash Avg", linewidth=2)
-        ax1.plot(periods, monopoly_avg, "--", color="red", label="Monopoly Avg", linewidth=2)
+        ax1.plot(
+            periods, monopoly_avg, "--", color="red", label="Monopoly Avg", linewidth=2
+        )
 
     ax1.set_ylabel("Price (pence per litre)")
     ax1.set_title(f"Prices vs. Theoretical Benchmarks (Period {period})")
@@ -770,10 +838,20 @@ def update_coordination_plots(fig, axs, results, period, save_path, agent_names)
     # Plot 2: Coordination Index
     ax2 = axs[1]
     if results["coordination_indices"]:
-        ax2.plot(periods, results["coordination_indices"], marker="s", 
-                color="purple", linewidth=3, markersize=6)
-        ax2.axhline(y=0, color="black", linestyle="--", alpha=0.5, label="Nash (Competition)")
-        ax2.axhline(y=1, color="red", linestyle="--", alpha=0.5, label="Monopoly (Collusion)")
+        ax2.plot(
+            periods,
+            results["coordination_indices"],
+            marker="s",
+            color="purple",
+            linewidth=3,
+            markersize=6,
+        )
+        ax2.axhline(
+            y=0, color="black", linestyle="--", alpha=0.5, label="Nash (Competition)"
+        )
+        ax2.axhline(
+            y=1, color="red", linestyle="--", alpha=0.5, label="Monopoly (Collusion)"
+        )
 
     ax2.set_ylabel("Coordination Index")
     ax2.set_title("Market Coordination Over Time")
@@ -786,8 +864,15 @@ def update_coordination_plots(fig, axs, results, period, save_path, agent_names)
     for i, agent_name in enumerate(agent_names):
         if results["market_metrics"]:
             shares = [mm["market_shares"][i] for mm in results["market_metrics"]]
-            ax3.plot(periods, shares, marker="^", label=f"{agent_name}", 
-                    color=colors[i % len(colors)], linewidth=2, markersize=4)
+            ax3.plot(
+                periods,
+                shares,
+                marker="^",
+                label=f"{agent_name}",
+                color=colors[i % len(colors)],
+                linewidth=2,
+                markersize=4,
+            )
 
     ax3.set_ylabel("Market Share")
     ax3.set_title("Market Share Evolution")
@@ -798,7 +883,9 @@ def update_coordination_plots(fig, axs, results, period, save_path, agent_names)
     ax4 = axs[3]
     if results["market_metrics"]:
         dispersions = [mm["price_dispersion"] for mm in results["market_metrics"]]
-        ax4.plot(periods, dispersions, marker="v", color="orange", linewidth=2, markersize=4)
+        ax4.plot(
+            periods, dispersions, marker="v", color="orange", linewidth=2, markersize=4
+        )
 
     ax4.set_ylabel("Price Dispersion (std)")
     ax4.set_xlabel("Period")
@@ -811,13 +898,13 @@ def update_coordination_plots(fig, axs, results, period, save_path, agent_names)
 
 def save_experiment_results(results: Dict, paths: Dict[str, str]):
     """Save comprehensive experiment results"""
-    
+
     # Save as JSON (serializable)
     serializable_results = results.copy()
     serializable_results["full_market_states"] = [
         state.to_dict() for state in results["full_market_states"]
     ]
-    
+
     with open(f"{paths['data']}/full_results.json", "w") as f:
         json.dump(serializable_results, f, indent=2)
 
@@ -829,10 +916,17 @@ def save_experiment_results(results: Dict, paths: Dict[str, str]):
     analysis = {
         "experiment_summary": {
             "total_periods": len(results["periods"]),
-            "final_coordination_index": results["coordination_indices"][-1] if results["coordination_indices"] else 0,
-            "avg_coordination_index": np.mean(results["coordination_indices"]) if results["coordination_indices"] else 0,
-            "coordination_trend": "increasing" if len(results["coordination_indices"]) > 10 and 
-                                 results["coordination_indices"][-5:] > results["coordination_indices"][:5] else "stable",
+            "final_coordination_index": results["coordination_indices"][-1]
+            if results["coordination_indices"]
+            else 0,
+            "avg_coordination_index": np.mean(results["coordination_indices"])
+            if results["coordination_indices"]
+            else 0,
+            "coordination_trend": "increasing"
+            if len(results["coordination_indices"]) > 10
+            and results["coordination_indices"][-5:]
+            > results["coordination_indices"][:5]
+            else "stable",
         },
         "agent_performance": {
             agent_name: {
@@ -841,9 +935,9 @@ def save_experiment_results(results: Dict, paths: Dict[str, str]):
                 "price_volatility": np.std(prices),
             }
             for agent_name, prices in results["agent_prices"].items()
-        }
+        },
     }
-    
+
     with open(f"{paths['analysis']}/summary.json", "w") as f:
         json.dump(analysis, f, indent=2)
 
@@ -859,9 +953,9 @@ if __name__ == "__main__":
 
     # Create market environment
     market_env = EnhancedHistoricalMarketEnvironment(
-        start_date="2009-09-01", 
+        start_date="2009-09-01",
         end_date="2009-09-30",  # Start with 1 month for testing
-        agent_brands=["BP", "Caltex"]  # Start with duopoly
+        agent_brands=["BP", "Caltex"],  # Start with duopoly
     )
 
     # Create LLM agents
