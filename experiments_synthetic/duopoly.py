@@ -54,7 +54,7 @@ async def main(prompt_prefix, alpha=1, experiment_name="duopoly_setting"):
 
     env = CalvanoDemandEnvironment(
         name="Calvano Market",
-        description="Monopoly environment with Calvano 2020 demand",
+        description="Duopoly environment with Calvano 2020 demand",
     )
 
     experiment = Experiment(name=experiment_name, 
