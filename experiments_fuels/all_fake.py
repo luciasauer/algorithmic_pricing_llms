@@ -22,37 +22,37 @@ MODEL_NAME = os.getenv("MODEL_NAME")
 
 
 marginal_costs = (
-    pl.read_parquet("experiments_fuels/marginal_costs.parquet")["tgpmin"]
+    pl.read_parquet("experiments_fuels/data/marginal_costs.parquet")["tgpmin"]
     .to_numpy()
     .flatten()
     / 100
 )
 bp_prices = (
-    pl.read_parquet("experiments_fuels/bp_prices.parquet")["avg_price"]
+    pl.read_parquet("experiments_fuels/data/bp_prices.parquet")["avg_price"]
     .to_numpy()
     .flatten()
     / 100
 )
 caltex_prices = (
-    pl.read_parquet("experiments_fuels/caltex_prices.parquet")["avg_price"]
+    pl.read_parquet("experiments_fuels/data/caltex_prices.parquet")["avg_price"]
     .to_numpy()
     .flatten()
     / 100
 )
 coles_prices = (
-    pl.read_parquet("experiments_fuels/coles_prices.parquet")["avg_price"]
+    pl.read_parquet("experiments_fuels/data/coles_prices.parquet")["avg_price"]
     .to_numpy()
     .flatten()
     / 100
 )
 woolworths_prices = (
-    pl.read_parquet("experiments_fuels/woolworths_prices.parquet")["avg_price"]
+    pl.read_parquet("experiments_fuels/data/woolworths_prices.parquet")["avg_price"]
     .to_numpy()
     .flatten()
     / 100
 )
 gull_prices = (
-    pl.read_parquet("experiments_fuels/gull_prices.parquet")["avg_price"]
+    pl.read_parquet("experiments_fuels/data/gull_prices.parquet")["avg_price"]
     .to_numpy()
     .flatten()
     / 100
