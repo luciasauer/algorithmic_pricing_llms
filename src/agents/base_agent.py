@@ -13,6 +13,7 @@ class Agent(ABC):
         self.env_index = env_index
         # Initialize parameters from env_params
         env_params = env_params or {}
+        self.env_params = env_params
         self.a = env_params.get("a")
         self.alpha = env_params.get("alpha")
         self.c = env_params.get("c")
