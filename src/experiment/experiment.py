@@ -1,15 +1,17 @@
 # src/experiment/experiment.py
-import datetime
 import asyncio
+import datetime
 import logging
+from typing import List
+
 import numpy as np
 import polars as pl
-from typing import List
-from src.utils.logger import setup_logger
+
 from src.agents.base_agent import Agent
 from src.experiment.storage import StorageManager
-from src.prompts.prompt_manager import PromptManager
 from src.plotting.plotting import plot_experiment_svg, plot_real_data_svg
+from src.prompts.prompt_manager import PromptManager
+from src.utils.logger import setup_logger
 
 
 class Experiment:
@@ -44,7 +46,7 @@ class Experiment:
             "a": np.array([agent.a for agent in sorted_agents]),
             "alpha": np.array([agent.alpha for agent in sorted_agents]),
             "c": np.array([agent.c for agent in sorted_agents]),
-            "mu": 0.25,
+            "mu": 0.25,  # 0.046,
             "beta": 100,
             "sigma": 0.0,
             "group_idxs": [1 for _ in sorted_agents],
