@@ -13,7 +13,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from src.agents.LLM_agent import LLMAgent
 from src.agents.fake_agent import FakeAgent
 from src.experiment.experiment import Experiment
-from src.prompts.prompts import GENERAL_PROMPT, P1C
+from src.prompts.prompts import GENERAL_PROMPT, P1
 from src.prompts.prompts_models import create_pricing_response_model
 from src.environment.penalty_demand_environment import PenaltyDemandEnvironment
 from pathlib import Path
@@ -95,7 +95,7 @@ async def main(alpha=1):
         ),
         LLMAgent(
             "Coles",
-            prefix=P1C,
+            prefix=P1,
             api_key=API_KEY,
             model_name=MODEL_NAME,
             response_model=PricingAgentResponse,
