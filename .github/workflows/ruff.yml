@@ -1,0 +1,23 @@
+name: Ruff Linting
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Run linter with --exit-zero (won't fail CI)
+      - name: Run Ruff linter
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "check --fix --exit-zero"
+      
+      # Run formatter (still fails on format issues)
+      - name: Run Ruff formatter  
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "format --check"
