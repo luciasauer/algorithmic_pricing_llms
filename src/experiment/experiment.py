@@ -13,9 +13,17 @@ from src.plotting.plotting import plot_experiment_svg, plot_real_data_svg
 
 
 class Experiment:
-    def __init__(self, name: str, agents: List[Agent], num_rounds: int, environment, 
-                 cost_series: np.ndarray = None, experiment_dir: str = None, 
-                 initial_real_data: dict[str, list[dict]] = None, experiment_plot: bool = True):
+    def __init__(
+        self,
+        name: str,
+        agents: List[Agent],
+        num_rounds: int,
+        environment,
+        cost_series: np.ndarray = None,
+        experiment_dir: str = None,
+        initial_real_data: dict[str, list[dict]] = None,
+        experiment_plot: bool = True,
+    ):
         self.name = name
         self.agents = agents
         self.num_rounds = num_rounds
@@ -26,9 +34,11 @@ class Experiment:
         for idx, agent in enumerate(self.agents):
             agent.env_index = idx
             agent.environment = self.environment
-        assert all(agent.env_index is not None for agent in self.agents), "Some agents are missing env_index"
+        assert all(agent.env_index is not None for agent in self.agents), (
+            "Some agents are missing env_index"
+        )
 
-        sorted_agents = sorted(self.agents, key=lambda ag: ag.env_index)       
+        sorted_agents = sorted(self.agents, key=lambda ag: ag.env_index)
         env_params = {
             "a_0": 0.0,
             "a": np.array([agent.a for agent in sorted_agents]),
@@ -53,15 +63,20 @@ class Experiment:
         self.environment._compute_benchmarks()  # Compute benchmarks for the environment
 
         self.logger = setup_logger()
-        self.storage = StorageManager(n_agents=len(agents), logger=self.logger, experiment_dir=experiment_dir)
+        self.storage = StorageManager(
+            n_agents=len(agents), logger=self.logger, experiment_dir=experiment_dir
+        )
         self.prompt_manager = PromptManager(logger=self.logger)
         self.history = {agent.name: {} for agent in agents}
 
         if self.cost_series is not None:
-            self.logger.info(f"agents {(len(agents), num_rounds)} cost series shape: {cost_series.shape}")
-            assert cost_series.shape == (len(agents), num_rounds), "Cost series shape mismatch"
+            self.logger.info(
+                f"agents {(len(agents), num_rounds)} cost series shape: {cost_series.shape}"
+            )
+            assert cost_series.shape == (len(agents), num_rounds), (
+                "Cost series shape mismatch"
+            )
             environment.register_time_series(c_series=cost_series)
-        
 
     async def run(self):
         self._setup_experiment()
@@ -84,17 +99,22 @@ class Experiment:
             "num_agents": len(self.agents),
             "agents_types": {agent.name: agent.type for agent in self.agents},
             "agents_prefixes": {agent.name: agent.prefix for agent in self.agents},
-            "agents_prompts": {agent.name: agent.prompt_template for agent in self.agents},
-            "agents_memory_length": {agent.name: agent.memory_length for agent in self.agents},
+            "agents_prompts": {
+                agent.name: agent.prompt_template for agent in self.agents
+            },
+            "agents_memory_length": {
+                agent.name: agent.memory_length for agent in self.agents
+            },
             "agents_models": {agent.name: agent.model_name for agent in self.agents},
-            "agent_environment_mapping": { agent.name: {
-                                                    "env_index": agent.env_index,
-                                                    "a": agent.a,
-                                                    "alpha": agent.alpha,
-                                                    "c": agent.c,
-                                                }
-                                                for agent in self.agents
-                                            },
+            "agent_environment_mapping": {
+                agent.name: {
+                    "env_index": agent.env_index,
+                    "a": agent.a,
+                    "alpha": agent.alpha,
+                    "c": agent.c,
+                }
+                for agent in self.agents
+            },
             "num_rounds": self.num_rounds,
             "start_time": datetime.datetime.now().isoformat(),
         }
@@ -109,9 +129,11 @@ class Experiment:
         self.storage.save_metadata(metadata)
 
     async def _run_round(self, round_num: int):
-        self.environment.set_round(round_num) 
+        self.environment.set_round(round_num)
         prompts = {
-            agent.name: self.prompt_manager.generate_prompt(agent, self.history[agent.name], round_num)
+            agent.name: self.prompt_manager.generate_prompt(
+                agent, self.history[agent.name], round_num
+            )
             for agent in self.agents
         }
 
@@ -120,7 +142,9 @@ class Experiment:
 
         prices = self._store_agent_outputs(results, round_num)
         agent_order = [(agent.name, agent.env_index) for agent in self.agents]
-        quantities, profits = self.environment.compute_quantities_and_profits(agent_order, prices)
+        quantities, profits = self.environment.compute_quantities_and_profits(
+            agent_order, prices
+        )
         self._store_environment_outputs(round_num, prices, quantities, profits)
         df_history = self._create_environment_dataframe()
         self.storage.save_environment_parquet(df_history)
@@ -128,15 +152,19 @@ class Experiment:
         svg_path = self.storage.experiment_path / "results_plot.svg"
         if self.experiment_plot:
             plot_experiment_svg(
-                    df=df_history,
-                    metadata=metadata,
-                    save_path=svg_path,
-                    show_quantities=True,
-                    show_profits=True,
-                    plot_references=True
-                )
+                df=df_history,
+                metadata=metadata,
+                save_path=svg_path,
+                show_quantities=True,
+                show_profits=True,
+                plot_references=True,
+            )
         else:
-            plot_real_data_svg(df=df_history,  metadata=metadata, save_path=svg_path,)
+            plot_real_data_svg(
+                df=df_history,
+                metadata=metadata,
+                save_path=svg_path,
+            )
 
         self.storage.save_round_data(self.history)
 
@@ -152,22 +180,24 @@ class Experiment:
     def _store_environment_outputs(self, round_num, prices, quantities, profits):
         for idx, agent in enumerate(self.agents):
             name = agent.name
-            competitors_prices = {a: round(p,2) for a, p in prices.items() if a != name}
+            competitors_prices = {
+                a: round(p, 2) for a, p in prices.items() if a != name
+            }
 
-            market_data = f'- My price: {round(prices[name],2)}\n'
+            market_data = f"- My price: {round(prices[name], 2)}\n"
             if competitors_prices:
                 market_data += f"- Competitor's prices: {competitors_prices}\n"
-            market_data += f'- My quantity sold: {round(quantities[name],2)}\n'
-            market_data += f'- My profit earned: {round(profits[name],2)}\n'
+            market_data += f"- My quantity sold: {round(quantities[name], 2)}\n"
+            market_data += f"- My profit earned: {round(profits[name], 2)}\n"
 
             marginal_cost = agent.get_marginal_cost(round_num)
             if self.cost_series is not None:
-                market_data += f'- Marginal cost: {marginal_cost}\n'
+                market_data += f"- Marginal cost: {marginal_cost}\n"
 
-            self.history[name][round_num]['marginal_cost'] = round(marginal_cost, 2)
-            self.history[name][round_num]['quantity'] = round(quantities[name],2)
-            self.history[name][round_num]['profit'] = round(profits[name],2)
-            self.history[name][round_num]['market_data'] = market_data
+            self.history[name][round_num]["marginal_cost"] = round(marginal_cost, 2)
+            self.history[name][round_num]["quantity"] = round(quantities[name], 2)
+            self.history[name][round_num]["profit"] = round(profits[name], 2)
+            self.history[name][round_num]["market_data"] = market_data
 
     def _finalize_experiment(self):
         metadata = self.storage.load_metadata()
@@ -187,7 +217,9 @@ class Experiment:
             agent_name = agent.name
             for round_num, data in self.history[agent_name].items():
                 # Use marginal cost from history if it's already injected
-                marginal_cost = data.get("marginal_cost", agent.get_marginal_cost(round_num))
+                marginal_cost = data.get(
+                    "marginal_cost", agent.get_marginal_cost(round_num)
+                )
 
                 record = {
                     "round": round_num,
@@ -208,12 +240,25 @@ class Experiment:
         Assumes real_data is a dict: agent_name -> list[{"round": int, "chosen_price": float}]
         """
         self.logger.info("📜 Injecting real data as initial memory.")
-        rounds_to_use = sorted(set(r["round"] for agent_data in self.initial_real_data.values() for r in agent_data))
+        rounds_to_use = sorted(
+            set(
+                r["round"]
+                for agent_data in self.initial_real_data.values()
+                for r in agent_data
+            )
+        )
 
         for round_num in rounds_to_use:
             # Gather prices from all agents
             prices = {
-                agent_name: next((entry["chosen_price"] for entry in agent_data if entry["round"] == round_num), None)
+                agent_name: next(
+                    (
+                        entry["chosen_price"]
+                        for entry in agent_data
+                        if entry["round"] == round_num
+                    ),
+                    None,
+                )
                 for agent_name, agent_data in self.initial_real_data.items()
             }
 
@@ -223,12 +268,16 @@ class Experiment:
                 raise ValueError(f"Skipping round {round_num}: incomplete data")
 
             agent_order = [(agent.name, agent.env_index) for agent in self.agents]
-            quantities, profits = self.environment.compute_quantities_and_profits(agent_order, prices)
+            quantities, profits = self.environment.compute_quantities_and_profits(
+                agent_order, prices
+            )
 
             for agent in self.agents:
                 name = agent.name
                 agent_entries = self.initial_real_data.get(name, [])
-                entry = next((e for e in agent_entries if e["round"] == round_num), None)
+                entry = next(
+                    (e for e in agent_entries if e["round"] == round_num), None
+                )
                 if entry is None:
                     continue
 
@@ -243,13 +292,13 @@ class Experiment:
                     "profit": profit,
                     "marginal_cost": marginal_cost,
                     "market_data": (
-                        f'- My price: {round(price,2)}\n'
-                        f"- Competitor's prices: { {k: round(v,2) for k, v in prices.items() if k != name} }\n"
-                        f'- My quantity sold: {round(quantity,2)}\n'
-                        f'- My profit earned: {round(profit,2)}\n'
-                        f'- Marginal cost: {round(marginal_cost,2)}\n'
+                        f"- My price: {round(price, 2)}\n"
+                        f"- Competitor's prices: { {k: round(v, 2) for k, v in prices.items() if k != name} }\n"
+                        f"- My quantity sold: {round(quantity, 2)}\n"
+                        f"- My profit earned: {round(profit, 2)}\n"
+                        f"- Marginal cost: {round(marginal_cost, 2)}\n"
                     ),
-                    "is_initial_history": True
+                    "is_initial_history": True,
                 }
 
         self.logger.info("✅ Finished injecting real data.\n")

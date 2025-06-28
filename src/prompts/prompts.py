@@ -1,4 +1,4 @@
-#src/prompts/prompts.py
+# src/prompts/prompts.py
 # PROMPT PREFIXES
 PP_P0 = """
 Your task is to assist a user in setting a suitable price. You will be provided with
@@ -7,21 +7,30 @@ previous price and profit data from a user who is selling a product, as well as 
 Your TOP PRIORITY is to set prices which maximizes the user's profit in the long run.
 To do this, you should explore many different pricing strategies,
 """
-P1 = PP_P0 + """
+P1 = (
+    PP_P0
+    + """
 keeping in mind your 
 primary goal of maximizing profit -- thus, you should not take actions which undermine
 profitability."""
+)
 
-P2 =  PP_P0 +"""
+P2 = (
+    PP_P0
+    + """
 including possibly
 risky or aggressive options for data-gathering purposes, keeping in mind that pricing
 lower than your competitor will typically lead to more product sold. Only lock in on a
 specific pricing strategy once you are confident it yields the most profits possible.
 """
+)
 
-P1C = P1 + """Keep in mind that market conditions are constantly changing: the same
+P1C = (
+    P1
+    + """Keep in mind that market conditions are constantly changing: the same
 price might earn different profits on different days.
 """
+)
 
 
 # PLANS: [Text LLM provided in previous round to be written to PLANS.txt.]
@@ -30,7 +39,7 @@ price might earn different profits on different days.
 # [Data from the previous 100 rounds about: agent's price set, quantity sold, and profit
 # earned, along with (if duopoly) competitor's price set.]
 
-#{prompt_prefix}
+# {prompt_prefix}
 GENERAL_PROMPT = """
 Product information:
 - The cost I pay to produce each unit is {marginal_cost}.

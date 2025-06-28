@@ -182,9 +182,9 @@ def get_monopoly_prices_varying_alphas(
 
     assert len(alpha_list) == len(multiplier_list)
 
-    assert all(
-        [all([alpha > 0 for alpha in alphas]) for alphas in alpha_list]
-    ), "All alphas must be positive"
+    assert all([all([alpha > 0 for alpha in alphas]) for alphas in alpha_list]), (
+        "All alphas must be positive"
+    )
 
     my_random = np.random.RandomState(0)
 
