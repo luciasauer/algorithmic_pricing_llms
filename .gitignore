@@ -209,3 +209,7 @@ output/
 results/
 .DS_Store
 experiments_runs/
+# But keep the following files:
+!data/.gitkeep
+!data/**/.gitkeep
+!data/**/*.md
