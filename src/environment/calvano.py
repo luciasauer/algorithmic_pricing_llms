@@ -41,11 +41,17 @@ class CalvanoDemandEnvironment:
             return self.c_series[:, self.round - 1]  # round is 1-based
         return self.c
 
-    def compute_quantities_and_profits(self, agent_order: list[tuple[str, int]], prices: dict[str, float]) -> tuple[dict[str, float], dict[str, float]]:
+    def compute_quantities_and_profits(
+        self,
+        agent_order: list[tuple[str, int]],
+        prices: dict[str, float],
+        c_override: np.ndarray = None
+    ) -> tuple[dict[str, float], dict[str, float]]:
         try:
             sorted_names = [name for name, _ in sorted(agent_order, key=lambda x: x[1])]
             price_values = [prices[name] for name in sorted_names]
-            current_c = self._current_c()
+
+            current_c = c_override if c_override is not None else self._current_c()
 
             quantities = get_quantities(
                 p=tuple(price_values), a0=self.a_0, a=self.a, mu=self.mu,

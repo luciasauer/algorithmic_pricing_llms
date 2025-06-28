@@ -13,7 +13,12 @@ class PenaltyDemandEnvironment:
         self.c = None  # current marginal costs per agent
         self.nbr_agents = None
 
-    def compute_quantities_and_profits(self, agent_order: list[tuple[str, int]], prices: dict[str, float]) -> tuple[dict[str, float], dict[str, float]]:
+    def compute_quantities_and_profits(
+        self,
+        agent_order: list[tuple[str, int]],
+        prices: dict[str, float],
+        c_override: np.ndarray = None
+    ) -> tuple[dict[str, float], dict[str, float]]:
         try:
             # Sort by env_index
             sorted_agents = sorted(agent_order, key=lambda x: x[1])
