@@ -1,4 +1,4 @@
-#experiments_fuels/only_one_agent.py
+# experiments_fuels/only_one_agent.py
 import os
 import sys
 import asyncio
@@ -14,7 +14,6 @@ from src.agents.fake_agent import FakeAgent
 from src.experiment.experiment import Experiment
 from src.prompts.prompts import GENERAL_PROMPT, P1C
 from src.prompts.prompts_models import create_pricing_response_model
-from src.environment.calvano import CalvanoDemandEnvironment
 from src.environment.penalty_demand_environment import PenaltyDemandEnvironment
 from pathlib import Path
 
@@ -25,50 +24,100 @@ API_KEY = os.getenv("MISTRAL_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
 
 
-marginal_costs = pl.read_parquet('experiments_fuels/data/marginal_costs.parquet')['tgpmin'].to_numpy().flatten() /100
-bp_prices = pl.read_parquet('experiments_fuels/data/bp_prices.parquet')['avg_price'].to_numpy().flatten()/100
-caltex_prices = pl.read_parquet('experiments_fuels/data/caltex_prices.parquet')['avg_price'].to_numpy().flatten()/100
-coles_prices = pl.read_parquet('experiments_fuels/data/coles_prices.parquet')['avg_price'].to_numpy().flatten()/100
-woolworths_prices = pl.read_parquet('experiments_fuels/data/woolworths_prices.parquet')['avg_price'].to_numpy().flatten()/100
-gull_prices = pl.read_parquet('experiments_fuels/data/gull_prices.parquet')['avg_price'].to_numpy().flatten()/100
+marginal_costs = (
+    pl.read_parquet("experiments_fuels/data/marginal_costs.parquet")["tgpmin"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
+bp_prices = (
+    pl.read_parquet("experiments_fuels/data/bp_prices.parquet")["avg_price"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
+caltex_prices = (
+    pl.read_parquet("experiments_fuels/data/caltex_prices.parquet")["avg_price"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
+coles_prices = (
+    pl.read_parquet("experiments_fuels/data/coles_prices.parquet")["avg_price"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
+woolworths_prices = (
+    pl.read_parquet("experiments_fuels/data/woolworths_prices.parquet")["avg_price"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
+gull_prices = (
+    pl.read_parquet("experiments_fuels/data/gull_prices.parquet")["avg_price"]
+    .to_numpy()
+    .flatten()
+    / 100
+)
 
 
-MEMORY_LENGTH = 100 
+MEMORY_LENGTH = 100
 N_ROUNDS = len(marginal_costs)
 N_RUNS = 1
 ALPHAS_TO_TRY = [1]
 import json
+
 with open("experiments_fuels/data/initial_real_data.json", "r") as f:
     initial_real_data = json.load(f)
 
 
 async def main(alpha=1):
-
-    PricingAgentResponse = create_pricing_response_model(include_wtp=True, wtp_value=2 * alpha)
-    cost_series = np.tile(marginal_costs, (4, 1))  #NOTE! SHOULD BE IN THE SAME ORDER AS AGENTS
+    PricingAgentResponse = create_pricing_response_model(
+        include_wtp=True, wtp_value=2 * alpha
+    )
+    cost_series = np.tile(
+        marginal_costs, (4, 1)
+    )  # NOTE! SHOULD BE IN THE SAME ORDER AS AGENTS
 
     print("marginal_costs.shape:", getattr(cost_series, "shape", type(marginal_costs)))
     print("cost_series.shape:", cost_series.shape)
     # print("Expected shape:", (len(agents), N_ROUNDS))
 
-    #NOTE! BRAND EFFECTS!
-    #(2.45, 2.13, 2.13, 2.0)
+    # NOTE! BRAND EFFECTS!
+    # (2.45, 2.13, 2.13, 2.0)
     # Load from config or pass manually
     agents = [
-        FakeAgent("BP", time_series_data=bp_prices, nbr_rounds=N_RUNS, env_params={"a": 2.45, "alpha": 1.0, "c": 1.0},),
-        FakeAgent("Caltex", time_series_data=caltex_prices, nbr_rounds=N_RUNS, env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},),
-        FakeAgent("Woolworths", time_series_data=woolworths_prices, nbr_rounds=N_RUNS, env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},),
+        FakeAgent(
+            "BP",
+            time_series_data=bp_prices,
+            nbr_rounds=N_RUNS,
+            env_params={"a": 2.45, "alpha": 1.0, "c": 1.0},
+        ),
+        FakeAgent(
+            "Caltex",
+            time_series_data=caltex_prices,
+            nbr_rounds=N_RUNS,
+            env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},
+        ),
+        FakeAgent(
+            "Woolworths",
+            time_series_data=woolworths_prices,
+            nbr_rounds=N_RUNS,
+            env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},
+        ),
         # FakeAgent("Coles", time_series_data=coles_prices, nbr_rounds=N_RUNS, env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},),
-        LLMAgent("Coles", 
-              prefix=P1C,
-              api_key=API_KEY, 
-              model_name=MODEL_NAME, 
-              response_model=PricingAgentResponse, 
-              memory_length=MEMORY_LENGTH, 
-              prompt_template=GENERAL_PROMPT,
-              env_params={"a": 2.0, "alpha": 1.0, "c": 1.0},
-              ),
-       # FakeAgent("Gull", time_series_data=gull_prices, nbr_rounds=N_RUNS, env_params={"a": 1.0, "alpha": 1.0, "c": 1.0},),
+        LLMAgent(
+            "Coles",
+            prefix=P1C,
+            api_key=API_KEY,
+            model_name=MODEL_NAME,
+            response_model=PricingAgentResponse,
+            memory_length=MEMORY_LENGTH,
+            prompt_template=GENERAL_PROMPT,
+            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0},
+        ),
+        # FakeAgent("Gull", time_series_data=gull_prices, nbr_rounds=N_RUNS, env_params={"a": 1.0, "alpha": 1.0, "c": 1.0},),
     ]
 
     # env = CalvanoDemandEnvironment(
@@ -78,20 +127,20 @@ async def main(alpha=1):
     env = PenaltyDemandEnvironment(
         name="Penalty Market",
         description="Oligopoly with penalty on price deviation from competitor average",
-        penalty_lambda=1#0.1#0.0622
+        penalty_lambda=1,  # 0.1#0.0622
     )
 
-    experiment = Experiment(name="oligopoly_experiment_one_agent_simple_demand_lambda_1", 
-                            agents=agents, 
-                            num_rounds=N_ROUNDS, 
-                            environment=env,
-                            cost_series=cost_series,
-                            initial_real_data=initial_real_data,
-                            experiment_dir=current_file_path.parent / "experiments_runs",
-                            experiment_plot=False
-                            )
+    experiment = Experiment(
+        name="oligopoly_experiment_one_agent_simple_demand_lambda_1",
+        agents=agents,
+        num_rounds=N_ROUNDS,
+        environment=env,
+        cost_series=cost_series,
+        initial_real_data=initial_real_data,
+        experiment_dir=current_file_path.parent / "experiments_runs",
+        experiment_plot=False,
+    )
     await experiment.run()
-
 
 
 if __name__ == "__main__":

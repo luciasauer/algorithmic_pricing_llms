@@ -1,10 +1,18 @@
-#src/agents/base_agent.py
+# src/agents/base_agent.py
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 
+
 class Agent(ABC):
-    def __init__(self, name: str, prefix: str = "", prompt_template: str = "", env_index: int = None, 
-                 env_params: dict = None, logger=None):
+    def __init__(
+        self,
+        name: str,
+        prefix: str = "",
+        prompt_template: str = "",
+        env_index: int = None,
+        env_params: dict = None,
+        logger=None,
+    ):
         self.name = name
         self.prefix = prefix
         self.prompt_template = prompt_template
@@ -19,7 +27,9 @@ class Agent(ABC):
 
         # Assert that these parameters are not None
         assert self.a is not None, f"Missing 'a' parameter for agent {self.name}"
-        assert self.alpha is not None, f"Missing 'alpha' parameter for agent {self.name}"
+        assert self.alpha is not None, (
+            f"Missing 'alpha' parameter for agent {self.name}"
+        )
         assert self.c is not None, f"Missing 'c' parameter for agent {self.name}"
 
     @property
@@ -29,7 +39,7 @@ class Agent(ABC):
     @property
     def type(self) -> str:
         return None
-    
+
     @abstractmethod
     async def act(self, prompt: str) -> Dict[str, Any]:
         pass

@@ -4,9 +4,16 @@ import logging
 import polars as pl
 from pathlib import Path
 
+
 class StorageManager:
-    def __init__(self, n_agents: int, base_dir="experiments_runs", experiment_dir = None, logger: logging.Logger = None):
-        self.base_dir = Path(base_dir) 
+    def __init__(
+        self,
+        n_agents: int,
+        base_dir="experiments_runs",
+        experiment_dir=None,
+        logger: logging.Logger = None,
+    ):
+        self.base_dir = Path(base_dir)
         if experiment_dir:
             self.base_dir = Path(experiment_dir)
         self.n_agents = n_agents
@@ -24,8 +31,8 @@ class StorageManager:
     def save_metadata(self, metadata: dict):
         with open(self.experiment_path / "metadata.json", "w") as f:
             json.dump(metadata, f, indent=2)
-        self.logger.info(f"✅ Metadata saved")
-    
+        self.logger.info("✅ Metadata saved")
+
     def load_metadata(self):
         try:
             with open(self.experiment_path / "metadata.json", "r") as f:
@@ -33,18 +40,20 @@ class StorageManager:
             return metadata
         except FileNotFoundError:
             self.logger.error("❌ Metadata file not found.")
-            raise FileNotFoundError("Metadata file not found. Please ensure the experiment has been set up correctly.")
+            raise FileNotFoundError(
+                "Metadata file not found. Please ensure the experiment has been set up correctly."
+            )
 
     def save_round_data(self, data: dict):
         try:
-            with open(self.experiment_path / f"results.json", "w") as f:
+            with open(self.experiment_path / "results.json", "w") as f:
                 json.dump(data, f, indent=2)
         except Exception as e:
             self.logger.error(f"❌ Failed to save round data: {e}")
-    
+
     def get_log_file_path(self):
         return self.experiment_path / "log.txt"
-    
+
     def save_environment_parquet(self, df: pl.DataFrame):
         try:
             path = self.experiment_path / "environment_history.parquet"
