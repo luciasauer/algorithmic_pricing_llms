@@ -5,9 +5,11 @@ from pathlib import Path
 
 import polars as pl
 
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+
 
 def load_tgp_data(
-    file_path: str = "../../data/113176-V1/data/TGP/tgpmin.csv",
+    file_path: str = PROJECT_ROOT / "data/tgp/tgpmin.csv",
     start_date: datetime.date = None,
     end_date: datetime.date = None,
 ) -> pl.DataFrame:
@@ -68,7 +70,7 @@ def get_tgp_for_period(tgp_data: pl.DataFrame, start_date: str, period: int) -> 
 
 
 def load_retail_data(
-    file_path: str = "../../data/113176-V1/data/Prices/",
+    file_path: str = PROJECT_ROOT / "data/retail/",
     file: str = "FuelWatchRetail-*.csv",
     start_date: datetime.date = None,
     end_date: datetime.date = None,
