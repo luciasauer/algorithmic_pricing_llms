@@ -14,48 +14,35 @@ from src.experiment.experiment import Experiment
 from src.environment.calvano import CalvanoDemandEnvironment
 from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).parent.parent
 current_file_path = Path(__file__).resolve()
 
 load_dotenv()
 API_KEY = os.getenv("MISTRAL_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
+DATA_DIR = PROJECT_ROOT / "data/processed"
 
 
 marginal_costs = (
-    pl.read_parquet("experiments_fuels/data/marginal_costs.parquet")["tgpmin"]
+    pl.read_parquet(DATA_DIR / "marginal_costs_tgp.parquet")["tgpmin"]
     .to_numpy()
     .flatten()
-    / 100
 )
 bp_prices = (
-    pl.read_parquet("experiments_fuels/data/bp_prices.parquet")["avg_price"]
-    .to_numpy()
-    .flatten()
-    / 100
+    pl.read_parquet(DATA_DIR / "bp_prices.parquet")["avg_price"].to_numpy().flatten()
 )
 caltex_prices = (
-    pl.read_parquet("experiments_fuels/data/caltex_prices.parquet")["avg_price"]
+    pl.read_parquet(DATA_DIR / "caltex_prices.parquet")["avg_price"]
     .to_numpy()
     .flatten()
-    / 100
 )
 coles_prices = (
-    pl.read_parquet("experiments_fuels/data/coles_prices.parquet")["avg_price"]
-    .to_numpy()
-    .flatten()
-    / 100
+    pl.read_parquet(DATA_DIR / "coles_prices.parquet")["avg_price"].to_numpy().flatten()
 )
 woolworths_prices = (
-    pl.read_parquet("experiments_fuels/data/woolworths_prices.parquet")["avg_price"]
+    pl.read_parquet(DATA_DIR / "woolworths_prices.parquet")["avg_price"]
     .to_numpy()
     .flatten()
-    / 100
-)
-gull_prices = (
-    pl.read_parquet("experiments_fuels/data/gull_prices.parquet")["avg_price"]
-    .to_numpy()
-    .flatten()
-    / 100
 )
 
 
@@ -69,10 +56,6 @@ async def main(alpha=1):
     cost_series = np.tile(
         marginal_costs, (4, 1)
     )  # NOTE! SHOULD BE IN THE SAME ORDER AS AGENTS
-
-    print("marginal_costs.shape:", getattr(cost_series, "shape", type(marginal_costs)))
-    print("cost_series.shape:", cost_series.shape)
-    # print("Expected shape:", (len(agents), N_ROUNDS))
 
     # Load from config or pass manually
     agents = [
@@ -100,7 +83,6 @@ async def main(alpha=1):
             nbr_rounds=N_RUNS,
             env_params={"a": 1.0, "alpha": 1.0, "c": 1.0},
         ),
-        # FakeAgent("Gull", time_series_data=gull_prices, nbr_rounds=N_RUNS, env_params={"a": 1.0, "alpha": 1.0, "c": 1.0},),
     ]
 
     env = CalvanoDemandEnvironment(

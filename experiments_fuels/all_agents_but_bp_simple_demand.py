@@ -19,33 +19,31 @@ from src.prompts.prompts_models import create_pricing_response_model
 from src.environment.penalty_demand_environment import PenaltyDemandEnvironment
 from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).parent.parent
 current_file_path = Path(__file__).resolve()
 
 load_dotenv()
 API_KEY = os.getenv("MISTRAL_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
-print("MODEL_NAME:", MODEL_NAME)
-
+DATA_DIR = PROJECT_ROOT / "data/processed"
 
 marginal_costs = (
-    pl.read_parquet("experiments_fuels/data/marginal_costs.parquet")["tgpmin"]
+    pl.read_parquet(DATA_DIR / "marginal_costs_tgp.parquet")["tgpmin"]
     .to_numpy()
     .flatten()
-    / 100
 )
 bp_prices = (
-    pl.read_parquet("experiments_fuels/data/bp_prices.parquet")["avg_price"]
-    .to_numpy()
-    .flatten()
-    / 100
+    pl.read_parquet(DATA_DIR / "bp_prices.parquet")["avg_price"].to_numpy().flatten()
 )
 
-MEMORY_LENGTH = 300
+
+MEMORY_LENGTH = 100
 N_ROUNDS = len(marginal_costs)
 N_RUNS = 1
 ALPHAS_TO_TRY = [1]
+LAMBDA = float(os.getenv("LAMBDA"))
 
-with open("experiments_fuels/data/initial_real_data.json", "r") as f:
+with open(DATA_DIR / "initial_real_data_to_inject_as_history.json", "r") as f:
     initial_real_data = json.load(f)
 
 
@@ -106,7 +104,7 @@ async def main(alpha=1):
     env = PenaltyDemandEnvironment(
         name="Penalty Market",
         description="Oligopoly with penalty on price deviation from competitor average",
-        penalty_lambda=0.0622,
+        penalty_lambda=LAMBDA,
     )
 
     experiment = Experiment(

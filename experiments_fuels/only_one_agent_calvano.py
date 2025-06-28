@@ -18,48 +18,34 @@ from src.prompts.prompts_models import create_pricing_response_model
 from src.environment.calvano import CalvanoDemandEnvironment
 from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).parent.parent
 current_file_path = Path(__file__).resolve()
 
 load_dotenv()
 API_KEY = os.getenv("MISTRAL_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
-
+DATA_DIR = PROJECT_ROOT / "data/processed"
 
 marginal_costs = (
-    pl.read_parquet("experiments_fuels/data/marginal_costs.parquet")["tgpmin"]
+    pl.read_parquet(DATA_DIR / "marginal_costs_tgp.parquet")["tgpmin"]
     .to_numpy()
     .flatten()
-    / 100
 )
 bp_prices = (
-    pl.read_parquet("experiments_fuels/data/bp_prices.parquet")["avg_price"]
-    .to_numpy()
-    .flatten()
-    / 100
+    pl.read_parquet(DATA_DIR / "bp_prices.parquet")["avg_price"].to_numpy().flatten()
 )
 caltex_prices = (
-    pl.read_parquet("experiments_fuels/data/caltex_prices.parquet")["avg_price"]
+    pl.read_parquet(DATA_DIR / "caltex_prices.parquet")["avg_price"]
     .to_numpy()
     .flatten()
-    / 100
 )
 coles_prices = (
-    pl.read_parquet("experiments_fuels/data/coles_prices.parquet")["avg_price"]
-    .to_numpy()
-    .flatten()
-    / 100
+    pl.read_parquet(DATA_DIR / "coles_prices.parquet")["avg_price"].to_numpy().flatten()
 )
 woolworths_prices = (
-    pl.read_parquet("experiments_fuels/data/woolworths_prices.parquet")["avg_price"]
+    pl.read_parquet(DATA_DIR / "woolworths_prices.parquet")["avg_price"]
     .to_numpy()
     .flatten()
-    / 100
-)
-gull_prices = (
-    pl.read_parquet("experiments_fuels/data/gull_prices.parquet")["avg_price"]
-    .to_numpy()
-    .flatten()
-    / 100
 )
 
 
@@ -68,7 +54,7 @@ N_ROUNDS = len(marginal_costs)
 N_RUNS = 1
 ALPHAS_TO_TRY = [1]
 
-with open("experiments_fuels/data/initial_real_data.json", "r") as f:
+with open(DATA_DIR / "initial_real_data_to_inject_as_history.json", "r") as f:
     initial_real_data = json.load(f)
 
 
@@ -79,10 +65,6 @@ async def main(alpha=1):
     cost_series = np.tile(
         marginal_costs, (4, 1)
     )  # NOTE! SHOULD BE IN THE SAME ORDER AS AGENTS
-
-    print("marginal_costs.shape:", getattr(cost_series, "shape", type(marginal_costs)))
-    print("cost_series.shape:", cost_series.shape)
-    # print("Expected shape:", (len(agents), N_ROUNDS))
 
     # NOTE! BRAND EFFECTS!
     # (2.45, 2.13, 2.13, 2.0)
