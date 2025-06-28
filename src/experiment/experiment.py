@@ -38,6 +38,8 @@ class Experiment:
             "beta": 100,
             "sigma": 0.0,
             "group_idxs": [1 for _ in sorted_agents],
+            "market_share": np.array([getattr(agent, "market_share", agent.env_params.get("market_share")) for agent in sorted_agents]),
+
         }
 
         # ✅ Overwrite the attributes in the existing environment object
@@ -50,6 +52,7 @@ class Experiment:
         self.environment.sigma = env_params["sigma"]
         self.environment.group_idxs = env_params["group_idxs"]
         self.environment.nbr_agents = len(sorted_agents)
+        self.environment.market_share = env_params["market_share"]
         self.environment._compute_benchmarks()  # Compute benchmarks for the environment
 
         self.logger = setup_logger()
