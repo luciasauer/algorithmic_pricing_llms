@@ -67,6 +67,7 @@ MEMORY_LENGTH = 100
 N_ROUNDS = len(marginal_costs)
 N_RUNS = 1
 ALPHAS_TO_TRY = [1]
+LAMBDA = 15.66  # Penalty factor for price deviation
 
 with open("experiments_fuels/data/initial_real_data.json", "r") as f:
     initial_real_data = json.load(f)
@@ -125,11 +126,11 @@ async def main(alpha=1):
     env = PenaltyDemandEnvironment(
         name="Penalty Market",
         description="Oligopoly with penalty on price deviation from competitor average",
-        penalty_lambda=0.0622,
+        penalty_lambda=LAMBDA,
     )
 
     experiment = Experiment(
-        name="oligopoly_experiment_one_agent_simple_demand_lambda_0622",
+        name=f"oligopoly_experiment_one_agent_simple_demand_lambda_{LAMBDA}",
         agents=agents,
         num_rounds=N_ROUNDS,
         environment=env,
