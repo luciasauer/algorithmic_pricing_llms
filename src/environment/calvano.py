@@ -15,25 +15,44 @@ class CalvanoDemandEnvironment:
         self.description = description
         self.logger = logger or logging.getLogger("experiment_logger")
 
+        # Core parameters
         self.a_0 = None
         self.a = None
         self.mu = None
         self.alpha = None
         self.beta = None
         self.sigma = None
-        self.c = None
+        self.c = None  # This will store fallback static values
         self.group_idxs = None
 
-        self.monopoly_prices = None
-        self.nash_prices = None
+        # Time-series cost data
+        self.c_series = None
         self.round = 0
 
+        # Benchmarks
+        self.monopoly_prices = None
+        self.nash_prices = None
+
+    def _current_c(self):
+        """
+        Returns the cost vector for the current round.
+        Prioritizes time-series if available, else defaults to static `self.c`.
+        """
+        if self.c_series is not None:
+            return self.c_series[:, self.round - 1]  # round is 1-based
+        return self.c
+
     def compute_quantities_and_profits(
-        self, agent_order: list[tuple[str, int]], prices: dict[str, float]
+        self,
+        agent_order: list[tuple[str, int]],
+        prices: dict[str, float],
+        c_override: np.ndarray = None,
     ) -> tuple[dict[str, float], dict[str, float]]:
         try:
             sorted_names = [name for name, _ in sorted(agent_order, key=lambda x: x[1])]
             price_values = [prices[name] for name in sorted_names]
+
+            current_c = c_override if c_override is not None else self._current_c()
 
             quantities = get_quantities(
                 p=tuple(price_values),
@@ -51,7 +70,7 @@ class CalvanoDemandEnvironment:
                 a=self.a,
                 mu=self.mu,
                 alpha=self.alpha,
-                c=self.c,
+                c=current_c,
                 multiplier=self.beta,
                 sigma=self.sigma,
                 group_idxs=self.group_idxs,
@@ -67,13 +86,15 @@ class CalvanoDemandEnvironment:
 
     def _compute_benchmarks(self):
         try:
-            # Monopoly solution
+            # Benchmarks use current round's cost
+            current_c = self._current_c()
+
             self.monopoly_prices = get_monopoly_prices(
                 a0=self.a_0,
                 a=self.a,
                 mu=self.mu,
                 alpha=self.alpha,
-                c=self.c,
+                c=current_c,
                 multiplier=self.beta,
                 sigma=self.sigma,
                 group_idxs=self.group_idxs,
@@ -96,19 +117,18 @@ class CalvanoDemandEnvironment:
                 a=self.a,
                 mu=self.mu,
                 alpha=self.alpha,
-                c=self.c,
+                c=current_c,
                 multiplier=self.beta,
                 sigma=self.sigma,
                 group_idxs=self.group_idxs,
             )
 
-            # Nash solution
             self.nash_prices = get_nash_prices(
                 a0=self.a_0,
                 a=self.a,
                 mu=self.mu,
                 alpha=self.alpha,
-                c=self.c,
+                c=current_c,
                 multiplier=self.beta,
                 sigma=self.sigma,
                 group_idxs=self.group_idxs,
@@ -131,16 +151,24 @@ class CalvanoDemandEnvironment:
                 a=self.a,
                 mu=self.mu,
                 alpha=self.alpha,
-                c=self.c,
+                c=current_c,
                 multiplier=self.beta,
                 sigma=self.sigma,
                 group_idxs=self.group_idxs,
             )
+
         except Exception as e:
             self.logger.error(
                 f"Error computing benchmarks when initializing environment: {e}"
             )
             raise e
+
+    def set_round(self, round_num: int):
+        """Set current round for cost lookup (if cost series is used)"""
+        self.round = round_num
+
+    def register_time_series(self, c_series: np.ndarray):
+        self.c_series = c_series
 
     def get_environment_params(self):
         return {
@@ -150,32 +178,12 @@ class CalvanoDemandEnvironment:
             "alpha": self.alpha.tolist(),
             "beta": self.beta,
             "sigma": self.sigma,
-            "c": self.c.tolist(),
+            "c": self._current_c().tolist(),
             "group_idxs": self.group_idxs,
-            "monopoly_prices": self.monopoly_prices
-            if self.monopoly_prices is not None
-            else None,
-            "monopoly_quantities": self.monopoly_quantities
-            if self.monopoly_quantities is not None
-            else None,
-            "monopoly_profits": self.monopoly_profits
-            if self.monopoly_profits is not None
-            else None,
-            "nash_prices": self.nash_prices if self.nash_prices is not None else None,
-            "nash_quantities": self.nash_quantities
-            if self.nash_quantities is not None
-            else None,
-            "nash_profits": self.nash_profits
-            if self.nash_profits is not None
-            else None,
+            "monopoly_prices": self.monopoly_prices,
+            "monopoly_quantities": self.monopoly_quantities,
+            "monopoly_profits": self.monopoly_profits,
+            "nash_prices": self.nash_prices,
+            "nash_quantities": self.nash_quantities,
+            "nash_profits": self.nash_profits,
         }
-
-    def register_time_series(self, c_series: np.ndarray):
-        """Supply full (num_agents, num_rounds) arrays of time-varying parameters"""
-        self.c_series = c_series
-
-    def set_round(self, round_num: int):
-        """Update time-varying parameters before using them"""
-        self.round = round_num
-        if hasattr(self, "c_series") and self.c_series is not None:
-            self.c = self.c_series[:, round_num - 1]  # 0-indexed access

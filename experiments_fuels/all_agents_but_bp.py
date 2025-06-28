@@ -12,9 +12,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from src.agents.LLM_agent import LLMAgent
 from src.agents.fake_agent import FakeAgent
 from src.experiment.experiment import Experiment
-from src.prompts.prompts import GENERAL_PROMPT, P1C
+from src.prompts.prompts import GENERAL_PROMPT, P1
 from src.prompts.prompts_models import create_pricing_response_model
-from src.environment.penalty_demand_environment import PenaltyDemandEnvironment
+from src.environment.calvano import CalvanoDemandEnvironment
 from pathlib import Path
 
 current_file_path = Path(__file__).resolve()
@@ -22,6 +22,7 @@ current_file_path = Path(__file__).resolve()
 load_dotenv()
 API_KEY = os.getenv("MISTRAL_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
+print("MODEL_NAME:", MODEL_NAME)
 
 
 marginal_costs = (
@@ -36,33 +37,8 @@ bp_prices = (
     .flatten()
     / 100
 )
-caltex_prices = (
-    pl.read_parquet("experiments_fuels/data/caltex_prices.parquet")["avg_price"]
-    .to_numpy()
-    .flatten()
-    / 100
-)
-coles_prices = (
-    pl.read_parquet("experiments_fuels/data/coles_prices.parquet")["avg_price"]
-    .to_numpy()
-    .flatten()
-    / 100
-)
-woolworths_prices = (
-    pl.read_parquet("experiments_fuels/data/woolworths_prices.parquet")["avg_price"]
-    .to_numpy()
-    .flatten()
-    / 100
-)
-gull_prices = (
-    pl.read_parquet("experiments_fuels/data/gull_prices.parquet")["avg_price"]
-    .to_numpy()
-    .flatten()
-    / 100
-)
 
-
-MEMORY_LENGTH = 100
+MEMORY_LENGTH = 21
 N_ROUNDS = len(marginal_costs)
 N_RUNS = 1
 ALPHAS_TO_TRY = [1]
@@ -94,22 +70,29 @@ async def main(alpha=1):
             nbr_rounds=N_RUNS,
             env_params={"a": 2.45, "alpha": 1.0, "c": 1.0},
         ),
-        FakeAgent(
+        LLMAgent(
             "Caltex",
-            time_series_data=caltex_prices,
-            nbr_rounds=N_RUNS,
+            prefix=P1,
+            api_key=API_KEY,
+            model_name=MODEL_NAME,
+            response_model=PricingAgentResponse,
+            memory_length=MEMORY_LENGTH,
+            prompt_template=GENERAL_PROMPT,
             env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},
         ),
-        FakeAgent(
+        LLMAgent(
             "Woolworths",
-            time_series_data=woolworths_prices,
-            nbr_rounds=N_RUNS,
+            prefix=P1,
+            api_key=API_KEY,
+            model_name=MODEL_NAME,
+            response_model=PricingAgentResponse,
+            memory_length=MEMORY_LENGTH,
+            prompt_template=GENERAL_PROMPT,
             env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},
         ),
-        # FakeAgent("Coles", time_series_data=coles_prices, nbr_rounds=N_RUNS, env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},),
         LLMAgent(
             "Coles",
-            prefix=P1C,
+            prefix=P1,
             api_key=API_KEY,
             model_name=MODEL_NAME,
             response_model=PricingAgentResponse,
@@ -117,21 +100,15 @@ async def main(alpha=1):
             prompt_template=GENERAL_PROMPT,
             env_params={"a": 2.0, "alpha": 1.0, "c": 1.0},
         ),
-        # FakeAgent("Gull", time_series_data=gull_prices, nbr_rounds=N_RUNS, env_params={"a": 1.0, "alpha": 1.0, "c": 1.0},),
     ]
 
-    # env = CalvanoDemandEnvironment(
-    #     name="Calvano Market",
-    #     description="Oligopoly environment with Calvano 2020 demand",
-    # )
-    env = PenaltyDemandEnvironment(
-        name="Penalty Market",
-        description="Oligopoly with penalty on price deviation from competitor average",
-        penalty_lambda=1,  # 0.1#0.0622
+    env = CalvanoDemandEnvironment(
+        name="Calvano Market",
+        description="Oligopoly environment with Calvano 2020 demand",
     )
 
     experiment = Experiment(
-        name="oligopoly_experiment_one_agent_simple_demand_lambda_1",
+        name="oligopoly_setting_all_agents_but_BP_P1_memory_21",
         agents=agents,
         num_rounds=N_ROUNDS,
         environment=env,

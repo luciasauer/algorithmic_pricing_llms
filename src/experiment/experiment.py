@@ -48,6 +48,12 @@ class Experiment:
             "beta": 100,
             "sigma": 0.0,
             "group_idxs": [1 for _ in sorted_agents],
+            "market_share": np.array(
+                [
+                    getattr(agent, "market_share", agent.env_params.get("market_share"))
+                    for agent in sorted_agents
+                ]
+            ),
         }
 
         # ✅ Overwrite the attributes in the existing environment object
@@ -60,6 +66,7 @@ class Experiment:
         self.environment.sigma = env_params["sigma"]
         self.environment.group_idxs = env_params["group_idxs"]
         self.environment.nbr_agents = len(sorted_agents)
+        self.environment.market_share = env_params["market_share"]
         self.environment._compute_benchmarks()  # Compute benchmarks for the environment
 
         self.logger = setup_logger()
@@ -192,7 +199,7 @@ class Experiment:
 
             marginal_cost = agent.get_marginal_cost(round_num)
             if self.cost_series is not None:
-                market_data += f"- Marginal cost: {marginal_cost}\n"
+                market_data += f"- Marginal cost: {round(marginal_cost, 2)}\n"
 
             self.history[name][round_num]["marginal_cost"] = round(marginal_cost, 2)
             self.history[name][round_num]["quantity"] = round(quantities[name], 2)
@@ -235,10 +242,6 @@ class Experiment:
         return pl.DataFrame(records)
 
     def _inject_initial_real_data(self):
-        """
-        Injects real price data into self.history and computes env outcomes.
-        Assumes real_data is a dict: agent_name -> list[{"round": int, "chosen_price": float}]
-        """
         self.logger.info("📜 Injecting real data as initial memory.")
         rounds_to_use = sorted(
             set(
@@ -249,7 +252,7 @@ class Experiment:
         )
 
         for round_num in rounds_to_use:
-            # Gather prices from all agents
+            # Gather prices
             prices = {
                 agent_name: next(
                     (
@@ -262,21 +265,41 @@ class Experiment:
                 for agent_name, agent_data in self.initial_real_data.items()
             }
 
-            # Skip round if any agent has no data
             if any(price is None for price in prices.values()):
                 self.logger.error(f"Skipping round {round_num}: incomplete data")
                 raise ValueError(f"Skipping round {round_num}: incomplete data")
 
+            # Create c_override vector in the correct env_index order
+            c_override = np.array(
+                [
+                    next(
+                        (
+                            entry.get(
+                                "marginal_cost", agent.get_marginal_cost(round_num)
+                            )
+                            for entry in self.initial_real_data[agent.name]
+                            if entry["round"] == round_num
+                        ),
+                        agent.get_marginal_cost(round_num),
+                    )
+                    for agent in sorted(self.agents, key=lambda ag: ag.env_index)
+                ]
+            )
+
             agent_order = [(agent.name, agent.env_index) for agent in self.agents]
             quantities, profits = self.environment.compute_quantities_and_profits(
-                agent_order, prices
+                agent_order, prices, c_override=c_override
             )
 
             for agent in self.agents:
                 name = agent.name
-                agent_entries = self.initial_real_data.get(name, [])
                 entry = next(
-                    (e for e in agent_entries if e["round"] == round_num), None
+                    (
+                        e
+                        for e in self.initial_real_data.get(name, [])
+                        if e["round"] == round_num
+                    ),
+                    None,
                 )
                 if entry is None:
                     continue
@@ -284,7 +307,9 @@ class Experiment:
                 price = entry["chosen_price"]
                 quantity = quantities[name]
                 profit = profits[name]
-                marginal_cost = entry.get("marginal_cost", agent.get_marginal_cost(1))
+                marginal_cost = entry.get(
+                    "marginal_cost", agent.get_marginal_cost(round_num)
+                )
 
                 self.history[name][round_num] = {
                     "chosen_price": price,
