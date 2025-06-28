@@ -50,7 +50,11 @@ class Agent(ABC):
         Return marginal cost for a given round.
         Falls back to static cost if no dynamic series is present.
         """
-        if hasattr(self, "environment") and hasattr(self.environment, "c_series"):
+        if (
+            hasattr(self, "environment")
+            and hasattr(self.environment, "c_series")
+            and self.environment.c_series is not None
+        ):
             marginal_cost = self.environment.c_series[self.env_index, round_num - 1]
         else:
             marginal_cost = self.c
