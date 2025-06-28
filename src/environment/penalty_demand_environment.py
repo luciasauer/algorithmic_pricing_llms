@@ -63,23 +63,30 @@ class PenaltyDemandEnvironment:
                 P_i = price_values[i]
                 MC_i = cost_values[i]
                 S_i = self.market_share[i]
-                other_prices = np.delete(price_values, i)
-                P_others_avg = np.mean(other_prices)
-                P_avg_weighted = np.average(
-                    price_values,
-                    weights=self.market_share[np.arange(len(self.market_share))],
+
+                # Exclude i-th price and market share
+                mask = np.arange(len(self.market_share)) != i
+                prices_excl_i = price_values[mask]
+                weights_excl_i = self.market_share[mask]
+
+                # Normalize weights to sum to 1
+                normalized_weights = weights_excl_i / np.sum(weights_excl_i)
+
+                P_avg_weighted_competitors = np.average(
+                    prices_excl_i,
+                    weights=normalized_weights,
                 )
 
                 penalty = np.exp(
-                    -self.penalty_lambda * abs(P_i - P_avg_weighted)
-                )  # NOTE!
+                    -self.penalty_lambda * abs(P_i - P_avg_weighted_competitors)
+                )
                 profit = (P_i - MC_i) * S_i * penalty
 
                 profits[name] = float(profit)
                 quantities[name] = float(S_i * penalty)
 
                 self.logger.info(
-                    f"Agent: {name}, Price: {P_i}, MC: {MC_i}, S: {S_i}, P_avg_weighted: {P_avg_weighted}, P_others_avg: {P_others_avg}"
+                    f"Agent: {name}, Price: {P_i}, MC: {MC_i}, S: {S_i}, P_avg_others: {P_avg_weighted_competitors}"
                 )
 
             return quantities, profits
