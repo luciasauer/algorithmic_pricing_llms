@@ -24,7 +24,7 @@ class StorageManager:
     def save_metadata(self, metadata: dict):
         with open(self.experiment_path / "metadata.json", "w") as f:
             json.dump(metadata, f, indent=2)
-        self.logger.info(f"✅ Metadata saved")
+        self.logger.info("✅ Metadata saved")
     
     def load_metadata(self):
         try:
@@ -37,7 +37,7 @@ class StorageManager:
 
     def save_round_data(self, data: dict):
         try:
-            with open(self.experiment_path / f"results.json", "w") as f:
+            with open(self.experiment_path / "results.json", "w") as f:
                 json.dump(data, f, indent=2)
         except Exception as e:
             self.logger.error(f"❌ Failed to save round data: {e}")
