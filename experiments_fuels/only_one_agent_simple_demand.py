@@ -14,7 +14,6 @@ from src.agents.fake_agent import FakeAgent
 from src.experiment.experiment import Experiment
 from src.prompts.prompts import GENERAL_PROMPT, P1C
 from src.prompts.prompts_models import create_pricing_response_model
-from src.environment.calvano import CalvanoDemandEnvironment
 from src.environment.penalty_demand_environment import PenaltyDemandEnvironment
 from pathlib import Path
 
@@ -53,12 +52,24 @@ async def main(alpha=1):
 
     #NOTE! BRAND EFFECTS!
     #(2.45, 2.13, 2.13, 2.0)
+    #MARKET SHARES NORMALIZED TO 1
+    # (0.22, 0.16, 0.16, 0.14)
+    # (0.323, 0.235, 0.235, 0.207)
+
     # Load from config or pass manually
     agents = [
-        FakeAgent("BP", time_series_data=bp_prices, nbr_rounds=N_RUNS, env_params={"a": 2.45, "alpha": 1.0, "c": 1.0},),
-        FakeAgent("Caltex", time_series_data=caltex_prices, nbr_rounds=N_RUNS, env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},),
-        FakeAgent("Woolworths", time_series_data=woolworths_prices, nbr_rounds=N_RUNS, env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},),
-        # FakeAgent("Coles", time_series_data=coles_prices, nbr_rounds=N_RUNS, env_params={"a": 2.13, "alpha": 1.0, "c": 1.0},),
+        FakeAgent("BP", 
+                  time_series_data=bp_prices, 
+                  nbr_rounds=N_RUNS, 
+                  env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.22},),
+        FakeAgent("Caltex", 
+                  time_series_data=caltex_prices, 
+                  nbr_rounds=N_RUNS, 
+                  env_params={"a": 2.0, "alpha": 1.0, "c": 1., "market_share": 0.235},),
+        FakeAgent("Woolworths", 
+                  time_series_data=woolworths_prices, 
+                  nbr_rounds=N_RUNS, 
+                  env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.235},),
         LLMAgent("Coles", 
               prefix=P1C,
               api_key=API_KEY, 
@@ -66,22 +77,17 @@ async def main(alpha=1):
               response_model=PricingAgentResponse, 
               memory_length=MEMORY_LENGTH, 
               prompt_template=GENERAL_PROMPT,
-              env_params={"a": 2.0, "alpha": 1.0, "c": 1.0},
+              env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.207},
               ),
-       # FakeAgent("Gull", time_series_data=gull_prices, nbr_rounds=N_RUNS, env_params={"a": 1.0, "alpha": 1.0, "c": 1.0},),
     ]
 
-    # env = CalvanoDemandEnvironment(
-    #     name="Calvano Market",
-    #     description="Oligopoly environment with Calvano 2020 demand",
-    # )
     env = PenaltyDemandEnvironment(
         name="Penalty Market",
         description="Oligopoly with penalty on price deviation from competitor average",
-        penalty_lambda=1#0.1#0.0622
+        penalty_lambda=0.0622
     )
 
-    experiment = Experiment(name="oligopoly_experiment_one_agent_simple_demand_lambda_1", 
+    experiment = Experiment(name="oligopoly_experiment_one_agent_all_a2", 
                             agents=agents, 
                             num_rounds=N_ROUNDS, 
                             environment=env,
