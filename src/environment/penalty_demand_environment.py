@@ -76,18 +76,12 @@ class PenaltyDemandEnvironment:
                     prices_excl_i,
                     weights=normalized_weights,
                 )
-
-                penalty = np.exp(
-                    -self.penalty_lambda * abs(P_i - P_avg_weighted_competitors)
-                )
+                price_deviation = P_i - P_avg_weighted_competitors
+                penalty = np.exp(-self.penalty_lambda * price_deviation)
                 profit = (P_i - MC_i) * S_i * penalty
 
                 profits[name] = float(profit)
                 quantities[name] = float(S_i * penalty)
-
-                self.logger.info(
-                    f"Agent: {name}, Price: {P_i}, MC: {MC_i}, S: {S_i}, P_avg_others: {P_avg_weighted_competitors}"
-                )
 
             return quantities, profits
 
