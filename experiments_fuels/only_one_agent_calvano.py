@@ -128,7 +128,7 @@ async def main(alpha=1):
     )
 
     experiment = Experiment(
-        name="oligopoly_experiment_one_agent_all_a2",
+        name="oligopoly_experiment_one_agent_estimated_a_vals",
         agents=agents,
         num_rounds=N_ROUNDS,
         environment=env,

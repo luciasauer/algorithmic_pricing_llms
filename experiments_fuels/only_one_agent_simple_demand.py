@@ -129,7 +129,7 @@ async def main(alpha=1):
     )
 
     experiment = Experiment(
-        name="oligopoly_experiment_one_agent",
+        name="oligopoly_experiment_one_agent_simple_demand_lambda_0622",
         agents=agents,
         num_rounds=N_ROUNDS,
         environment=env,
