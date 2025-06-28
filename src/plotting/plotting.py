@@ -115,9 +115,10 @@ def plot_real_data_svg(df: pl.DataFrame,  metadata: dict, save_path: Path):
     rounds = df["round"].unique().to_list()
     agents = df["agent"].unique().to_list()
     monopoly_prices = None
-    if 'monopoly_price' in df.columns:
-        monopoly_prices = df.filter(pl.col('monopoly_price')>0).group_by(['round']).agg(pl.col('monopoly_price').max())['monopoly_price'].to_numpy().flatten()
-        rounds_monopoly = df.filter(pl.col('monopoly_price')>0).select('round').unique().to_numpy().flatten()
+    rounds_monopoly = None
+    # if 'monopoly_price' in df.columns:
+    #     monopoly_prices = df.filter(pl.col('monopoly_price')>0).group_by(['round']).agg(pl.col('monopoly_price').max())['monopoly_price'].to_numpy().flatten()
+    #     rounds_monopoly = df.filter(pl.col('monopoly_price')>0).select('round').unique().to_numpy().flatten()
     agents.sort()
     colors = ['blue', 'red', 'orange', 'purple', 'cyan', 'brown', 'magenta', 'gray']
 
@@ -133,8 +134,8 @@ def plot_real_data_svg(df: pl.DataFrame,  metadata: dict, save_path: Path):
         linestyle = ':' if "fake" in agent.lower() and 'bp' not in agent.lower() else '-'
         prices = df.filter(pl.col("agent") == agent).sort("round")["price"].to_list()
         ax.plot(rounds, prices, label=agent, color=colors[i % len(colors)], linestyle=linestyle)
-    if len(monopoly_prices) >0:
-        ax.plot(rounds_monopoly, monopoly_prices, label='$P^M$', color='red', linestyle=':')
+    # if len(monopoly_prices) >0:
+    #     ax.plot(rounds_monopoly, monopoly_prices, label='$P^M$', color='red', linestyle=':')
     ax.plot(rounds, marginal_cost, label="TGP", color="grey", linestyle="--", alpha=0.7)
     ax.set_ylabel("Price")
     ax.legend(loc='upper left')
