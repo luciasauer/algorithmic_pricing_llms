@@ -76,7 +76,7 @@ class PenaltyDemandEnvironment:
                     prices_excl_i,
                     weights=normalized_weights,
                 )
-                price_deviation = P_i - P_avg_weighted_competitors
+                price_deviation = abs(P_i - P_avg_weighted_competitors)
                 penalty = np.exp(-self.penalty_lambda * price_deviation)
                 profit = (P_i - MC_i) * S_i * penalty
 
