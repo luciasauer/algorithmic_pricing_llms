@@ -13,7 +13,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from src.agents.LLM_agent import LLMAgent
 from src.agents.fake_agent import FakeAgent
 from src.experiment.experiment import Experiment
-from src.prompts.prompts import GENERAL_PROMPT, P1
+from src.prompts.prompts import GENERAL_PROMPT, P1C
 from src.prompts.prompts_models import create_pricing_response_model
 from src.environment.penalty_demand_environment import PenaltyDemandEnvironment
 from pathlib import Path
@@ -66,12 +66,9 @@ async def main(alpha=1):
     cost_series = np.tile(
         marginal_costs, (4, 1)
     )  # NOTE! SHOULD BE IN THE SAME ORDER AS AGENTS
-
-    # NOTE! BRAND EFFECTS!
-    # (2.45, 2.13, 2.13, 2.0)
     # MARKET SHARES NORMALIZED TO 1
     # (0.22, 0.16, 0.16, 0.14)
-    # (0.323, 0.235, 0.235, 0.207)
+    # [0.3235, 0.2353, 0.2353, 0.2059]
 
     # Load from config or pass manually
     agents = [
@@ -79,29 +76,29 @@ async def main(alpha=1):
             "BP",
             time_series_data=bp_prices,
             nbr_rounds=N_RUNS,
-            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.323},
+            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.3235},
         ),
         FakeAgent(
             "Caltex",
             time_series_data=caltex_prices,
             nbr_rounds=N_RUNS,
-            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.235},
+            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.2353},
         ),
         FakeAgent(
             "Woolworths",
             time_series_data=woolworths_prices,
             nbr_rounds=N_RUNS,
-            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.235},
+            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.2353},
         ),
         LLMAgent(
             "Coles",
-            prefix=P1,
+            prefix=P1C,
             api_key=API_KEY,
             model_name=MODEL_NAME,
             response_model=PricingAgentResponse,
             memory_length=MEMORY_LENGTH,
             prompt_template=GENERAL_PROMPT,
-            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.207},
+            env_params={"a": 2.0, "alpha": 1.0, "c": 1.0, "market_share": 0.2059},
         ),
     ]
 
@@ -112,7 +109,7 @@ async def main(alpha=1):
     )
 
     experiment = Experiment(
-        name=f"oligopoly_experiment_one_agent_simple_demand_lambda_{LAMBDA}",
+        name=f"oligopoly_experiment_one_agent_simple_demand_lambda_{LAMBDA}_ABSOLUTE_P1C",
         agents=agents,
         num_rounds=N_ROUNDS,
         environment=env,
