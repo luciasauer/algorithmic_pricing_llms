@@ -1,27 +1,21 @@
 \section{Methodology}
 
+Our methodology consists of two main phases. In the first phase, we replicate the synthetic market environment developed by \parencite{fish_algorithmic_2025}, using it as a testbed to evaluate the behavior of various open-source LLMs as pricing agents. While the environment itself remains unchanged, our contribution lies in replacing the proprietary LLMs used by the authors with open-source alternatives and extending the analysis beyond monopoly and duopoly to an oligopoly setting. \textcolor{red}{Furthermore, we introduce cost shocks in the environment via varying marginal costs}.
+
+In the second phase, we select the best-performing model and apply it to a real-world setting using data from Australia's FuelWatch program. This empirical application enables us to investigate whether insights gained from the synthetic simulations apply to realistic market behavior. The two-phase design provides a foundation for testing both theoretical plausibility and real-world applicability of LLM-based pricing agents.
+
+
 \subsection{Part 1: Simulation Design (Synthetic Setting)}
 
-Agent architecture (LLMs, prompt engineering)
-Pricing game structure (monopoly, duopoly, oligopoly)
-Demand and profit functions (Calvano-style)
-Evaluation criteria (price stability, margins, convergence)
+In the following section, we dive into the details of the experimental setup by describing the experiment design, the agents themselves, and the market configuration.
 
-\subsection{Part 2: Real Data Application (FuelWatch)
-Data description (sources, preprocessing)}
+\subsubsection*{Experiment Design}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection*{Estimating a demand function}
-Estimating demand (logit, marginal cost via TGP)
+We build directly on the framework introduced by \cite{fish_algorithmic_2025}, running a series of pricing game experiments in which agents represent firms competing in a Bertrand oligopoly setting. These agents repeatedly set prices over 300 periods without the possibility of explicit communication. Based on the prices submitted in each round, the environment determines each firm's demand and profit, which serve as the agent’s reward signal.
 
-We employ the Calvano demand function, which has become the standard framework for studying algorithmic pricing and collusion in the industrial organization literature \parencite{calvano_artificial_2020, fish_algorithmic_2025}. This logit demand specification provides a tractable yet realistic framework for analyzing pricing behavior in differentiated product markets, making it particularly suitable for experiments involving algorithmic pricing agents.
-
-\subsubsection*{The Calvano Demand Function}
-
-Following \textcite{calvano_artificial_2020, fish_algorithmic_2025}, we specify demand using a multinomial logit model. If firms $i = 1, \ldots, n$ set prices $p_1, \ldots, p_n$, then the demand for firm $i$'s product is given by:
-
+The reward structure depends on the demand function, which is defined following the work by \parencite{calvano_artificial_2020}, where market shares respond smoothly to price differences. Specifically, the demand for firm \( i \) at time \( t \) is given by:
 \begin{equation}
-    q_i = \beta \times \frac{e^{\frac{a_i - p_i/\alpha}{\mu}}}{\sum_{j=1}^{n} e^{\frac{a_j - p_j/\alpha}{\mu}} + e^{\frac{a_0}{\mu}}}
+    q_i^t = \beta \times \frac{e^{\frac{a_i - p_i^t/\alpha}{\mu}}}{\sum_{j=1}^{n} e^{\frac{a_j - p_j^t/\alpha}{\mu}} + e^{\frac{a_0}{\mu}}}
 \end{equation}
 
 where:
@@ -31,8 +25,81 @@ where:
     \item $a_0$ captures aggregate demand and serves as the utility of the outside option
     \item $\alpha$ and $\beta$ are scaling parameters that do not affect the economic analysis
 \end{itemize}
+Under this demand function, firms with lower prices gain a greater market share, but the market is not a winner-takes-all scenario due to product differentiation. The firm profits at time \( t \) are computed as: 
+\begin{equation}
+    \pi_i^t = (p_i^t - c_i^t) \cdot q_i^t
+\end{equation}
 
-This demand specification is theoretically grounded in random utility maximization, where consumer $k$ derives utility $U_{ik} = a_i - p_i/\alpha + \epsilon_{ik}$ from purchasing product $i$, with $\epsilon_{ik}$ following a Type I Extreme Value distribution scaled by parameter $\mu$ \parencite{berry_estimating_1994, train_discrete_2009}.
+where \( c_i^t \) is the marginal cost of firm \( i \) at period \( t \). This setup enables reinforcement-style learning even in stateless agents, as continuous feedback guides their behavior over time.
+
+\subsubsection*{Pricing Agents}
+
+Due to budget constraints, we focus exclusively on open-source LLMs, including DeepSeek, Llama, and Mistral (Small and Large variants). Each agent sets prices by generating a response to a structured prompt, updated each round. In this methodology, we exactly follow the \textcite{fish_algorithmic_2025} approach. The prompt includes:
+
+\begin{enumerate}
+    \item \textbf{Prompt prefix:} An instruction that sets the agent’s strategic objective (e.g., maximizing profit over time).
+    \item \textbf{Cost information:} The current marginal cost \( c_i^t \).
+    \item \textbf{Market history:} Prices charged by all firms in the previous few rounds.
+    \item \textbf{Planning context:} A memory proxy that recalls the agent’s own past intentions or strategy, with the aim to give ``continuity of thought” between periods.
+    \item \textbf{Output instruction:} A directive to return only a numerical price.
+\end{enumerate}
+
+This prompt design enables learning dynamics through prompt chaining, despite LLMs being stateless and without parameter updates, by encouraging consistent strategies across rounds through the embedding of a sense of continuity.
+
+
+\subsubsection*{Market Configurations}
+
+To assess the influence of prompt framing on agent behavior, we vary the prefix to reflect either competitive or collusive goals, avoiding explicit coordination language. \en{Competitive} prompts encourage aggressive pricing for individual gain, while \en{collusive} prompts emphasize market stability and long-term profitability. However, the agents are not explicitly instructed to collude in either scenario.
+
+\begin{itemize}
+    \item \textbf{P1 – Long-Term Strategy:} Encourages stable pricing and long-term profit maximization, implicitly fostering coordination.
+    \item \textbf{P2 – Competitive Exploration:} Promotes short-term profit-seeking with allowance for exploratory undercutting strategies.
+\end{itemize}
+
+\subsubsection*{Add subtitle to comment how we evaluate the results}
+
+
+\subsection{Part 2: Real Data Application (FuelWatch)
+Data description (sources, preprocessing)}
+
+Having validated our agent architecture in a synthetic environment, we now apply it to real-world data from the Australian retail gasoline market. Specifically, we utilize the dataset provided in the replication package of \parencite{byrne_learning_2019}, which compiles data from the FuelWatch program---a regulatory initiative in Western Australia that requires gasoline retailers to submit their prices daily, one day in advance.
+
+The dataset covers the period from 2001 to 2015 and includes station-level price postings, firm identifiers, and proxies for marginal costs (Terminal Gate Prices). For the purposes of our agent-based simulations, we aggregate the data to the firm level and focus on a specific three-year window from April 2009 to April 2012.
+
+We restrict our analysis to the four dominant firms during this period---BP, Caltex, Woolworths, and Coles---who played a central role in the well-documented “Thursday jump” phenomenon. This refers to the coordinated pattern of price increases typically observed on Thursdays, which we will leverage to test the pricing behavior of our LLM-based agents under these real market conditions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Estimating a demand function}
+%Estimating demand (logit, marginal cost via TGP)
+
+As the FuelWatch dataset does not include data on quantities sold, we estimate a demand system to simulate consumer responses to price decisions made by the agents in each round. This enables us to compute profits and simulate market dynamics accurately.
+
+Following the previous phase, we employed the Calvano demand function, which is particularly well-suited for our purposes for three reasons. First, it ensures that a firm lowering its price gains market share without capturing the entire market, reflecting realistic partial substitutability among branded gasoline retailers. Second, the retail gasoline market features spatial and brand-driven heterogeneity (e.g., location convenience, loyalty programs), which justifies the assumption of differentiated products as captured by firm-specific utility shifters \parencite{hastings_vertical_2004, byrne_learning_2019}. Third, the logit model offers computational tractability and closed-form expressions for market shares and profits, which are essential for repeated simulations over long time horizons in agent-based environments.
+
+This modeling choice is consistent with prior empirical work on fuel markets, which frequently uses discrete choice frameworks to estimate demand responses to price changes \parencite{hastings_fungibility_2013, houde_spatial_2012}. In particular, the use of smooth demand functions---as opposed to winner-takes-all rules---allows for a more faithful representation of consumer behavior in settings with localized competition and modest switching costs.
+
+
+%We employ the Calvano demand function, which has become the standard framework for studying algorithmic pricing and collusion in the industrial organization literature \parencite{calvano_artificial_2020, fish_algorithmic_2025}. This logit demand specification provides a tractable yet realistic framework for analyzing pricing behavior in differentiated product markets, making it particularly suitable for experiments involving algorithmic pricing agents.
+
+%\subsubsection*{The Calvano Demand Function}
+
+%Following \textcite{calvano_artificial_2020, fish_algorithmic_2025}, we specify demand using a multinomial logit model. If firms $i = 1, \ldots, n$ set prices $p_1, \ldots, p_n$, then the demand for firm $i$'s product is given by:
+
+%\begin{equation}
+%    q_i = \beta \times \frac{e^{\frac{a_i - p_i/\alpha}{\mu}}}{\sum_{j=1}^{n} e^{\frac{a_j - p_j/\alpha}{\mu}} + e^{\frac{a_0}{\mu}}}
+%\end{equation}
+
+%where:
+%\begin{itemize}
+%    \item $\mu > 0$ captures the degree of horizontal product differentiation between firms
+%    \item $a_i$ represents firm-specific brand effects or vertical differentiation parameters
+%    \item $a_0$ captures aggregate demand and serves as the utility of the outside option
+%    \item $\alpha$ and $\beta$ are scaling parameters that do not affect the economic analysis
+%\end{itemize}
+
+%This demand specification is theoretically grounded in random utility maximization, where consumer $k$ derives utility $U_{ik} = a_i - p_i/\alpha + \epsilon_{ik}$ from purchasing product $i$, with $\epsilon_{ik}$ following a Type I Extreme Value distribution scaled by parameter $\mu$ \parencite{berry_estimating_1994, train_discrete_2009}.
+
+
 
 \subsubsection*{Parameter Estimation via Berry Inversion}
 
