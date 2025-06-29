@@ -76,22 +76,26 @@ We replicate this paper using Open Source Models, where \textbf{Mistral LLMs sho
 \begin{columns}
     % Left column: text
     \begin{column}{0.55\textwidth}
- \includegraphics[width=\linewidth]{imgs/dupoly_experiment.png}
-  \caption{\textbf{Original} - ChatGPT-4}
+    \begin{figure}
+        \centering
+        \includegraphics[width=\linewidth]{imgs/dupoly_experiment.png}
+        \caption{\textbf{Original} - ChatGPT-4}
+        \label{fig:rep_org}
+    \end{figure}
     \end{column}
 
     % Right column: image
     \begin{column}{0.55\textwidth}
-           \includegraphics[width=\linewidth]{imgs/duopoly_experiment_replication.png}
+    \begin{figure}
+        \centering
+           \includegraphics[width=\linewidth]{slides_pricing_collusion//imgs/replication_dupoly.png}
            \caption{\textbf{Replication} - MistralAI}
+        \label{fig:rep_new}
+    \end{figure}
     \end{column}
 \end{columns}
 
-
 \end{frame}
-
-
-
 
 
 \subsection{}
@@ -104,8 +108,8 @@ They analyze tacit collusion in Australian fuel market. By law, retailers are ma
         % Left column: text
         \begin{column}{0.55\textwidth}
             \begin{itemize}
-                \item Repeated Game, with Homogenous Price, Symmetrics Marginal Cost (TGP) and perfect information.
-                \item \textbf{Price leadership} BP started increasing prices and this gives it the informational role of signaling a price intention to the other firms that coordinate, creating tacit collusion.
+                \item Repeated Game, with homogeneous prices, symmetrical Marginal Costs (TGP), and quasi-perfect information.
+                \item \textbf{Price leadership} BP started increasing prices, and this gives it the informational role of signaling a price intention to the other firms that coordinate, creating tacit collusion.
                 \item \textbf{Market shares constants through time.}
             \end{itemize}
         \end{column}
@@ -145,7 +149,7 @@ $$
 \end{itemize}
     \item Focus on markup, taking advantage of the real market structure
     \begin{itemize}
-        \item ⁠Inelastic demand (people need gas regardless)
+        \item Inelastic demand (people need gas regardless)
         \item Sticky market shares due to location/convenience
         \item Competition primarily on margins, not volume
     \end{itemize}
@@ -155,6 +159,34 @@ $$
 
 
 
+
+\begin{frame}{Demand function estimation - Naive approach}
+
+\vspace{0.5em}
+\textbf{1. Baseline Profit Proxy:}
+\[
+\text{profit}_i = (P_i - MC) \cdot s_i
+\]
+
+\vspace{0.5em}
+\textbf{2. Strategic Penalization:}
+\[
+\text{adjusted\_profit}_i = \text{profit}_i \cdot \exp\left(-\lambda \cdot |P_i - \bar{P}_{-i}|\right)
+\]
+{\footnotesize $\bar{P}_{-i}$: average price of rivals, $\lambda$: penalization strength (to estimate)}
+
+\vspace{0.5em}
+\textbf{3. Estimating $\lambda$:}
+\[
+\log(\text{profit}_i) = \alpha - \lambda \cdot |P_i - \bar{P}_{-i}| + \epsilon_i
+\]
+
+\begin{itemize}
+    \item $\texttt{adjusted\_profit}$ used as the reward signal in our learning agent.
+    \item Captures tradeoff between markup and strategic positioning.
+\end{itemize}
+    
+\end{frame}
 %\appendix
 
 %\begin{frame}[fragile]{Backup slides}
