@@ -71,7 +71,7 @@ async def main(alpha=1):
     )
 
     experiment = Experiment(
-        name="duopoly_setting",
+        name="duopoly_shock_1a",
         agents=agents,
         num_rounds=N_ROUNDS,
         environment=env,
