@@ -50,11 +50,11 @@ class MarketPricingEngine:
         self,
         *,
         p: Tuple[float],
-        a0: float,
+        a_0: float,
         a: Tuple[float],
         mu: float,
         alpha: Tuple[float],
-        multiplier: float,
+        beta: float,
         sigma: float,
         group_idxs: Tuple[int],
         c: Tuple[float] = None,
@@ -65,11 +65,11 @@ class MarketPricingEngine:
         assert set(group_idxs) == set(range(1, max(group_idxs) + 1))
 
         num_groups = max(group_idxs) + 1
-        delta0 = a0 / mu
+        delta_0 = a_0 / mu
         deltas = [(ai - pi / alphai) / mu for ai, pi, alphai in zip(a, p, alpha)]
 
         # Calculate group weights
-        group_weights = [exp(delta0) / (1 - sigma)]
+        group_weights = [exp(delta_0) / (1 - sigma)]
         for group_idx in sorted(set(group_idxs)):
             group_i_weight = sum(
                 exp(deltai / (1 - sigma))
@@ -95,7 +95,7 @@ class MarketPricingEngine:
         ]
 
         quantities = [
-            multiplier * prob_j_given_g * group_g_selection_probs[group_idxs[j]]
+            beta * prob_j_given_g * group_g_selection_probs[group_idxs[j]]
             for j, prob_j_given_g in enumerate(
                 conditional_product_selection_probabilities
             )
@@ -126,12 +126,12 @@ class MarketPricingEngine:
     def _compute_monopoly_prices(
         self,
         *,
-        a0: float,
+        a_0: float,
         a: Tuple[float],
         mu: float,
         alpha: Tuple[float],
         c: Tuple[float],
-        multiplier: float,
+        beta: float,
         sigma: float,
         group_idxs: Tuple[int],
     ) -> List[float]:
@@ -141,12 +141,12 @@ class MarketPricingEngine:
             return -sum(
                 self.get_profits(
                     p=p,
-                    a0=a0,
+                    a_0=a_0,
                     a=a,
                     mu=mu,
                     alpha=alpha,
                     c=c,
-                    multiplier=multiplier,
+                    beta=beta,
                     sigma=sigma,
                     group_idxs=group_idxs,
                 )
@@ -179,11 +179,11 @@ class MarketPricingEngine:
     def _compute_nash_prices(
         self,
         *,
-        a0: float,
+        a_0: float,
         a: Tuple[float],
         mu: float,
         alpha: Tuple[float],
-        multiplier: float,
+        beta: float,
         sigma: float,
         group_idxs: Tuple[int],
         c: Tuple[float],
@@ -195,12 +195,12 @@ class MarketPricingEngine:
 
         # Get bounds
         monopoly_prices = self.get_monopoly_prices_cached(
-            a0=a0,
+            a_0=a_0,
             a=a,
             mu=mu,
             alpha=alpha,
             c=c,
-            multiplier=multiplier,
+            beta=beta,
             sigma=sigma,
             group_idxs=group_idxs,
         )
@@ -217,12 +217,12 @@ class MarketPricingEngine:
                 self._get_best_response(
                     p=p[:i] + (None,) + p[i + 1 :],
                     i=i,
-                    a0=a0,
+                    a_0=a_0,
                     a=a,
                     mu=mu,
                     alpha=alpha,
                     c=c,
-                    multiplier=multiplier,
+                    beta=beta,
                     sigma=sigma,
                     group_idxs=group_idxs,
                     lower_bound_pi=lower_bound,

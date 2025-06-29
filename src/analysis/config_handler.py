@@ -14,44 +14,59 @@ class SimulationConfig:
     def __init__(self, metadata_path: Optional[str] = None):
         self.metadata_path = metadata_path
         self.default_params = {
-            "a0": 0,
-            "a": [2],
-            "alpha": [1],
-            "c": [1],
+            "a_0": 0.0,
+            "a": [2.0],
+            "alpha": [1.0],
+            "c": [1.0],
             "mu": 0.25,
-            "multiplier": 100,
-            "sigma": 0,
+            "beta": 100,
+            "sigma": 0.0,
             "group_idxs": [1],
         }
 
-    def load_agent_environment_mapping(self, json_file_path: str) -> Dict[str, Any]:
+    def load_environment_params(self, json_file_path: str) -> Dict[str, Any]:
         """
-        Extract and transpose agent_environment_mapping from JSON file.
+        Extract specific environment parameters and agent names from JSON file.
 
         Args:
             json_file_path: Path to the JSON metadata file
 
         Returns:
-            Dictionary with parameters as keys and lists of values
+            Dictionary with required environment parameters and agents list
         """
+        # Define the keys we want to extract from environment_params
+        required_keys = {"a_0", "a", "mu", "alpha", "beta", "sigma", "c", "group_idxs"}
+
         try:
             with open(json_file_path, "r") as file:
                 data = json.load(file)
 
-            agent_mapping = data.get("agent_environment_mapping", {})
-            if not agent_mapping:
+            # Get environment parameters
+            environment_params = data.get("environment", {}).get(
+                "environment_params", {}
+            )
+            if not environment_params:
+                print("Warning: 'environment_params' not found or empty in JSON.")
                 return {}
 
-            # Get parameter names from first agent
-            first_agent = next(iter(agent_mapping.values()))
-            param_names = list(first_agent.keys())
+            # Extract only the required parameters
+            result = {}
+            for key in required_keys:
+                if key in environment_params:
+                    result[key] = environment_params[key]
+                else:
+                    print(
+                        f"Warning: Required parameter '{key}' not found in environment_params"
+                    )
 
-            # Create transposed dictionary
-            result = {"agents": list(agent_mapping.keys())}
-            for param in param_names:
-                result[param] = [
-                    agent_config[param] for agent_config in agent_mapping.values()
-                ]
+            # Get agent names from agent_environment_mapping
+            agent_mapping = data.get("agent_environment_mapping", {})
+            if agent_mapping:
+                result["agents"] = list(agent_mapping.keys())
+            else:
+                print(
+                    "Warning: 'agent_environment_mapping' not found, no agents extracted"
+                )
 
             return result
 
@@ -62,7 +77,7 @@ class SimulationConfig:
             print(f"Error: Invalid JSON format in '{json_file_path}'.")
             return {}
         except KeyError:
-            print("Error: 'agent_environment_mapping' key not found in JSON.")
+            print("Error: 'environment' key not found in JSON.")
             return {}
 
     def prepare_simulation_params(self, metadata_path: str) -> Dict[str, Any]:
@@ -76,27 +91,20 @@ class SimulationConfig:
             Complete parameters dictionary ready for pricing calculations
         """
         # Load parameters from metadata
-        params = self.load_agent_environment_mapping(metadata_path)
+        params = self.load_environment_params(metadata_path)
 
         if not params:
             print("Warning: No parameters loaded from metadata, using defaults")
             return self.default_params.copy()
 
-        # Get number of agents
-        num_agents = len(params.get("agents", []))
-
         # Fill in missing parameters with defaults
         for key, default_value in self.default_params.items():
             if key not in params:
-                if isinstance(default_value, list) and len(default_value) == 1:
-                    # Expand single-element lists to match number of agents
-                    params[key] = [default_value[0]] * num_agents
-                else:
-                    params[key] = default_value
+                params[key] = default_value
 
         # Convert lists to tuples for hashability (needed for caching)
         for key, value in params.items():
-            if isinstance(value, list) and key != "agents":
+            if isinstance(value, list):
                 params[key] = tuple(value)
 
         return params
@@ -112,12 +120,12 @@ class SimulationConfig:
             True if valid, False otherwise
         """
         required_keys = [
-            "a0",
+            "a_0",
             "a",
             "alpha",
             "c",
             "mu",
-            "multiplier",
+            "beta",
             "sigma",
             "group_idxs",
         ]
@@ -130,10 +138,15 @@ class SimulationConfig:
 
         # Check that list parameters have consistent lengths
         list_params = ["a", "alpha", "c", "group_idxs"]
-        if "agents" in params:
-            expected_length = len(params["agents"])
+        if list_params:
+            expected_length = (
+                len(params["a"]) if isinstance(params["a"], (list, tuple)) else 1
+            )
             for param in list_params:
-                if len(params[param]) != expected_length:
+                if (
+                    isinstance(params[param], (list, tuple))
+                    and len(params[param]) != expected_length
+                ):
                     print(
                         f"Parameter {param} has length {len(params[param])}, expected {expected_length}"
                     )
@@ -144,8 +157,8 @@ class SimulationConfig:
             print("Parameter mu must be positive")
             return False
 
-        if params["multiplier"] <= 0:
-            print("Parameter multiplier must be positive")
+        if params["beta"] <= 0:
+            print("Parameter beta must be positive")
             return False
 
         return True
@@ -161,12 +174,12 @@ class SimulationConfig:
             Dictionary with only pricing-relevant parameters
         """
         pricing_keys = [
-            "a0",
+            "a_0",
             "a",
             "alpha",
             "c",
             "mu",
-            "multiplier",
+            "beta",
             "sigma",
             "group_idxs",
         ]
@@ -217,28 +230,26 @@ class ConfigPresets:
     def get_default_market_config() -> Dict[str, Any]:
         """Get default market configuration matching Calvano et al. (2020)."""
         return {
-            "a0": 0,
-            "a": (2, 2),  # Two agents with a_i = 2
-            "alpha": (1, 1),
-            "c": (1, 1),
+            "a_0": 0.0,
+            "a": (2.0, 2.0),  # Two agents with a_i = 2
+            "alpha": (1.0, 1.0),
+            "c": (1.0, 1.0),
             "mu": 0.25,  # Standard value from literature
-            "multiplier": 100,
-            "sigma": 0,
+            "beta": 100,
+            "sigma": 0.0,
             "group_idxs": (1, 1),
-            "agents": ["agent_0", "agent_1"],
         }
 
     @staticmethod
     def get_perth_fuel_config() -> Dict[str, Any]:
         """Get configuration adapted for Perth fuel market analysis."""
         return {
-            "a0": 0,
-            "a": (2, 2, 2, 2),  # Four major fuel companies
-            "alpha": (1, 1, 1, 1),
-            "c": (1, 1, 1, 1),  # Will be updated with actual TGP data
+            "a_0": 0.0,
+            "a": (2.0, 2.0, 2.0, 2.0),  # Four major fuel companies
+            "alpha": (1.0, 1.0, 1.0, 1.0),
+            "c": (1.0, 1.0, 1.0, 1.0),  # Will be updated with actual TGP data
             "mu": 0.25,  # Lower value for less substitution in fuel market
-            "multiplier": 100,
-            "sigma": 0,
+            "beta": 100,
+            "sigma": 0.0,
             "group_idxs": (1, 1, 1, 1),
-            "agents": ["BP", "Caltex", "Woolworths", "Coles"],  # Major Perth retailers
         }

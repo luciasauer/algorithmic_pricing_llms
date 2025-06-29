@@ -46,7 +46,8 @@ def save_round_data(
             f.seek(0)
             f.write(content + "\n" + existing)
 
-    separator = lambda label: f"{'=' * 20} Round {i} {'=' * 20}\n"
+    def separator(label):
+        return f"{'=' * 20} Round {i} {'=' * 20}\n"
 
     prepend(paths["insights"], separator("Insights") + insights)
     prepend(paths["plans"], separator("Plans") + plans)

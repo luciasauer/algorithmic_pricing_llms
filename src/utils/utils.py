@@ -85,7 +85,7 @@ def update_plot(
     fill_convergende_range=True,
     title_experiment_type="Monopoly",
 ):
-    n_agents = len(price_history)
+    # TODO: check why not accessed: n_agents = len(price_history)
     firm_names = list(price_history.keys())
     colors = ["blue", "red", "orange", "purple", "cyan", "brown", "magenta", "gray"]
 
