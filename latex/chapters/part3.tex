@@ -1,6 +1,6 @@
 \section{Methodology}
 
-Our methodology consists of two main phases. In the first phase, we replicate the synthetic market environment developed by \parencite{fish_algorithmic_2025}, using it as a testbed to evaluate the behavior of various open-source LLMs as pricing agents. While the environment itself remains unchanged, our contribution lies in replacing the proprietary LLMs used by the authors with open-source alternatives and extending the analysis beyond monopoly and duopoly to an oligopoly setting. \textcolor{red}{Furthermore, we introduce cost shocks in the environment via varying marginal costs}.
+Our methodology consists of two main phases. In the first phase, we replicate the synthetic market environment developed by \textcite{fish_algorithmic_2025}, using it as a testbed to evaluate the behavior of various open-source LLMs as pricing agents. While the environment itself remains unchanged, our contribution lies in replacing the proprietary LLMs used by the authors with open-source alternatives and extending the analysis beyond monopoly and duopoly to an oligopoly setting. \textcolor{red}{Furthermore, we introduce cost shocks in the environment via varying marginal costs}.
 
 In the second phase, we select the best-performing model and apply it to a real-world setting using data from Australia's FuelWatch program. This empirical application enables us to investigate whether insights gained from the synthetic simulations apply to realistic market behavior. The two-phase design provides a foundation for testing both theoretical plausibility and real-world applicability of LLM-based pricing agents.
 
@@ -11,9 +11,9 @@ In the following section, we dive into the details of the experimental setup by 
 
 \subsubsection*{Experiment Design}
 
-We build directly on the framework introduced by \cite{fish_algorithmic_2025}, running a series of pricing game experiments in which agents represent firms competing in a Bertrand oligopoly setting. These agents repeatedly set prices over 300 periods without the possibility of explicit communication. Based on the prices submitted in each round, the environment determines each firm's demand and profit, which serve as the agent’s reward signal.
+We build directly on the framework introduced by \textcite{fish_algorithmic_2025}, running a series of pricing game experiments in which agents represent firms competing in a Bertrand oligopoly setting. These agents repeatedly set prices over 300 periods without explicitly communicating. Based on the prices submitted in each round, the environment determines each firm's demand and profit, which serve as the agent’s reward signal.
 
-The reward structure depends on the demand function, which is defined following the work by \parencite{calvano_artificial_2020}, where market shares respond smoothly to price differences. Specifically, the demand for firm \( i \) at time \( t \) is given by:
+The reward structure depends on the demand function, which is defined following the work by \textcite{calvano_artificial_2020}, where market shares respond smoothly to price differences. Specifically, the demand for firm $i$ at time $t$ is given by:
 \begin{equation}
     q_i^t = \beta \times \frac{e^{\frac{a_i - p_i^t/\alpha}{\mu}}}{\sum_{j=1}^{n} e^{\frac{a_j - p_j^t/\alpha}{\mu}} + e^{\frac{a_0}{\mu}}}
 \end{equation}
@@ -34,13 +34,13 @@ where \( c_i^t \) is the marginal cost of firm \( i \) at period \( t \). This s
 
 \subsubsection*{Pricing Agents}
 
-Due to budget constraints, we focus exclusively on open-source LLMs, including DeepSeek, Llama, and Mistral (Small and Large variants). Each agent sets prices by generating a response to a structured prompt, updated each round. In this methodology, we exactly follow the \textcite{fish_algorithmic_2025} approach. The prompt includes:
+Due to budget constraints, we focus exclusively on open-source LLMs, including DeepSeek, Llama, and Mistral (Small and Large variants). Each agent sets prices by generating a response to a structured prompt, updated each round. The prompt includes:
 
 \begin{enumerate}
     \item \textbf{Prompt prefix:} An instruction that sets the agent’s strategic objective (e.g., maximizing profit over time).
-    \item \textbf{Cost information:} The current marginal cost \( c_i^t \).
-    \item \textbf{Market history:} Prices charged by all firms in the previous few rounds.
-    \item \textbf{Planning context:} A memory proxy that recalls the agent’s own past intentions or strategy, with the aim to give ``continuity of thought” between periods.
+    \item \textbf{Cost information:} The current marginal cost $c_i^t$.
+    \item \textbf{Market history:} Prices charged by all firms in the previous 100 rounds.
+    \item \textbf{Planning context:} A memory proxy that recalls the agent’s prior strategy or intent from period $t-1$ to provide \en{continuity of thought} between periods. Since LLMs are stateless, the agent writes down its plans at the end of each period to include in the next prompt. 
     \item \textbf{Output instruction:} A directive to return only a numerical price.
 \end{enumerate}
 
@@ -66,7 +66,7 @@ Having validated our agent architecture in a synthetic environment, we now apply
 
 The dataset covers the period from 2001 to 2015 and includes station-level price postings, firm identifiers, and proxies for marginal costs (Terminal Gate Prices). For the purposes of our agent-based simulations, we aggregate the data to the firm level and focus on a specific three-year window from April 2009 to April 2012.
 
-We restrict our analysis to the four dominant firms during this period---BP, Caltex, Woolworths, and Coles---who played a central role in the well-documented “Thursday jump” phenomenon. This refers to the coordinated pattern of price increases typically observed on Thursdays, which we will leverage to test the pricing behavior of our LLM-based agents under these real market conditions.
+We restrict our analysis to the four dominant firms during this period---BP, Caltex, Woolworths, and Coles---who played a central role in the well-documented ``Thursday jump” phenomenon. This refers to the coordinated pattern of price increases typically observed on Thursdays, which we will leverage to test the pricing behavior of our LLM-based agents under these real market conditions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection*{Estimating a demand function}
@@ -74,7 +74,7 @@ We restrict our analysis to the four dominant firms during this period---BP, Cal
 
 As the FuelWatch dataset does not include data on quantities sold, we estimate a demand system to simulate consumer responses to price decisions made by the agents in each round. This enables us to compute profits and simulate market dynamics accurately.
 
-Following the previous phase, we employed the Calvano demand function, which is particularly well-suited for our purposes for three reasons. First, it ensures that a firm lowering its price gains market share without capturing the entire market, reflecting realistic partial substitutability among branded gasoline retailers. Second, the retail gasoline market features spatial and brand-driven heterogeneity (e.g., location convenience, loyalty programs), which justifies the assumption of differentiated products as captured by firm-specific utility shifters \parencite{hastings_vertical_2004, byrne_learning_2019}. Third, the logit model offers computational tractability and closed-form expressions for market shares and profits, which are essential for repeated simulations over long time horizons in agent-based environments.
+Following the previous phase, we employed the Calvano demand function, which is particularly well-suited for our purposes for three reasons. First, it ensures that a firm lowering its price gains market share without capturing the entire market, reflecting realistic partial substitutability among branded gasoline retailers. Second, the retail gasoline market features spatial and brand-driven heterogeneity (e.g., location convenience, loyalty programs), which justifies the assumption of differentiated products as captured by firm-specific utility shifters \parencite{hastings_vertical_2004}. Third, the logit model offers computational tractability and closed-form expressions for market shares and profits, which are essential for repeated simulations over long time horizons in agent-based environments.
 
 This modeling choice is consistent with prior empirical work on fuel markets, which frequently uses discrete choice frameworks to estimate demand responses to price changes \parencite{hastings_fungibility_2013, houde_spatial_2012}. In particular, the use of smooth demand functions---as opposed to winner-takes-all rules---allows for a more faithful representation of consumer behavior in settings with localized competition and modest switching costs.
 
