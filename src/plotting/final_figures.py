@@ -111,9 +111,7 @@ def plot_monopoly_experiment_svg(
     # Price plot
     ax = axs[0]
     if p_m is not None and plot_references:
-        ax.axhline(
-            y=p_m[0], color="black", linestyle="--", alpha=0.6, label="$P^M=P^N$"
-        )
+        ax.axhline(y=p_m[0], color="black", linestyle="--", alpha=0.6, label="$P^M$")
     for agent in agents:
         prices = (
             df_sorted.filter(pl.col("agent") == agent).sort("round")["price"].to_list()
@@ -143,7 +141,7 @@ def plot_monopoly_experiment_svg(
                 color="black",
                 linestyle="--",
                 alpha=0.6,
-                label="$\\pi^M = \\pi^N$",
+                label="$\\pi^M$",
             )
         for agent in agents:
             profits = (
@@ -165,7 +163,7 @@ def plot_monopoly_experiment_svg(
         ax = axs[idx]
         if q_m is not None and plot_references:
             ax.axhline(
-                y=q_m[0], color="black", linestyle="--", alpha=0.6, label="$Q^M = Q^N$"
+                y=q_m[0], color="black", linestyle="--", alpha=0.6, label="$Q^M$"
             )
         for agent in agents:
             quantities = (
