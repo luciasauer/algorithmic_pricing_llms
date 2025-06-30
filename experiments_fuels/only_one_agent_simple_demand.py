@@ -5,6 +5,7 @@ import json
 import asyncio
 import numpy as np
 import polars as pl
+from datetime import datetime
 from dotenv import load_dotenv
 
 # Add project root to sys.path
@@ -54,8 +55,8 @@ N_ROUNDS = len(marginal_costs)
 N_RUNS = 1
 ALPHAS_TO_TRY = [1]
 # LAMBDA = float(os.getenv("LAMBDA"))
-# LAMBDA=12.6111
-LAMBDA = 25
+LAMBDA = 12.6111
+# LAMBDA = 25
 
 with open(DATA_DIR / "initial_real_data_to_inject_as_history.json", "r") as f:
     initial_real_data = json.load(f)
@@ -111,7 +112,7 @@ async def main(alpha=1):
     )
 
     experiment = Experiment(
-        name=f"oligopoly_experiment_one_agent_simple_demand_lambda_{LAMBDA}_ABSOLUTE_P1C",
+        name=f"oligopoly_experiment_one_agent_simple_demand_lambda_{LAMBDA}_ABSOLUTE_P1C_DATE",
         agents=agents,
         num_rounds=N_ROUNDS,
         environment=env,
@@ -119,8 +120,8 @@ async def main(alpha=1):
         initial_real_data=initial_real_data,
         experiment_dir=current_file_path.parent / "experiments_runs",
         experiment_plot=False,
-        # include_date_in_prompt=True,  # Turn ON date in prompt
-        # start_date=datetime(2009, 8, 1),  # set your experiment start date here
+        include_date_in_prompt=True,  # Turn ON date in prompt
+        start_date=datetime(2009, 8, 1),  # set your experiment start date here
     )
     await experiment.run()
 
