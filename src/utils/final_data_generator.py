@@ -120,10 +120,12 @@ def generate_individual_series(
     start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
 
     df_tgp_final = (
-        df.group_by("publish_date")
+        df.filter(pl.col("publish_date") >= start_date_obj)
+        .group_by("publish_date")
         .agg(pl.col("tgpmin").first().alias("tgpmin"))
         .sort("publish_date")
     )
+    print(df_tgp_final.head())
     df_tgp_final.write_parquet(
         output_path / "marginal_costs_tgp.parquet", compression="snappy"
     )
