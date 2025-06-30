@@ -23,7 +23,7 @@ MODEL_NAME = os.getenv("MODEL_NAME")
 
 MEMORY_LENGTH = 100
 N_ROUNDS = 300
-N_RUNS = 7
+N_RUNS = 4
 ALPHAS_TO_TRY = [1, 3.2, 10]
 
 
@@ -63,7 +63,7 @@ async def main(prompt_prefix, alpha=1, experiment_name="oligopoly_setting_4_firm
             env_params={"a": 2.0, "alpha": alpha, "c": 1.0},
         ),
         LLMAgent(
-            "Firm C",
+            "Firm D",
             prefix=prompt_prefix,
             api_key=API_KEY,
             model_name=MODEL_NAME,
