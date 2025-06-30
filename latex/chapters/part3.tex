@@ -68,19 +68,34 @@ To do this, you should explore many different pricing strategies.
 \end{tcolorbox}
 \end{center}
 
-In this case, the agent is expected to converge to the monopoly price and remain stable over time. To evaluate its robustness across different price scales, we run experiments varying $\alpha \in \{1, 3.2, 10\}$.
 
-[ADD Monopoly convergence image]
+In this case, the agent is expected to converge to the monopoly price and remain stable over time. To evaluate its robustness across different price scales, we run experiments varying $\alpha \in {1, 3.2, 10}$. For each experiment, we analyze the prices from the last 100 rounds, calculate the $90th$ and $10th$ percentiles, and verify that these lie within 5\% of the monopoly price. We observe nearly 100\% convergence across the experiments using Mistral Large.
+
+\figureref{fig:monopoly_convergence} illustrates the results from one such experiment, showing the model’s rapid convergence to the monopoly price (represented by the dotted line), demonstrating the agent’s ability to set appropriate prices in this economic setting.
+
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.5\linewidth]{}
-    \caption{Caption}
-    \label{fig:enter-label}
+    \includesvg[width=1\linewidth]{latex/imgs/res/monopoly/monopoly_experiment_complete.svg}
+    \caption{Illustration of the convergence behavior observed in a monopoly experiment conducted with the Mistral Large model at $\alpha = 1$. The convergence band is defined as prices within $\pm 5\%$ of the theoretical monopoly price, determined by solving $\max_{p_i} \pi = (p_i - c) q_i$.}
+    \label{fig:monopoly_convergence}
 \end{figure}
 
-\textcolor{red}{Finish this:} \textbf{Finding: Analyze visually the results and comment the analysis of convergence}.
-Take the prices from the last 100 rounds in each experiment, calculate the top $90th$
-percentile and bottom $10th$ percentile prices and check that they are within $5\%$ of monopoly price. Justify that Mistral Small performed worse than Large.
+\begin{table}[H]
+\caption{Statistics of the monopoly experiment by agent model.}
+\label{tab:monopoly_stats_transposed}
+\begin{tabular}{lcc}
+\toprule
+Statistic & \texttt{magistral-small-2506} & \texttt{mistral-large-2411} \\
+\midrule
+Mean price & 1.8083 & 1.8028 \\
+Mean absolute deviation & 6.8160 & 6.6776 \\
+Mean absolute deviation (\%) & 3.7825 & 3.7057 \\
+Standard deviation of price & 0.1573 & 0.0233 \\
+Outside range count & 100 & 100 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 
 \subsubsection*{Symmetric Duopoly}
 
