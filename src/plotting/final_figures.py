@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 golden_ratio = (5**0.5 - 1) / 2  # ≈ 0.618
 FIG_WIDTH_IN = 170 / 25.4  # matches typical \linewidth in 12pt LaTeX article
 FIG_HEIGHT_IN = FIG_WIDTH_IN * golden_ratio  # aesthetically pleasing height
-SUPTITLE_FONTSIZE = 14
+SUPTITLE_FONTSIZE = 12
 plt.rcParams.update(
     {
         # === Font settings ===
@@ -22,7 +22,7 @@ plt.rcParams.update(
         "font.family": "serif",
         "font.size": 8,  # Base font size
         "axes.labelsize": 8,  # Axis label font
-        "axes.titlesize": 14,  # Title font size
+        "axes.titlesize": 12,  # Title font size
         "xtick.labelsize": 8,  # X tick labels
         "ytick.labelsize": 8,  # Y tick labels
         "legend.fontsize": 8,  # Legend text size
@@ -48,11 +48,11 @@ plt.rcParams.update(
 )
 plt.rcParams["axes.prop_cycle"] = plt.cycler(
     color=[
-        "#e41a1c",
-        "#1f77b4",
-        "#4daf4a",
         "#984ea3",
         "#ff7f0e",
+        "#1f77b4",
+        "#e41a1c",
+        "#4daf4a",
         "#ffff3e",
         "#f781bf",
         "#999999",
@@ -68,7 +68,9 @@ INPUT_PATH = Path("../experiments_synthetic/experiments_runs/")
 def plot_monopoly_experiment_svg(
     df: pl.DataFrame,
     title: str,
-    metadata: dict,
+    monopoly_price: float,
+    monopoly_quantity: float,
+    monopoly_profit: float,
     save_path: Path,
     show_quantities: bool = False,
     show_profits: bool = False,
@@ -76,16 +78,9 @@ def plot_monopoly_experiment_svg(
     last_n_rounds: int = None,
     display: bool = False,
 ):
-    env_params = metadata.get("environment").get("environment_params")
-    p_m, q_m, pi_m = (
-        env_params.get("monopoly_prices"),
-        env_params.get("monopoly_quantities"),
-        env_params.get("monopoly_profits"),
-    )
-
     nrows = 1 + int(show_quantities) + int(show_profits)
 
-    fig, axs = plt.subplots(nrows, 1, figsize=(FIG_WIDTH_IN, 2.5 * nrows), sharex=False)
+    fig, axs = plt.subplots(nrows, 1, figsize=(FIG_WIDTH_IN, 3 * nrows), sharex=False)
     axs = np.atleast_1d(axs)
 
     # Clean and prepare data
@@ -110,8 +105,10 @@ def plot_monopoly_experiment_svg(
 
     # Price plot
     ax = axs[0]
-    if p_m is not None and plot_references:
-        ax.axhline(y=p_m[0], color="black", linestyle="--", alpha=0.6, label="$P^M$")
+    if monopoly_price is not None and plot_references:
+        ax.axhline(
+            y=monopoly_price, color="black", linestyle="--", alpha=0.6, label="$P^M$"
+        )
     for agent in agents:
         prices = (
             df_sorted.filter(pl.col("agent") == agent).sort("round")["price"].to_list()
@@ -119,8 +116,8 @@ def plot_monopoly_experiment_svg(
         ax.plot(rounds, prices, label=agent, color=color_map[agent])
     ax.fill_between(
         rounds,
-        p_m[0] * 0.95,
-        p_m[0] * 1.05,
+        monopoly_price * 0.95,
+        monopoly_price * 1.05,
         color=color_list[0],
         alpha=0.1,
         label="Convergence Area",
@@ -135,9 +132,9 @@ def plot_monopoly_experiment_svg(
     # Profit plot
     if show_profits:
         ax = axs[1]
-        if pi_m is not None and plot_references:
+        if monopoly_profit is not None and plot_references:
             ax.axhline(
-                y=pi_m[0],
+                y=monopoly_profit,
                 color="black",
                 linestyle="--",
                 alpha=0.6,
@@ -161,9 +158,13 @@ def plot_monopoly_experiment_svg(
     if show_quantities:
         idx = 2 if show_profits else 1
         ax = axs[idx]
-        if q_m is not None and plot_references:
+        if monopoly_quantity is not None and plot_references:
             ax.axhline(
-                y=q_m[0], color="black", linestyle="--", alpha=0.6, label="$Q^M$"
+                y=monopoly_quantity,
+                color="black",
+                linestyle="--",
+                alpha=0.6,
+                label="$Q^M$",
             )
         for agent in agents:
             quantities = (
