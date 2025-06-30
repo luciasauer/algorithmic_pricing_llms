@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.agents.LLM_agent import LLMAgent
 from src.experiment.experiment import Experiment
-from src.prompts.prompts import GENERAL_PROMPT, P1, P2
+from src.prompts.prompts import GENERAL_PROMPT, P1
 from src.prompts.prompts_models import create_pricing_response_model
 
 from src.environment.calvano import CalvanoDemandEnvironment
@@ -82,13 +82,12 @@ async def main(prompt_prefix, alpha=1, experiment_name="oligopoly_setting_3_firm
 if __name__ == "__main__":
     for _ in range(N_RUNS):
         for alpha in ALPHAS_TO_TRY:
-            for n, prompt in enumerate([P1, P2], start=1):
-                print(f"Running experiment with alpha={alpha}")
-                asyncio.run(
-                    main(
-                        prompt_prefix=prompt,
-                        alpha=alpha,
-                        experiment_name=f"oligopoly_setting_3_firms_P{n}",
-                    )
+            print(f"Running experiment with alpha={alpha}")
+            asyncio.run(
+                main(
+                    prompt_prefix=P1,
+                    alpha=alpha,
+                    experiment_name="oligopoly_setting_3_firms_P1",
                 )
-                print(f"Experiment with alpha={alpha} completed.\n")
+            )
+            print(f"Experiment with alpha={alpha} completed.\n")
