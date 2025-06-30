@@ -24,7 +24,7 @@ MODEL_NAME = os.getenv("MODEL_NAME")
 
 MEMORY_LENGTH = 100
 N_ROUNDS = 300
-N_RUNS = 7
+N_RUNS = 2
 ALPHAS_TO_TRY = [1, 3.2, 10]
 
 
@@ -109,7 +109,7 @@ if __name__ == "__main__":
                     main(
                         prompt_prefix=prompt,
                         alpha=alpha,
-                        experiment_name=f"oligopoly_setting_3_firms_P{n}",
+                        experiment_name=f"oligopoly_setting_5_firms_P{n}",
                     )
                 )
                 print(f"Experiment with alpha={alpha} completed.\n")
