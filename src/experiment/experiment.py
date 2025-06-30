@@ -25,6 +25,8 @@ class Experiment:
         experiment_dir: str = None,
         initial_real_data: dict[str, list[dict]] = None,
         experiment_plot: bool = True,
+        include_date_in_prompt: bool = False,  # NEW PARAMETER
+        start_date: datetime.date = datetime.date(2023, 1, 1),  # NEW PARAMETER
     ):
         self.name = name
         self.agents = agents
@@ -33,6 +35,8 @@ class Experiment:
         self.environment = environment
         self.experiment_plot = experiment_plot
         self.initial_real_data = initial_real_data or {}
+        self.include_date_in_prompt = include_date_in_prompt
+        self.start_date = start_date
         for idx, agent in enumerate(self.agents):
             agent.env_index = idx
             agent.environment = self.environment
@@ -193,7 +197,15 @@ class Experiment:
                 a: round(p, 2) for a, p in prices.items() if a != name
             }
 
-            market_data = f"- My price: {round(prices[name], 2)}\n"
+            market_data = ""
+            if self.include_date_in_prompt:
+                current_date = self.start_date + datetime.timedelta(days=round_num - 1)
+                day_of_week = current_date.strftime("%A")
+                market_data += (
+                    f"- Date: {current_date.strftime('%Y-%m-%d')} ({day_of_week})\n"
+                )
+
+            market_data += f"- My price: {round(prices[name], 2)}\n"
             if competitors_prices:
                 market_data += f"- Competitor's prices: {competitors_prices}\n"
             market_data += f"- My quantity sold: {round(quantities[name], 2)}\n"
@@ -313,18 +325,32 @@ class Experiment:
                     "marginal_cost", agent.get_marginal_cost(round_num)
                 )
 
+                # Inject date if enabled
+                market_data = ""
+
+                if self.include_date_in_prompt:
+                    current_date = self.start_date + datetime.timedelta(
+                        days=round_num - 1
+                    )
+                    day_of_week = current_date.strftime("%A")
+                    market_data += (
+                        f"- Date: {current_date.strftime('%Y-%m-%d')} ({day_of_week})\n"
+                    )
+
+                market_data += (
+                    f"- My price: {round(price, 2)}\n"
+                    f"- Competitor's prices: { {k: round(v, 2) for k, v in prices.items() if k != name} }\n"
+                    f"- My quantity sold: {round(quantity, 2)}\n"
+                    f"- My profit earned: {round(profit, 2)}\n"
+                    f"- Marginal cost: {round(marginal_cost, 2)}\n"
+                )
+
                 self.history[name][round_num] = {
                     "chosen_price": price,
                     "quantity": quantity,
                     "profit": profit,
                     "marginal_cost": marginal_cost,
-                    "market_data": (
-                        f"- My price: {round(price, 2)}\n"
-                        f"- Competitor's prices: { {k: round(v, 2) for k, v in prices.items() if k != name} }\n"
-                        f"- My quantity sold: {round(quantity, 2)}\n"
-                        f"- My profit earned: {round(profit, 2)}\n"
-                        f"- Marginal cost: {round(marginal_cost, 2)}\n"
-                    ),
+                    "market_data": market_data,
                     "is_initial_history": True,
                 }
 
