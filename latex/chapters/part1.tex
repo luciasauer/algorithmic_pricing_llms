@@ -9,39 +9,36 @@
 %     \end{flushright}
 % \end{displayquote}
 
-%\subsection{Background}
-%Context (algorithmic pricing, LLMs, FuelWatch)
-%\subsection{Motivation}: Why this matters (regulation, digital collusion, real data use)
-%\subsection{Research question(s)}: Clear and specific
-%\subsection{Contribution}: What's novel in your work
-%\subsection{Outline}: What each chapter does
-
-The dawn of artificial intelligence in pricing represents one of the most consequential shifts in market dynamics since the introduction of electronic trading. While Commissioner Vestager's anecdote illustrates the unintended consequences of simple algorithmic interactions, recent advances in Large Language Models (LLMs) suggest far more sophisticated and concerning possibilities. What happens when AI systems capable of strategic reasoning, contextual understanding, and autonomous decision-making are deployed in competitive markets? More critically, do these systems spontaneously develop the exact coordination mechanisms that human competitors have refined over decades of strategic interaction?
+The dawn of artificial intelligence in pricing represents one of the most consequential shifts in market dynamics since the introduction of electronic trading. While Commissioner Vestager's anecdote illustrates the unintended consequences of simple algorithmic interactions, recent advances in Large Language Models (LLMs) suggest far more sophisticated and concerning possibilities. When AI systems capable of strategic reasoning and autonomous decision-making compete in markets, they demonstrate remarkable abilities to coordinate pricing without explicit agreements. Yet a fundamental question remains unanswered: do these AI coordination mechanisms follow the same theoretical boundaries that govern human collusion, or do they represent an entirely new category of competitive threat?
 
 \subsection{Background and Motivation}
-
 The rise of algorithmic pricing has fundamentally altered competitive dynamics across industries. From Amazon's dynamic pricing algorithms to airlines' revenue management systems, artificial intelligence increasingly determines the prices consumers pay for goods and services. This technological shift has attracted intense regulatory scrutiny, with competition authorities worldwide expressing concern about the potential of algorithms to facilitate tacit collusion without explicit agreements between firms \parencite{oecd_algorithmic_2023, harrington_developing_2018}. The \textcite{us_department_of_justice_price_2021} emphasizes that unlawful collusion typically requires some form of agreement or coordination among firms. Yet with algorithmic pricing, such coordination may emerge autonomously, complicating legal enforcement.
 
 These concerns are rooted not only in the implications for firm behavior, but in the broader consequences for social welfare: anticompetitive outcomes can lead to higher prices, reduced output, and diminished consumer surplus—hallmarks of inefficiency and welfare loss.
 
-However, most algorithmic collusion research has been confined to simplified theoretical environments or controlled laboratory settings. While \textcite{calvano_artificial_2020} demonstrated that Q-learning algorithms could achieve supracompetitive outcomes in simulated Bertrand competition, and subsequent studies have extended these findings to various market structures, a critical gap remains: we lack evidence of how advanced AI systems behave when confronted with the complexity, uncertainty, and strategic depth of actual market conditions.
+Recent breakthrough research by \textcite{fish_algorithmic_2025} demonstrates that Large Language Model-based pricing agents autonomously achieve supracompetitive outcomes in duopoly settings, coordinating through sophisticated "price-war avoidance" mechanisms without explicit instructions to collude. Unlike traditional Q-learning algorithms that require extensive trial-and-error learning, LLM agents leverage pre-trained knowledge about strategic behavior to recognize and implement coordination strategies with unprecedented speed and effectiveness.
 
-This gap is particularly significant given the rapid advancement of Large Language Model technology. Unlike traditional reinforcement learning algorithms, which require long training horizons to converge to stable pricing strategies through trial-and-error exploration—and are vulnerable to adversarial exploitation—LLMs sidestep both concerns. They arrive pre-trained on vast corpora of human-generated text about markets, competition, and strategic behavior, are considerably more robust to manipulation, and have a much lower barrier to entry, as demonstrated by their rapid adoption. As \textcite{fish_algorithmic_2025} demonstrate, this enables LLM agents to recognize and implement sophisticated coordination strategies with speed and effectiveness. Yet their analysis, like virtually all algorithmic collusion research, employs stylized economic environments that abstract away from the rich strategic landscape of real markets.
 
 \subsection{Research Questions and Contributions}
+However, this research—like virtually all algorithmic collusion studies—focuses exclusively on duopoly interactions. Economic theory provides clear predictions about what should happen as market competition intensifies: the Folk Theorem establishes that collusion sustainability requires increasingly patient behavior as the number of competitors grows, with the critical condition $\delta \geq \frac{\pi^D - \pi^C}{\pi^D}$ becoming harder to satisfy when collusive profits $\frac{\pi^C = \pi^M}{n}$ must be shared among n participants. Experimental evidence consistently shows a breakdown in collusion among three to four participants across diverse settings and populations.
 
-We investigate three fundamental questions at the intersection of artificial intelligence and market competition:
+Whether LLM agents follow these same theoretical boundaries represents a critical gap with profound implications for competition policy. If AI coordination proves more robust than human collusion, markets with multiple algorithmic competitors may sustain harmful coordination, contrary to economic theory's predictions of competition. Conversely, if LLM agents face similar or more severe coordination constraints, policy interventions could focus on ensuring sufficient market participation rather than restricting algorithmic capabilities.
 
-\textbf{Primary Research Question:} Can LLM-based pricing agents autonomously discover and implement the coordination mechanisms documented in real-world gasoline markets when exposed to actual price histories and market conditions?
+
+Therefore, this thesis investigates a fundamental question at the intersection of artificial intelligence, game theory, and competition policy:
+
+\textbf{Primary Research Question:} Do LLM agent collusion mechanisms break down according to Folk Theorem predictions as market concentration decreases, and if so, at what critical thresholds?
 
 \textbf{Secondary Questions:}
-\begin{enumerate}
-    \item How do LLM agents react to cost shocks and dynamic cost environments?
-    \item How do LLM agents' coordination patterns compare to the gradual learning processes observed among human competitors?
-    \item What role do market structure variables—terminal gate prices, spatial competition, and demand conditions—play in facilitating or constraining LLM coordination?
-\end{enumerate}
+\begin{itemize}
+    \item How does collusion stability vary across $n = 2, 3, 4, 5+$ LLM agents in controlled oligopoly settings?
+    \item What coordination mechanisms emerge, persist, or fail as strategic complexity increases with more participants?
+    \item Do breakdown patterns align with theoretical predictions from the Folk Theorem and empirical evidence from human experiments?
+\end{itemize}
 
-Our contributions span theoretical, methodological, and policy dimensions. \emph{Theoretically}, we provide the first test of whether algorithmic collusion findings from controlled environments extend to realistic market conditions, addressing a critical external validity question in the growing literature on AI and competition. \emph{Methodologically}, we pioneer the integration of actual market data with LLM agent simulation, establishing a new approach for testing AI behavior under realistic competitive conditions. \emph{From a policy perspective}, our findings generate insights for competition authorities grappling with the regulatory challenges posed by increasingly sophisticated AI pricing systems.
+Our contributions span theoretical, empirical, and policy dimensions. Theoretically, we provide the first systematic test of Folk Theorem predictions in LLM agent coordination, extending algorithmic collusion research beyond duopoly settings to examine breakdown boundaries. Empirically, we establish a controlled experimental framework for testing AI coordination across varying market structures, generating quantitative evidence on stability thresholds and coordination mechanisms. From a policy perspective, our findings inform competition authorities about the scope and limitations of AI coordination threats, providing evidence-based foundations for regulatory approaches to algorithmic pricing in concentrated markets.
+
+This gap is particularly significant given the rapid advancement of Large Language Model technology. Unlike traditional reinforcement learning algorithms, which require long training horizons to converge to stable pricing strategies through trial-and-error exploration—and are vulnerable to adversarial exploitation—LLMs sidestep both concerns. They arrive pre-trained on vast corpora of human-generated text about markets, competition, and strategic behavior, are considerably more robust to manipulation, and have a much lower barrier to entry, as demonstrated by their rapid adoption. As \textcite{fish_algorithmic_2025} demonstrate, this enables LLM agents to recognize and implement sophisticated coordination strategies with speed and effectiveness. Yet their analysis, like virtually all algorithmic collusion research, employs stylized economic environments that abstract away from the rich strategic landscape of real markets.
 
 \subsection{Outline}
 
