@@ -60,7 +60,7 @@ plt.rcParams["axes.prop_cycle"] = plt.cycler(
 )
 
 
-OUPUT_PATH = Path("../latex/imgs/results/")
+OUPUT_PATH = Path("../latex/imgs/res/")
 OUPUT_PATH.mkdir(parents=True, exist_ok=True)
 INPUT_PATH = Path("../experiments_synthetic/experiments_runs/")
 
@@ -87,15 +87,15 @@ def plot_monopoly_experiment_svg(
     df = df.with_columns(
         pl.col("agent_type").str.replace("_agent", "").alias("agent_type")
     )
-    df_sorted = df.sort(["round", "agent"]).with_columns(
-        (pl.col("agent") + " (" + pl.col("agent_type") + ")").alias("agent")
-    )
+    df_sorted = df.sort(
+        ["round", "alpha", "agent"], descending=[False, False, False]
+    ).with_columns((pl.col("agent") + " (" + pl.col("agent_type") + ")").alias("agent"))
     if last_n_rounds is not None:
         df_sorted = df_sorted.filter(
             pl.col("round") >= (df_sorted["round"].max() - last_n_rounds + 1)
         )
     rounds = df_sorted["round"].unique().to_list()
-    agents = sorted(df_sorted["agent"].unique().to_list())
+    agents = df_sorted["agent"].unique().to_list()
 
     # Prepare color mapping for agents
     color_list = plt.rcParams["axes.prop_cycle"].by_key()["color"]
