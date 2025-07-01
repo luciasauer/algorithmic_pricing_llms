@@ -26,7 +26,7 @@ MODEL_NAME = os.getenv("MODEL_NAME")
 MEMORY_LENGTH = 100
 N_ROUNDS = 300
 N_RUNS = 7
-ALPHAS_TO_TRY = [1, 3.2, 10]
+ALPHAS_TO_TRY = [1]  # , 3.2, 10]
 
 
 async def main(alpha=1):
@@ -63,15 +63,15 @@ async def main(alpha=1):
 
     # Create cost series with shock
     cost_series = create_step_shock_series(
-        n_agents=2,  # number of agents (Firm A and Firm B)
+        n_agents=len(agents),  # number of agents (Firm A and Firm B)
         n_rounds=N_ROUNDS,
-        shock_round=100,  # After first third (convergence normally afer 60-80 rounds)
+        shock_round=150,  # After first third (convergence normally afer 60-80 rounds)
         base_cost=1.0,
-        shock_magnitude=0.3,
+        shock_magnitude=2,
     )
 
     experiment = Experiment(
-        name="duopoly_shock_1a",
+        name="duopoly_shock_experiment",
         agents=agents,
         num_rounds=N_ROUNDS,
         environment=env,
