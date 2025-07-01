@@ -7,6 +7,7 @@ import numpy as np
 import polars as pl
 from pathlib import Path
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
 # Inspiread by sns palletes: 'CMRmap', 'Set1', 'tab20'
 
@@ -185,3 +186,194 @@ def plot_monopoly_experiment_svg(
     if display:
         plt.show()
     plt.close(fig)
+
+
+def plot_duopoly_results_from_df(
+    df,
+    p_nash,
+    p_m,
+    pi_nash,
+    pi_m,
+    title="Figure 2: Duopoly Experiment Results",
+    save_path=None,
+):
+    fig, axs = plt.subplots(1, 2, figsize=(14, 5))
+    fig.suptitle(title, fontsize=16)
+
+    # get colors from matplotlib cycler
+    colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+
+    df = (
+        df.filter(pl.col("round").is_between(251, 300))
+        .select(
+            [
+                "experiment_timestamp",
+                "agent",
+                "agent_prefix_type",
+                "alpha",
+                "chosen_price",
+                "profit",
+            ]
+        )
+        .with_columns(
+            (pl.col("chosen_price") / pl.col("alpha")).alias("price_normalized"),
+            (pl.col("profit") / pl.col("alpha")).alias("profit_normalized"),
+        )
+        .group_by(["experiment_timestamp", "agent", "agent_prefix_type"])
+        .agg(
+            pl.col("price_normalized").mean().round(2).alias("mean_price_normalized"),
+            pl.col("profit").mean().round(2).alias("profit"),
+        )
+        .sort(["experiment_timestamp", "agent", "agent_prefix_type"])
+        .pivot(
+            index=["experiment_timestamp", "agent_prefix_type"],
+            on="agent",
+            values=["mean_price_normalized", "profit"],
+        )
+        .with_columns(
+            (pl.col("profit_Firm A") - pl.col("profit_Firm B")).alias("pi_delta"),
+            (pl.col("profit_Firm A") + pl.col("profit_Firm B")).alias("pi_sum"),
+        )
+    )
+    # === Panel 1: Price comparison ===
+    axs[0].scatter(
+        df.filter((pl.col("agent_prefix_type") == "P1")).select(
+            "mean_price_normalized_Firm A"
+        ),
+        df.filter((pl.col("agent_prefix_type") == "P1")).select(
+            "mean_price_normalized_Firm B"
+        ),
+        color=colors[2],
+        marker="s",
+        label="P1 vs. P1",
+    )
+    axs[0].scatter(
+        df.filter((pl.col("agent_prefix_type") == "P2")).select(
+            "mean_price_normalized_Firm A"
+        ),
+        df.filter((pl.col("agent_prefix_type") == "P2")).select(
+            "mean_price_normalized_Firm B"
+        ),
+        color=colors[1],
+        marker="^",
+        label="P2 vs. P2",
+    )
+
+    # Axis setup
+    axs[0].xaxis.set_major_formatter(ticker.FormatStrFormatter("%.2f"))
+    axs[0].yaxis.set_major_formatter(ticker.FormatStrFormatter("%.2f"))
+    # set x and y ticks each 0.2
+    axs[0].xaxis.set_major_locator(ticker.MultipleLocator(0.2))
+    axs[0].yaxis.set_major_locator(ticker.MultipleLocator(0.2))
+
+    # Reference lines
+    axs[0].axvline(p_nash, color=colors[4], linestyle="--", linewidth=1)
+    axs[0].axhline(p_nash, color=colors[4], linestyle="--", linewidth=1)
+    axs[0].axvline(p_m, color=colors[3], linestyle=":", linewidth=1)
+    axs[0].axhline(p_m, color=colors[3], linestyle=":", linewidth=1)
+
+    # Axis annotations (external, aligned with ticks)
+    axs[0].annotate(
+        r"$p^{Nash}$",
+        xy=(p_nash, axs[0].get_ylim()[0]),
+        xytext=(0, -5),
+        textcoords="offset points",
+        ha="center",
+        va="top",
+        color=colors[4],
+    )
+    axs[0].annotate(
+        r"$p^{Nash}$",
+        xy=(axs[0].get_xlim()[0], p_nash),
+        xytext=(-5, 0),
+        textcoords="offset points",
+        ha="right",
+        va="center",
+        color=colors[4],
+    )
+
+    axs[0].annotate(
+        r"$p^M$",
+        xy=(p_m, axs[0].get_ylim()[0]),
+        xytext=(0, -5),
+        textcoords="offset points",
+        ha="center",
+        va="top",
+        color=colors[3],
+    )
+    axs[0].annotate(
+        r"$p^M$",
+        xy=(axs[0].get_xlim()[0], p_m),
+        xytext=(-5, 0),
+        textcoords="offset points",
+        ha="right",
+        va="center",
+        color=colors[3],
+    )
+
+    axs[0].set_xlabel("Firm 1 average price (over periods 251-300)")
+    axs[0].set_ylabel("Firm 2 average price (over periods 251-300)")
+    axs[0].set_title("Pricing Behavior of Firms by Prefix Type")
+    axs[0].grid(False)
+
+    # === Panel 2: Profit comparison ===
+    axs[1].scatter(
+        df.filter((pl.col("agent_prefix_type") == "P1")).select("pi_delta"),
+        df.filter((pl.col("agent_prefix_type") == "P1")).select("pi_sum"),
+        color=colors[2],
+        marker="s",
+        label="P1 vs. P1",
+    )
+    axs[1].scatter(
+        df.filter((pl.col("agent_prefix_type") == "P2")).select("pi_delta"),
+        df.filter((pl.col("agent_prefix_type") == "P2")).select("pi_sum"),
+        color=colors[1],
+        marker="^",
+        label="P2 vs. P2",
+    )
+
+    # Diagonal lines for π₁ = π^{Nash} and π₂ = π^{Nash}
+    y_vals = np.linspace(2 * pi_nash, 2 * pi_m, 200)
+    delta_1 = 2 * pi_nash - y_vals  # π₁ = π^{Nash}
+    delta_2 = y_vals - 2 * pi_nash  # π₂ = π^{Nash}
+
+    axs[1].plot(delta_1, y_vals, "--", color=colors[4])
+    axs[1].plot(delta_2, y_vals, "--", color=colors[4])
+
+    # Annotations
+    axs[1].text(
+        np.mean(delta_1) * 1.5,
+        (2.2 * pi_nash),
+        r"$\pi_1 = \pi^{Nash}$",
+        color=colors[4],
+        fontsize=10,
+    )
+    axs[1].text(
+        np.mean(delta_2),
+        (2.2 * pi_nash),
+        r"$\pi_2 = \pi^{Nash}$",
+        color=colors[4],
+        fontsize=10,
+    )
+
+    # Monopoly profit line
+
+    axs[1].set_title("Profit Results by Prefix Type")
+
+    axs[1].set_xlabel(
+        "Average difference in profits $\\pi_1 - \\pi_2$ (over periods 251-300)"
+    )
+    axs[1].set_ylabel("Average sum of profits $\\pi_1 + \\pi_2$(over periods 251-300)")
+    axs[1].axhline(2 * pi_m, color=colors[3], linestyle=":", linewidth=1)
+    axs[1].text(
+        min(df["pi_delta"].min(), min(delta_1)) * 1.05,
+        2 * pi_m,
+        r"$\pi^M$",
+        color=colors[3],
+    )
+    # === Legend outside below both plots ===Add commentMore actions
+    handles, labels = axs[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=4, bbox_to_anchor=(0.5, -0.05))
+    if save_path:
+        plt.savefig(save_path, bbox_inches="tight")
+    plt.show()
