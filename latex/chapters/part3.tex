@@ -71,11 +71,11 @@ To do this, you should explore many different pricing strategies.
 
 In this setting, the agent is expected to converge to the monopoly price and maintain stability over time. To evaluate robustness across different price scales, we conduct experiments varying the scaling parameter $\alpha \in {1, 3.2, 10}$. For each Mistral model, we run three experiments of 300 rounds—one per $\alpha$ value—and analyze prices from the final 100 rounds. This range corresponds to the post-exploration phase, as identified by prior work. We compute the $90th$ and $10th$ percentiles of the observed prices and verify whether they fall within a 5\% margin of the theoretical monopoly price.
 
-The results in \ref{tab:monopoly_stats} show near-perfect convergence across all runs for both models. Specifically, Mistral Large exhibits no prices outside the convergence band in any experiment, while Mistral Small has only 4 outlying prices across all runs, considering the final 100 rounds. Although both models demonstrate strong robustness, we choose to proceed with Mistral Large for subsequent analyses due to its larger parameter count, which implies greater representational capacity and decision-making precision.
+The results in \tableref{tab:monopoly_stats} show near-perfect convergence across all runs for both models. Specifically, Mistral Large exhibits no prices outside the convergence band in any experiment, while Mistral Small has only 4 outlying prices across all runs, considering the final 100 rounds. \textcolor{red}{Although both models demonstrate strong robustness, we choose to proceed with Mistral Large for subsequent analyses due to its larger parameter count, which implies greater representational capacity and decision-making precision}.
 
-\include{latex/tables/monopoly_models}
+\input{latex/tables/monopoly_models}
 
-\figureref{fig:monopoly_convergence} visualizes the experiment results using Mistral Large. The model rapidly converges to the monopoly price (indicated by the dotted line), clearly demonstrating its ability to identify and sustain optimal pricing in this economic scenario.
+\figureref{fig:monopoly_convergence} visualizes the experiment results using Mistral Large. The model converges within 25 rounds to the monopoly price (indicated by the dotted line), clearly demonstrating its ability to identify and sustain optimal pricing in this economic scenario.
 
 \begin{figure}[H]
 \centering
