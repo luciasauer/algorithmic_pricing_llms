@@ -17,6 +17,7 @@ dependencies = [
     "numpy>=2.3.0",
     "openai>=1.86.0",
     "pandas>=2.3.0",
+    "plotly>=6.2.0",
     "polars>=1.30.0",
     "pre-commit>=4.2.0",
     "pyarrow>=20.0.0",

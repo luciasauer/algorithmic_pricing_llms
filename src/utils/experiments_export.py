@@ -9,6 +9,8 @@ from pathlib import Path
 from functools import reduce
 from src.prompts.prompts import P1, P2
 
+SAMPLING_SEED = 42
+
 
 def rebalance_experiments(df_all, min_required=7, keep_exacly_min_required=True):
     alphas_of_interest = [1, 3.2, 10]
@@ -135,7 +137,7 @@ def rebalance_experiments(df_all, min_required=7, keep_exacly_min_required=True)
                     sampled_exp = unique_exps
                 else:
                     sampled_exp = unique_exps.sample(
-                        n=n_samples, with_replacement=False
+                        n=n_samples, with_replacement=False, seed=SAMPLING_SEED
                     )
 
                 filtered_exp = df_exps.join(
