@@ -34,11 +34,42 @@ The results in \tableref{tab:monopoly_stats} show near-perfect convergence acros
 \subsection*{Symmetric Duopoly}
 
 
+\begin{figure}[H]
+\centering
+\includesvg[width=0.7\linewidth]{latex/imgs/res/duopoly/duopoly_jointplot.svg}
+\caption{}
+\label{fig:monopoly_convergence}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includesvg[width=0.7\linewidth]{latex/imgs/res/duopoly/duopoly_profit_panel.svg}
+\caption{}
+\label{fig:monopoly_convergence}
+\end{figure}
+
+\begin{figure}[htpb]
+    \centering
+    \begin{subfigure}[b]{0.475\linewidth}
+    \includesvg[width=1\linewidth]{latex/imgs/res/duopoly/duopoly_jointplot.svg}
+    \caption{Duopoly pricing}
+    \label{fig:monopoly_convergence1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.475\linewidth}
+    \includesvg[width=1\linewidth]{latex/imgs/res/duopoly/duopoly_profit_panel.svg}
+    \caption{Duopoly profits}
+    \label{fig:monopoly_convergence2}
+    \end{subfigure}
+    \caption{Duopoly experiment}
+    \label{fig:duopoly}
+\end{figure}
+
 \subsubsection*{Tit for Tat Response - Fixed Effect Regression}
 
 Reciprocal strategies such as Tit for Tat, where firms match a competitor's prior action, are central to sustaining cooperation in repeated price-setting environments. Given the experimental design, we expect this behavior to emerge more clearly in P1 than in P2.
 
-To test this, we follow the methodology used by the authors \cite{fish_algorithmic_2025} and estimate the fixed effects panel regression expressed below, examining whether firms adjust their prices in response to their own and their rival’s lagged prices. This approach allows us to capture strategic interaction patterns consistent with reward-punishment dynamics in repeated games.
+To test this, we follow the methodology used by the authors \cite{fish_algorithmic_2025} and estimate the fixed effects panel regression expressed below, examining whether firms adjust their prices in response to their own and their rivals’ lagged prices. This approach allows us to capture strategic interaction patterns consistent with reward-punishment dynamics in repeated games.
 
 
 \begin{equation}
@@ -97,3 +128,10 @@ This differenced specification successfully addresses the persistence issue and 
 \end{table}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection*{Towards convergence}
+
+While \textcite[p. 18]{fish_algorithmic_2025} found moderate price stickiness $(\gamma_{P1} \approx 0.48)$ alongside meaningful strategic responsiveness in duopoly settings, our duopoly analysis reveals a fundamental behavioral shift when employing the same methodology: LLM agents exhibit near-unit root persistence $(\gamma_{P1} \approx 0.997)$ with virtually no period-to-period strategic interaction. Although we detect strategic responses when using log-differenced specifications (cf. \tableref{tab:fe_duopoly}), we cannot reproduce their exact dynamic patterns. This suggests LLM agents follow \emph{converge-and-persist coordination}---initially finding focal price levels, then maintaining them with minimal deviation---rather than active reward-punishment schemes with period-by-period adjustments.
+
+This behavioral pattern has important methodological implications. Since price dynamics are dominated by persistence rather than strategic interaction, standard dynamic panel approaches become uninformative for testing predictions of the Folk Theorem. Instead, we focus on two complementary analyses: (1) run-level equilibrium differences that capture the Folk Theorem's core predictions about group size effects on collusion sustainability, and (2) convergence behavior in early periods where coordination occurs.
