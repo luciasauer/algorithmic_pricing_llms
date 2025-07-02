@@ -10,7 +10,7 @@ from pydantic import BaseModel, ValidationError, create_model
 from src.agents.base_agent import Agent
 
 MAX_RETRIES = 15
-RETRY_DELAY_SECONDS = 4
+RETRY_DELAY_SECONDS = 1
 
 
 class LLMAgent(Agent):
