@@ -15,7 +15,7 @@ from src.environment.calvano import CalvanoDemandEnvironment
 from src.experiment.experiment import Experiment
 from src.prompts.prompts import GENERAL_PROMPT, P1
 from src.prompts.prompts_models import create_pricing_response_model
-from src.utils.cost_generators import create_step_shock_series
+from src.utils.cost_generators import create_shock_series
 
 current_file_path = Path(__file__).resolve()
 
@@ -52,12 +52,12 @@ async def main(alpha=1):
     )
 
     # Create cost series with shock
-    cost_series = create_step_shock_series(
+    cost_series = create_shock_series(
         n_agents=len(agents),
         n_rounds=N_ROUNDS,
-        shock_round=50,  # After first third (convergence normally afer 60-80 rounds)
+        shock_series_rounds=[100],
         base_cost=1.0,
-        shock_magnitude=2,
+        shock_magnitudes=[2],  # 100% increase
     )
 
     experiment = Experiment(
