@@ -13,3 +13,87 @@ Real market simulations: price following, margin formation, focal point behavior
 Tables, graphs, timelines
 
 Interpret results carefully
+
+\subsection*{Monopoly Results}
+
+We compute the $90th$ and $10th$ percentiles of the observed prices and verify whether they fall within a 5\% margin of the theoretical monopoly price.
+
+The results in \tableref{tab:monopoly_stats} show near-perfect convergence across all runs for both models. Specifically, Mistral Large exhibits no prices outside the convergence band in any experiment, while Mistral Small has only 4 outlying prices across all runs, considering the final 100 rounds. \textcolor{red}{Although both models demonstrate strong robustness, we choose to proceed with Mistral Large for subsequent analyses due to its larger parameter count, which implies greater representational capacity and decision-making precision}.
+
+\input{latex/tables/monopoly_models}
+
+\figureref{fig:monopoly_convergence} visualizes the experiment results using Mistral Large. The model converges within 25 rounds to the monopoly price (indicated by the dashed line), clearly demonstrating its ability to identify and sustain optimal pricing in this economic scenario.
+
+\begin{figure}[H]
+\centering
+\includesvg[width=1\linewidth]{latex/imgs/res/monopoly/monopoly_experiment_complete.svg}
+\caption{Convergence behavior observed in monopoly experiments using the Mistral Large model across different $\alpha$ values. The convergence band represents prices within $\pm 5\%$ of the theoretical monopoly price, computed by solving: $\max_{p_i} \pi = (p_i - c) q_i$.}
+\label{fig:monopoly_convergence}
+\end{figure}
+
+\subsubsection*{Symmetric Duopoly}
+
+
+\subsection*{Tit for Tat Response - Fixed Effect Regression}
+
+Reciprocal strategies such as Tit for Tat, where firms match a competitor's prior action, are central to sustaining cooperation in repeated price-setting environments. Given the experimental design, we expect this behavior to emerge more clearly in P1 than in P2.
+
+To test this, we follow the methodology used by the authors \cite{fish_algorithmic_2025} and estimate the fixed effects panel regression expressed below, examining whether firms adjust their prices in response to their own and their rival’s lagged prices. This approach allows us to capture strategic interaction patterns consistent with reward-punishment dynamics in repeated games.
+
+
+\begin{equation}
+    p_{i,r}^{t} = \alpha_{i,r} + \gamma p_{i,r}^{t-1} + \delta p_{j,r}^{t-1} + \epsilon_{i,r}^t
+\end{equation}
+
+The dependent variable $p_{i,r}^{t}$ is the price set by agent $i$ at time $t$ in experiment $r$. We include lagged self-price and lagged competitor price as regressors. The fixed effects $\alpha_{i,r}$ capture agent-experiment-level heterogeneity. 
+
+To mitigate the endogeneity concerns—particularly the potential correlation between lagged dependent variables and the error term—we construct the panel using disjoint pairs of periods, ensuring that no two observations share a time index. This design reduces serial correlation in the error term by skipping periods between observations. Additionally, we alternate which agent is designated as \textit{self} across period pairs, breaking firm-specific time dependencies and preventing the formation of continuous time series per firm.
+
+As a result, the panel is defined at the \texttt{experiment\_id}–agent level, yielding 21 units (7 experiments × 3 firms with alternation). Combined with the controlled experimental environment—free of external confounders and driven solely by the manipulation of observable variables—this setup helps isolate each observation’s error term, $\epsilon_{i,r}^t$, from other periods.
+
+Altogether, the use of disjoint periods, firm alternation, and a clean experimental structure effectively breaks the feedback loop that typically generates endogeneity in dynamic panel settings, thereby supporting the validity of our fixed effects regression approach.
+
+However, when replicating this regression, we encountered strong persistence in the price series. Agents tend to converge rapidly to stable pricing strategies, leading to limited price variation and coefficients on lagged prices close to one—suggesting potential non-stationarity. This violates standard assumptions in dynamic panels and raises concerns about spurious regression.
+
+To address this, we initially considered System GMM \parencite{blundell_initial_1998}, which is well-suited to settings with endogenous regressors and high persistence. However, the rapid convergence in agent behavior meant that additional lags provided little identifying variation, and key diagnostic tests (e.g., Hansen overidentification tests) failed to validate the instruments.
+
+We therefore formally tested for unit roots using the Augmented Dickey-Fuller test and found that most series were indeed non-stationary. To restore stationarity, we applied a logarithmic transformation and first-differenced the series. The following model was then estimated:
+
+\begin{equation}
+    \Delta \log p_{i,r}^{t} = \gamma \, \Delta \log p_{i,r}^{t-1} + \delta \, \Delta \log p_{j,r}^{t-1} + \Delta \epsilon_{i,r}^t
+\end{equation}
+
+This differenced specification successfully addresses the persistence issue and reveals meaningful patterns of strategic interaction. As shown in \ref{tab:fe_duopoly}, firms respond positively and significantly to changes in their competitor’s prices, consistent with Tit-for-Tat or punishment-based coordination. Moreover, the competitor effect is nearly twice as strong in P1 compared to P2, suggesting a more credible or aggressive enforcement of coordination. In contrast, the negative coefficient on the firm’s own lagged price change suggests mild mean reversion, consistent with the observed convergence to stable price levels. 
+
+\begin{table}[htpb!]
+    \centering
+    \caption{Tit for Tat Response – Duopoly Setting}
+    \label{tab:fe_duopoly}
+    {\small
+    \begin{tabular}{lcc}
+    \toprule
+    & \multicolumn{2}{c}{Dependent variable: $\Delta$ log Self Price} \\
+    \cmidrule(lr){2-3}
+    & (1) & (2) \\
+    \midrule
+    $\Delta$ log Self Price $t-1$         & $-0.3448^{**}$ & $-0.2442^{*}$  \\
+                             & (0.1566)       & (0.1332)       \\
+    $\Delta$ log Competitor's Price $t-1$ & $0.4790^{***}$ & $0.2766^{***}$ \\
+                             & (0.0989)       & (0.1332)       \\
+    \midrule
+    Model                    & P1 vs P1       & P2 vs P2       \\          
+    Group fixed effects      & Yes            & Yes            \\
+    \midrule
+    Observations             & 3,150          & 3,150          \\
+    Number of groups         & 21             & 21             \\
+    \bottomrule
+    \end{tabular}
+    }
+    \vspace{1mm}
+    
+    \begin{minipage}{\textwidth}
+    \footnotesize \textit{Notes:} Robust standard errors in parentheses. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. Models (1) and (2) examine P1 and P2's pricing responses, respectively. 
+    \end{minipage}
+\end{table}
+
+
