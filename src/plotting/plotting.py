@@ -251,3 +251,166 @@ def plot_real_data_svg(df: pl.DataFrame, metadata: dict, save_path: Path):
     plt.tight_layout()
     fig.savefig(str(save_path.with_suffix(".svg")), format="svg")
     plt.close(fig)
+
+
+def plot_experiment_shocks_svg(
+    df: pl.DataFrame,
+    metadata: dict,
+    save_path: Path,
+    environment,
+    show_quantities: bool = False,
+    show_profits: bool = False,
+    plot_references: bool = True,
+):
+    env_params = metadata.get("environment").get("environment_params")
+    p_m = env_params.get("monopoly_prices")
+    q_m = env_params.get("monopoly_quantities")
+    pi_m = env_params.get("monopoly_profits")
+    p_n = env_params.get("nash_prices")
+    q_n = env_params.get("nash_quantities")
+    pi_n = env_params.get("nash_profits")
+
+    fig, axs = plt.subplots(
+        1 + int(show_quantities) + int(show_profits),
+        1,
+        figsize=(10, 3 * (1 + int(show_quantities) + int(show_profits))),
+        sharex=True,
+    )
+
+    if not isinstance(axs, (list, np.ndarray)):
+        axs = [axs]
+
+    # Prepare data
+    df = df.with_columns(
+        pl.col("agent_type").str.replace("_agent", "").alias("agent_type")
+    )
+
+    df_sorted = df.sort(["round", "agent"])
+    # concat agent with agent_type
+    df_sorted = df_sorted.with_columns(
+        (pl.col("agent") + " (" + pl.col("agent_type") + ")").alias("agent")
+    )
+    rounds = df_sorted["round"].unique().to_list()
+    agents = df_sorted["agent"].unique().to_list()
+    agents.sort()
+    colors = ["blue", "red", "orange", "purple", "cyan", "brown", "magenta", "gray"]
+
+    num_rounds = df["round"].max()
+    monopoly_prices_series = []
+    nash_prices_series = []
+    monopoly_quantities_series = []
+    monopoly_profits_series = []
+    nash_quantities_series = []
+    nash_profits_series = []
+
+    for round_num in range(1, num_rounds + 1):
+        environment.set_round(round_num)
+        environment._compute_benchmarks()
+        monopoly_prices_series.append(
+            environment.monopoly_prices[0]
+        )  # or avg if multi-agent
+        nash_prices_series.append(environment.nash_prices[0])
+        monopoly_quantities_series.append(np.mean(environment.monopoly_quantities))
+        monopoly_profits_series.append(np.mean(environment.monopoly_profits))
+        nash_quantities_series.append(np.mean(environment.nash_quantities))
+        nash_profits_series.append(np.mean(environment.nash_profits))
+
+    # --- Price plot ---
+    ax = axs[0]
+    if plot_references:
+        ax.plot(
+            rounds,
+            monopoly_prices_series,
+            color="black",
+            linestyle="--",
+            alpha=0.6,
+            label="$P^M$",
+        )
+        ax.plot(
+            rounds,
+            nash_prices_series,
+            color="green",
+            linestyle=":",
+            alpha=0.9,
+            label="$P^N$",
+        )
+
+    for i, agent in enumerate(agents):
+        prices = (
+            df_sorted.filter(pl.col("agent") == agent).sort("round")["price"].to_list()
+        )
+        ax.plot(rounds, prices, label=agent, color=colors[i % len(colors)])
+    ax.set_ylabel("Price")
+    ax.legend(loc="upper left")
+    ax.grid(True)
+
+    # --- Quantity plot ---
+    if show_quantities:
+        ax = axs[1 if not show_profits else 1]
+        if plot_references:
+            ax.plot(
+                rounds,
+                monopoly_quantities_series,
+                color="black",
+                linestyle="--",
+                alpha=0.6,
+                label="$Q^M$",
+            )
+            ax.plot(
+                rounds,
+                nash_quantities_series,
+                color="green",
+                linestyle=":",
+                alpha=0.9,
+                label="$Q^N$",
+            )
+        for i, agent in enumerate(agents):
+            quantities = (
+                df_sorted.filter(pl.col("agent") == agent)
+                .sort("round")["quantity"]
+                .to_list()
+            )
+            ax.plot(rounds, quantities, label=agent, color=colors[i % len(colors)])
+        ax.set_ylabel("Quantity")
+        ax.legend(loc="upper left")
+        ax.grid(True)
+
+    # --- Profit plot ---
+    if show_profits:
+        idx = 2 if show_quantities else 1
+        ax = axs[idx]
+        if plot_references:
+            ax.plot(
+                rounds,
+                monopoly_profits_series,
+                color="black",
+                linestyle="--",
+                alpha=0.6,
+                label="$\\pi^M$",
+            )
+            ax.plot(
+                rounds,
+                nash_profits_series,
+                color="green",
+                linestyle=":",
+                alpha=0.9,
+                label="$\\pi^N$",
+            )
+        for i, agent in enumerate(agents):
+            profits = (
+                df_sorted.filter(pl.col("agent") == agent)
+                .sort("round")["profit"]
+                .to_list()
+            )
+            ax.plot(rounds, profits, label=agent, color=colors[i % len(colors)])
+        ax.set_ylabel("Profit")
+        ax.set_xlabel("Round")
+        ax.legend(loc="upper left")
+        ax.grid(True)
+
+    plt.suptitle(
+        f"Experiment: {metadata.get('name', 'Unknown')}", fontsize=16, fontweight="bold"
+    )
+    plt.tight_layout()
+    fig.savefig(str(save_path.with_suffix(".svg")), format="svg")
+    plt.close(fig)
