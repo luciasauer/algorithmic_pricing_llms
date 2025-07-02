@@ -9,7 +9,7 @@ from pathlib import Path
 from functools import reduce
 from src.prompts.prompts import P1, P2
 
-SAMPLING_SEED = 42
+SAMPLING_SEED = 12345
 
 
 def rebalance_experiments(df_all, min_required=7, keep_exacly_min_required=True):
@@ -128,9 +128,12 @@ def rebalance_experiments(df_all, min_required=7, keep_exacly_min_required=True)
                 )
                 df_exps = df_all.filter(mask_exp)
 
-                unique_exps = df_exps.select(
-                    ["experiment_timestamp", "experiment_name"]
-                ).unique()
+                unique_exps = (
+                        df_exps
+                        .select(["experiment_timestamp", "experiment_name"])
+                        .unique()
+                        .sort(["experiment_timestamp", "experiment_name"])  # <--- Add this
+                    )
 
                 n_unique = unique_exps.height
                 if n_unique <= n_samples:
