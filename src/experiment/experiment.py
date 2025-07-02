@@ -2,7 +2,8 @@
 import asyncio
 import datetime
 import logging
-from typing import List
+import time
+from typing import Any, Dict, List
 
 import numpy as np
 import polars as pl
@@ -12,6 +13,137 @@ from src.experiment.storage import StorageManager
 from src.plotting.plotting import plot_experiment_svg, plot_real_data_svg
 from src.prompts.prompt_manager import PromptManager
 from src.utils.logger import setup_logger
+
+
+class RateLimiter:
+    """Thread-safe rate limiter that ensures requests are spaced appropriately."""
+
+    def __init__(self, rate_limit_seconds: float = 1.0):
+        self.rate_limit_seconds = rate_limit_seconds
+        self.last_request_time = 0
+        self.lock = asyncio.Lock()
+
+    async def acquire(self):
+        """Acquire the rate limiter, waiting if necessary to respect the rate limit."""
+        async with self.lock:
+            current_time = time.time()
+            time_since_last = current_time - self.last_request_time
+
+            if time_since_last < self.rate_limit_seconds:
+                wait_time = self.rate_limit_seconds - time_since_last
+                await asyncio.sleep(wait_time)
+
+            self.last_request_time = time.time()
+
+
+class RateLimitedAgentWrapper:
+    """Wrapper for agents that enforces rate limiting on their act method."""
+
+    def __init__(self, agent, rate_limiter: RateLimiter, max_retries: int = 20):
+        self.agent = agent
+        self.rate_limiter = rate_limiter
+        self.max_retries = max_retries
+        self.logger = getattr(agent, "logger", logging.getLogger())
+
+    async def act_with_rate_limit(self, prompt: str) -> Dict[str, Any]:
+        """Execute agent.act() with rate limiting and retry logic."""
+        last_exception = None
+
+        for attempt in range(self.max_retries + 1):
+            try:
+                # Acquire rate limiter before making request
+                await self.rate_limiter.acquire()
+
+                # Make the actual request
+                result = await self.agent.act(prompt)
+
+                if attempt > 0:
+                    self.logger.info(
+                        f"Agent {self.agent.name} succeeded on attempt {attempt + 1}"
+                    )
+
+                return result
+
+            except Exception as e:
+                last_exception = e
+                if attempt < self.max_retries:
+                    wait_time = min(2**attempt, 30)  # Exponential backoff, max 30s
+                    self.logger.warning(
+                        f"Agent {self.agent.name} failed on attempt {attempt + 1}/{self.max_retries + 1}: {e}. "
+                        f"Retrying in {wait_time}s..."
+                    )
+                    await asyncio.sleep(wait_time)
+                else:
+                    self.logger.error(
+                        f"Agent {self.agent.name} failed after {self.max_retries + 1} attempts: {e}"
+                    )
+
+        # If we get here, all retries failed
+        raise last_exception
+
+
+async def execute_agents_rate_limited(
+    agents: List,
+    prompts: Dict[str, str],
+    rate_limit_seconds: float = 1.1,
+    max_retries: int = 20,
+    logger=None,
+) -> List[Dict[str, Any]]:
+    """
+    Execute all agents with rate limiting and async response collection.
+
+    Args:
+        agents: List of agent objects
+        prompts: Dict mapping agent names to their prompts
+        rate_limit_seconds: Minimum seconds between API requests
+        max_retries: Maximum number of retries per agent
+        logger: Logger instance for debugging
+
+    Returns:
+        List of results from all agents
+    """
+    if logger:
+        logger.info(f"Starting rate-limited execution for {len(agents)} agents")
+
+    # Create shared rate limiter
+    rate_limiter = RateLimiter(rate_limit_seconds)
+
+    # Wrap agents with rate limiting
+    wrapped_agents = [
+        RateLimitedAgentWrapper(agent, rate_limiter, max_retries) for agent in agents
+    ]
+
+    # Create tasks for all agents
+    tasks = [
+        asyncio.create_task(
+            wrapped_agent.act_with_rate_limit(prompts[wrapped_agent.agent.name]),
+            name=f"agent_{wrapped_agent.agent.name}",
+        )
+        for wrapped_agent in wrapped_agents
+    ]
+
+    if logger:
+        logger.info(f"Created {len(tasks)} tasks, collecting results...")
+
+    # Wait for all agents to complete (with retries)
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    # Handle any remaining exceptions
+    final_results = []
+    for i, result in enumerate(results):
+        if isinstance(result, Exception):
+            # Log the final failure and create a fallback result
+            agent_name = agents[i].name
+            if logger:
+                logger.error(f"Agent {agent_name} ultimately failed: {result}")
+            raise result  # Or handle this differently based on your needs
+        else:
+            final_results.append(result)
+
+    if logger:
+        logger.info(f"Successfully collected {len(final_results)} results")
+
+    return final_results
 
 
 class Experiment:
@@ -27,6 +159,8 @@ class Experiment:
         experiment_plot: bool = True,
         include_date_in_prompt: bool = False,  # NEW PARAMETER
         start_date: datetime.date = datetime.date(2023, 1, 1),  # NEW PARAMETER
+        rate_limit_seconds: float = 1.1,  # NEW: API rate limit
+        max_retries: int = 20,  # NEW: Max retries per agent
     ):
         self.name = name
         self.agents = agents
@@ -37,6 +171,9 @@ class Experiment:
         self.initial_real_data = initial_real_data or {}
         self.include_date_in_prompt = include_date_in_prompt
         self.start_date = start_date
+        self.rate_limit_seconds = rate_limit_seconds
+        self.max_retries = max_retries
+
         for idx, agent in enumerate(self.agents):
             agent.env_index = idx
             agent.environment = self.environment
@@ -129,6 +266,8 @@ class Experiment:
                 for agent in self.agents
             },
             "num_rounds": self.num_rounds,
+            "rate_limit_seconds": self.rate_limit_seconds,
+            "max_retries": self.max_retries,
             "start_time": datetime.datetime.now().isoformat(),
         }
 
@@ -142,6 +281,7 @@ class Experiment:
         self.storage.save_metadata(metadata)
 
     async def _run_round(self, round_num: int):
+        """Optimized round execution with rate limiting."""
         self.environment.set_round(round_num)
         prompts = {
             agent.name: self.prompt_manager.generate_prompt(
@@ -150,27 +290,22 @@ class Experiment:
             for agent in self.agents
         }
 
-        # PARALLEL STRATEGY
-        tasks = [agent.act(prompts[agent.name]) for agent in self.agents]
-        results = await asyncio.gather(*tasks)
+        # Use rate-limited execution
+        self.logger.info(
+            f"Executing {len(self.agents)} agents with {self.rate_limit_seconds}s rate limit"
+        )
+        start_time = time.time()
 
-        # tasks = []
+        results = await execute_agents_rate_limited(
+            agents=self.agents,
+            prompts=prompts,
+            rate_limit_seconds=self.rate_limit_seconds,
+            max_retries=self.max_retries,
+            logger=self.logger,
+        )
 
-        # ## STAGGERED STRATEGY
-        # for agent in self.agents:
-        #     task = asyncio.create_task(agent.act(prompts[agent.name]))
-        #     tasks.append(task)
-        #     await asyncio.sleep(5)  # Stagger start by 0.5s
-
-        # results = await asyncio.gather(*tasks)
-
-        ## SEQUENTIAL STRATEGY
-        # results = []
-
-        # for agent in self.agents:
-        #     result = await agent.act(prompts[agent.name])
-        #     results.append(result)
-        #     await asyncio.sleep(1)  # Enforce 1 second between requests
+        execution_time = time.time() - start_time
+        self.logger.info(f"Agent execution completed in {execution_time:.2f} seconds")
 
         prices = self._store_agent_outputs(results, round_num)
         agent_order = [(agent.name, agent.env_index) for agent in self.agents]
