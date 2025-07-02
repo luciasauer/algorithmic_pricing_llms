@@ -1,6 +1,12 @@
 \section{Methodology}\label{sec:meth}
 
-We build on the synthetic market environment developed by \textcite{fish_algorithmic_2025}, replicating their setup as a foundation for our own analysis. While preserving the core structure of their environment, we introduce two key modifications. First, we replace the proprietary LLMs used in the original study with open-source alternatives.\footnote{\noindent\textcite{fish_algorithmic_2025} determined their model selection through monopoly-price convergence testing, which we also conducted on the open-source models to inform our model selection (cf. \chapterref{sec:res}).} Second, we extend the analysis from duopoly to oligopoly settings, enabling us to study how LLMs behave as pricing agents in markets with more than two competitors. This extension allows us to investigate a central implication of the \emph{Folk Theorem} in repeated games: as the number of firms increases, sustaining collusion becomes more difficult because the per-firm share of collusive profits diminishes, making deviation more attractive. To maintain cooperation, firms must place greater weight on future payoffs—reflected in a discount factor $\delta$ approaching one—which implies a high degree of patience.
+We build on the synthetic market environment developed by \textcite{fish_algorithmic_2025}, replicating their setup as a foundation for our own analysis. While preserving the core structure of their environment, we introduce two key modifications:
+\begin{enumerate}
+    \item We replace the proprietary LLMs used in the original study with open-source alternatives.\footnote{\noindent\textcite{fish_algorithmic_2025} determined their model selection through monopoly-price convergence testing, which we also conducted on the open-source models to inform our model selection (cf. \chapterref{sec:res}).} 
+    \item We extend the analysis from duopoly to oligopoly settings, enabling us to study how LLMs behave as pricing agents in markets with more than two competitors. 
+\end{enumerate}
+
+These extension allows us to investigate a central implication of the \emph{Folk Theorem} in repeated games. As the number of firms increases, sustaining collusion becomes more difficult because the per-firm share of collusive profits diminishes, making deviation more attractive. To maintain cooperation, firms must place greater weight on future payoffs—reflected in a discount factor $\delta$ approaching one—which implies a high degree of patience.
 
 \subsection{Simulation Design}
 
@@ -39,7 +45,7 @@ where \( c_i^t \) is the marginal cost of firm \( i \) at period \( t \). This s
 
 \subsubsection*{Pricing Agents}
 
-Due to budget constraints, we focus exclusively on open-source LLMs: DeepSeek, Llama, and Mistral (both Small and Large variants). However, DeepSeek and Llama require local deployment, have relatively few parameters, and lack the capacity needed for our task. In contrast, Mistral is the only provider offering a free API for large, high-performance models, enabling us to run experiments at scale with more model capabilities. Therefore, while we initially tested all models, we proceeded exclusively with Mistral models\footnote{Specifically, the \texttt{mistral-large-2411} and \texttt{mistral-small-2406} variants.} for both practical and performance reasons.
+Due to budget constraints, we focus exclusively on open-source LLMs: DeepSeek, Llama, and Mistral (both Small and Large variants). However, DeepSeek and Llama require local deployment, have relatively few parameters, and lack the capacity needed for our task. In contrast, Mistral is the only provider offering a free API for large, high-performance models, enabling us to run experiments at scale with more model capabilities. Therefore, while we initially tested all models, we proceeded exclusively with Mistral models\footnote{Specifically, the \texttt{mistral-large-2411} and \texttt{mistral-small-2406}.} for both practical and performance reasons.
 
 Each agent sets prices by generating responses to a structured prompt that is updated every round. The prompt includes:
 
@@ -56,7 +62,6 @@ This prompt design enables learning dynamics through prompt chaining, despite LL
 
 \subsubsection*{Market Configurations}
 
-%\subsubsubsection*{Monopoly}
 We first test the capability of a single LLM-based pricing agent in a monopoly setting.  For that, we use the following prompt prefix:
 
 \begin{center}
@@ -69,28 +74,10 @@ To do this, you should explore many different pricing strategies.
 \end{center}
 
 
-In this setting, the agent is expected to converge to the monopoly price and maintain stability over time. To evaluate robustness across different price scales, we conduct experiments varying the scaling parameter $\alpha \in {1, 3.2, 10}$. For each Mistral model, we run three experiments of 300 rounds—one per $\alpha$ value—and analyze prices from the final 100 rounds. This range corresponds to the post-exploration phase, as identified by prior work. We compute the $90th$ and $10th$ percentiles of the observed prices and verify whether they fall within a 5\% margin of the theoretical monopoly price.
-
-The results in \tableref{tab:monopoly_stats} show near-perfect convergence across all runs for both models. Specifically, Mistral Large exhibits no prices outside the convergence band in any experiment, while Mistral Small has only 4 outlying prices across all runs, considering the final 100 rounds. \textcolor{red}{Although both models demonstrate strong robustness, we choose to proceed with Mistral Large for subsequent analyses due to its larger parameter count, which implies greater representational capacity and decision-making precision}.
-
-\input{latex/tables/monopoly_models}
-
-\figureref{fig:monopoly_convergence} visualizes the experiment results using Mistral Large. The model converges within 25 rounds to the monopoly price (indicated by the dotted line), clearly demonstrating its ability to identify and sustain optimal pricing in this economic scenario.
-
-\begin{figure}[H]
-\centering
-\includesvg[width=1\linewidth]{latex/imgs/res/monopoly/monopoly_experiment_complete.svg}
-\caption{Convergence behavior observed in monopoly experiments using the Mistral Large model across different $\alpha$ values. The convergence band represents prices within $\pm 5\%$ of the theoretical monopoly price, computed by solving $\max\_{p\_i} \pi = (p\_i - c) q\_i$.}
-\label{fig:monopoly_convergence}
-\end{figure}
+In this setting, the agent is expected to converge to the monopoly price and maintain stability over time. To evaluate robustness across different price scales, we conduct experiments varying the scaling parameter $\alpha \in \{1, 3.2, 10\}$. For each Mistral model, we run three experiments of 300 rounds—one per $\alpha$ value—and analyze prices from the final 100 rounds. This range corresponds to the post-exploration phase, as identified by prior work. 
 
 
-
-
-
-\subsubsection*{Symmetric Duopoly}
-
-Then, we turn to investigate the behavior of LLM-based pricing agents in a duopoly setting, using Mistral Large that was the model that best performed in the monopoly setting. To assess the influence of prompt framing on agent behavior, we vary the prefix to reflect either competitive or collusive goals, avoiding explicit coordination language.
+Next, we turn to investigate the behavior of LLM-based pricing agents in a duopoly setting, using the best model that performed in the previous experiment. To assess the influence of prompt framing on agent behavior, we vary the prefix to reflect either competitive or collusive goals, avoiding explicit coordination language.
 
 \begin{center}
 \begin{tcolorbox}[colback=gray!10, colframe=black, width=0.9\textwidth]
@@ -106,67 +93,44 @@ Then, we turn to investigate the behavior of LLM-based pricing agents in a duopo
 \end{tcolorbox}
 \end{center}
 
-\en{Collusive} prefix encourages stable pricing and long-term profitability, while \en{Competitive} prefix promotes short-term profit-seeking with allowance for exploratory undercutting strategies.
+\en{Collusive} prefix encourages stable pricing and long-term profitability, while \en{Competitive} prefix promotes short-term profit-seeking with allowance for exploratory undercutting strategies. Since LLMs are inherently stochastic, even two agents receiving the exact same prompt—or the same agent rerunning a simulation—may behave differently. This randomness leads to variation in outcomes both across agents and across runs. To account for this, we run 7 experiments per prefix for each value of $\alpha$.
 
-
-Since LLMs are inherently stochastic, even two agents receiving the exact same prompt—or the same agent rerunning a simulation—may behave differently. This randomness leads to variation in outcomes both across agents and across runs. To account for this, we run 7 experiments per prefix for each value of $\alpha$, leading to the results shown below:
-
-[ADD Duopoly results image]
-\begin{figure}[H]
-    \centering
-    % \includegraphics[width=0.5\linewidth]{}
-    \caption{Caption}
-    \label{fig:enter-label}
-\end{figure}
-
-\textbf{Finding: Analyze visually the results and comment the Welch test to measure difference in means between prefix results}.
 
 Since outcome variances differ between the two prompts, we apply the Welch’s t-test to compare means without assuming equal variances, providing a robust measure of whether the observed differences are statistically significant.
 
-\subsubsection*{Asymmetric Duopoly}
 
-To introduce additional structure into the economic environment, we extend the previous experiment by assigning different values of $a_i$ to each firm, which reflects vertical differentiation between firms. This variation allows us to model differences in inherent product quality, thereby relaxing the assumption of symmetry and enabling a richer analysis of firm behavior under heterogeneous conditions.
-
-
-[ADD Duopoly Asymmetric results image]
-\begin{figure}[H]
-    \centering
-    % \includegraphics[width=0.5\linewidth]{}
-    \caption{Caption}
-    \label{fig:enter-label}
-\end{figure}
-\textbf{Finding: Analyze visually the results and report the Welch test results}.
-
-
-
-\subsubsection*{Symmetric Oligopoly}
-
-This section presents the core contribution of our thesis: the exploration of collusive dynamics in symmetric oligopoly settings using LLM-based agents. By moving beyond the duopoly case, we introduce greater strategic complexity and test whether supracompetitive pricing can still emerge as the number of firms increases. This shift brings the analysis closer to realistic market conditions and allows us to assess how LLM agents navigate environments where the incentives to deviate from cooperation are substantially stronger.
+And finally, as the core contribution of our thesis, we explore collusive dynamics in symmetric oligopoly settings using LLM-based agents. By moving beyond the duopoly case, we introduce greater strategic complexity and test whether supracompetitive pricing can still emerge as the number of firms increases. This shift brings the analysis closer to realistic market conditions and allows us to assess how LLM agents navigate environments where the incentives to deviate from cooperation are substantially stronger.
 
 From a theoretical standpoint, the \emph{Folk Theorem} in repeated games suggests that collusion can be sustained indefinitely, provided firms are sufficiently patient—i.e., they value future profits highly, which corresponds to a discount factor $\delta$ close to one. However, as the number of firms $n$ increases, the individual share of the collusive profit $\pi^C = \frac{\pi^M}{n}$ declines, while the immediate gain from undercutting competitors $\pi^D$ becomes more tempting \parencite{ivaldi_chapter_2007, tirole_theory_1988}.
 
 This trade-off is captured by the standard trigger strategy, where firms cooperate by charging the collusive price as long as no one deviates, but revert permanently to competitive pricing if a deviation occurs. Under this strategy, the value of cooperating is:
 
-$$V_C = \frac{\pi^C}{1 - \delta}$$
+\begin{equation}
+    V_C = \frac{\pi^C}{1 - \delta}
+\end{equation}
 
 whereas the value of deviating is:
 
-$$V_D = \pi^D + \frac{\pi^N}{1 - \delta}$$
+\begin{equation}
+    V_D = \pi^D + \frac{\pi^N}{1 - \delta}
+\end{equation}
 
 In the case of a grim trigger, where punishment is permanent, we assume $\pi^N = 0$, so the deviation payoff simplifies to $V_D = \pi^D$. The incentive compatibility condition $V_C \geq V_D$ then implies:
 
-$$\frac{\pi^C}{1 - \delta} \geq \pi^D$$
+\begin{equation}\label{eq:inc}
+    \frac{\pi^C}{1 - \delta} \geq \pi^D
+\end{equation}
 
-While this condition is derived under the assumption that a deviating firm captures the full market in a single period, this does not strictly apply in our setting. Under the demand function used by \textcite{calvano_artificial_2020}, lower prices lead to higher—but not exclusive—market shares, reflecting product differentiation. Thus, deviation yields only a partial market gain. Nevertheless, we adopt this simplified condition for expositional clarity, as it still captures the qualitative effect of increasing firm numbers on the incentives to defect.
+While this condition is derived under the assumption that a deviating firm captures the full market in a single period, this does not strictly apply in our setting. According to the demand function used by \textcite{calvano_artificial_2020}, lower prices result in higher—but not exclusive—market shares, reflecting product differentiation. Thus, deviation yields only a partial market gain. Nevertheless, we adopt this simplified condition for expositional clarity, as it still captures the qualitative effect of increasing the number of firms on the incentives to defect. Multiplying both sides in \equationref{eq:inc} by $1 - \delta$ and rearranging gives:
 
-Multiplying both sides by $1 - \delta$ and rearranging gives:
+\begin{equation}
+    \delta \geq \frac{\pi^D - \pi^C}{\pi^D}
+\end{equation}
 
-$$\delta \geq \frac{\pi^D - \pi^C}{\pi^D}$$
-
-As $n$ grows, $\pi^C$ falls and the threshold $\delta^*$ approaches one, meaning firms must be increasingly patient for collusion to be sustainable. This theoretical insight motivates our key experiment: testing whether LLM-based agents can maintain supracompetitive prices in a four-firm setting, where the incentives to defect are stronger and the theoretical conditions for stable collusion are tighter.
+As $n$ grows, $\pi^C$ falls, and the threshold $\delta^*$ approaches one, meaning firms must be increasingly patient for collusion to be sustainable. This theoretical insight motivates our key experiment: testing whether LLM-based agents can maintain supracompetitive prices in a four-firm setting, where the incentives to defect are more substantial and the theoretical conditions for stable collusion are tighter.
 
 
-So for that, we run several experiments with 3, 4, anf 5 firms to test the responses of the agents to this environment.
+So for that, we run several experiments with 3, 4, and 5 firms to test the responses of the agents to this environment.
 
 
 
