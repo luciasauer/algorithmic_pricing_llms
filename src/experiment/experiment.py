@@ -150,8 +150,27 @@ class Experiment:
             for agent in self.agents
         }
 
+        # PARALLEL STRATEGY
         tasks = [agent.act(prompts[agent.name]) for agent in self.agents]
         results = await asyncio.gather(*tasks)
+
+        # tasks = []
+
+        # ## STAGGERED STRATEGY
+        # for agent in self.agents:
+        #     task = asyncio.create_task(agent.act(prompts[agent.name]))
+        #     tasks.append(task)
+        #     await asyncio.sleep(5)  # Stagger start by 0.5s
+
+        # results = await asyncio.gather(*tasks)
+
+        ## SEQUENTIAL STRATEGY
+        # results = []
+
+        # for agent in self.agents:
+        #     result = await agent.act(prompts[agent.name])
+        #     results.append(result)
+        #     await asyncio.sleep(1)  # Enforce 1 second between requests
 
         prices = self._store_agent_outputs(results, round_num)
         agent_order = [(agent.name, agent.env_index) for agent in self.agents]
