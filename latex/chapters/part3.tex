@@ -74,7 +74,7 @@ To do this, you should explore many different pricing strategies.
 \end{center}
 
 
-In this setting, the agent is expected to converge to the monopoly price and maintain stability over time. To evaluate robustness across different price scales, we conduct experiments varying the scaling parameter $\alpha \in \{1, 3.2, 10\}$. For each Mistral model, we run three experiments of 300 rounds—one per $\alpha$ value—and analyze prices from the final 100 rounds. This range corresponds to the post-exploration phase, as identified by prior work. 
+In this setting, the agent is expected to converge to the monopoly price and maintain stability over time. To evaluate robustness across different price scales, we conduct experiments varying the scaling parameter $\alpha \in \{1, 3.2, 10\}$ in the demand function. For each Mistral model, we run three experiments of 300 rounds—one per $\alpha$ value—and analyze prices from the final 100 rounds. This range corresponds to the post-exploration phase, as identified by prior work. 
 
 
 Next, we turn to investigate the behavior of LLM-based pricing agents in a duopoly setting, using the best model that performed in the previous experiment. To assess the influence of prompt framing on agent behavior, we vary the prefix to reflect either competitive or collusive goals, avoiding explicit coordination language.
