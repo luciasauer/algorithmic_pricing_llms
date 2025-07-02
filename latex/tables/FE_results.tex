@@ -1,0 +1,25 @@
+\begin{table}[htpb!]
+    \centering
+    \caption{Tit for Tat Response}
+    \label{tab:csscore_did_results}
+    \begin{tabular}{lccccc}
+    \toprule
+    & \multicolumn{3}{c}{Dependent variable: Complexity Score} \\
+    \cmidrule(lr){2-4}
+    & (1) & (2) & (3) \\
+    \midrule
+    Treatment Effect         & 0.084$^{***}$ & 0.059$^{***}$ & 0.073$^{***}$ \\
+    & (0.011)       & (0.014)       & (0.010) \\
+    &               &               & \\
+    \midrule
+    Model                    & 2 firms       & 3 firms       & 4 firms & 5 firms \\
+    Self $t-1$               & Yes           & Yes           & Yes     & Yes\\
+    Group fixed effects      & Yes           & Yes           & Yes     & Yes\\
+    Month covariates         & No            & No            & Yes     & Yes\\
+    \midrule
+    Observations             & 1,328         & 1,328         & 1,328   & 1,328\\
+    Number of groups         & 8             & 8             & 8       & 8\\
+    \bottomrule
+    \multicolumn{4}{p{1\linewidth}}{\footnotesize \textit{Notes:} Standard errors in parentheses, clustered at the group level. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. The dependent variable is the standardized complexity score calculated at the individual question level. Each question's complexity is measured as the average of four z-standardized components: tag count, code length, body length, and title length. Treatment is defined as the period after ChatGPT's release (November 30, 2022). Models 1-2 use traditional DiD specifications, while Model 3 uses synthetic control methods with month covariates.} \\
+    \end{tabular}
+\end{table}
