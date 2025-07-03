@@ -1,1 +1,21 @@
 \appendix
+\begin{table}[htpb!]
+    \centering
+    \caption{Welch’s t-test: Average Prices Across Prompt Prefixes}
+    \label{tab:welch_test_1}
+    \begin{tabular}{lcc}
+    \toprule
+    & P1 & P2 \\
+    \midrule
+    Mean Price (last 50 rounds) &  &  \\
+    Standard Deviation          &  &  \\
+    Observations                &  &  \\
+    \midrule
+    Difference in Means         & \multicolumn{2}{c}{$^{***}$} \\
+    Welch's t-statistic         & \multicolumn{2}{c}{} \\
+    Degrees of Freedom          & \multicolumn{2}{c}{} \\
+    p-value                     & \multicolumn{2}{c}{<} \\
+    \bottomrule
+    \multicolumn{3}{p{0.9\linewidth}}{\footnotesize \textit{Notes:} Welch’s t-test compares the mean prices set under each prompt prefix across the 21 experiments, assuming unequal variances. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. Mean prices are calculated using the final 50 rounds of each experiment.}
+    \end{tabular}
+\end{table}
