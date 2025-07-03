@@ -1,20 +1,45 @@
 \section{Discussion}\label{sec:dis}
 
-Interpretation: What did you observe?
+This thesis provides the first systematic empirical test of Folk Theorem predictions in LLM-mediated markets, extending algorithmic collusion research beyond duopoly settings to examine the theoretical boundaries of AI coordination. Our findings demonstrate that LLM agents can achieve sustained supracompetitive outcomes across multiple market structures, but with coordination effectiveness declining systematically as predicted by economic theory.
 
-How does it relate to theory and prior work?
+\subsection{Core Findings and Literature Positioning}
 
-Limitations: Data availability, assumptions (no quantities), LLM reproducibility
+Our central finding—a 3.7% price reduction per additional competitor with cumulative effects reaching 10.6% from duopoly to five-agent markets—provides the first quantitative validation of Folk Theorem predictions in LLM settings. This systematic breakdown pattern aligns with Calvano et al.'s (2020) observation that Q-learning algorithms maintained "substantial collusion" even "when the active firms are three or four in number" (p. 3268), but provides the missing quantification of breakdown trajectories they did not examine.
 
-Policy implications: Transparency, algorithm regulation
+The experimental design enables clean identification of group size effects by holding constant all other market characteristics—demand structure, cost parameters, and agent specifications—while varying only the number of competing agents. This controlled variation extends beyond observational studies like Assad et al. (2024), whose analysis of German gasoline markets documented significant coordination effects (15% margin increases in non-monopoly markets) but could not isolate market structure effects from other confounding factors.
 
+The systematic coordination breakdown contradicts concerns about AI systems potentially transcending traditional economic constraints. Instead, LLM agents appear subject to the same fundamental coordination challenges that constrain both human and traditional algorithmic coordination, albeit with notably higher baseline coordination capabilities than documented in prior Q-learning studies.
 
+\subsection{Theoretical Implications and Coordination Mechanisms}
 
-%%%%%%%%Just threw some ideas, need to be refined
-This thesis has demonstrated that multi-agent pricing strategies powered by Large Language Models (LLMs) can achieve supracompetitive outcomes in oligopolistic market settings. Notably, our results were obtained using significantly smaller and less computationally intensive models than those employed in prior, resource-heavy studies. Despite their relative simplicity, these lightweight models were still capable of producing competitive—and in some cases, strategically sophisticated—pricing behavior.
+The observed "converge-and-persist" coordination pattern reveals that LLM agents coordinate through fundamentally different mechanisms than traditional reinforcement learning algorithms. While Calvano et al. (2020, 2021) documented Q-learning algorithms discovering collusive strategies through extended trial-and-error exploration, often requiring hundreds of periods to establish stable coordination, LLM agents rapidly converge to stable focal points and maintain them with minimal deviation. This behavioral difference reflects their pre-training on human-generated text about markets and strategic behavior.
 
-Our findings highlight several important implications. First, the low barrier to entry for deploying LLMs in economic simulations suggests a promising alternative to traditional reinforcement learning (RL) approaches, which often require extensive tuning and infrastructure. Furthermore, LLMs offer a unique advantage by providing human-interpretable reasoning following each pricing decision, potentially enhancing transparency and trust in automated decision-making systems—something conventional RL methods typically lack.
+However, the LLM coordination mechanism also creates distinctive vulnerabilities. The extreme price persistence (near-unit root behavior) suggests that coordination depends critically on maintaining stable strategic frameworks across participants—a requirement that becomes increasingly difficult as group size increases. This finding helps explain why coordination breakdown follows smooth patterns consistent with theoretical predictions rather than exhibiting sudden threshold effects.
 
-However, these benefits must be weighed against critical limitations. Most notably, the conclusions drawn from our experiments are not directly generalizable to real-world markets. The stochastic nature of LLMs means outcomes can vary significantly between runs, and their black-box architecture obscures the internal logic behind individual decisions. While the explanations they generate may appear coherent and strategically sound, they may also reflect a form of anthropomorphized bias—textual justifications that are more aesthetically pleasing than truly informative.
+The 18.8% price difference between prompt specifications (P1 vs P2) extends Fish et al.'s (2025) duopoly results to oligopoly settings, confirming that algorithmic coordination is highly sensitive to seemingly minor design choices. This prompt sensitivity operates independently of market structure effects, validating the robustness of Folk Theorem predictions across different algorithmic implementations while highlighting new regulatory concerns about unintentional coordination facilitation.
 
-In summary, while LLM-based agents represent a promising and accessible tool for modeling strategic economic interactions, their reliability, interpretability, and applicability to real-world markets remain open questions. Further research is needed to systematically evaluate their robustness, improve their transparency, and explore how they might be responsibly integrated into economic policy and practice.
+\subsection{Critical Limitations}
+
+Several fundamental limitations constrain the interpretation and generalizability of our findings. Most critically, LLMs represent stochastic "black box" systems whose decision-making processes remain largely opaque. While our agents provide textual explanations for their pricing decisions, these explanations may reflect post-hoc rationalization rather than genuine strategic reasoning.
+
+**Sample size constraints** represent a significant methodological limitation. Our experimental design, while sufficient for detecting major coordination effects, relies on relatively small sample sizes per treatment condition. The computational costs and API rate limits associated with LLM experimentation restrict the scale of data collection compared to traditional algorithmic studies, affecting both the precision of our estimates and our ability to detect smaller coordination effects.
+
+**Model access limitations** constrain the generalizability of our findings across different AI architectures. Due to resource constraints and API availability, our analysis focuses primarily on open-source models (Mistral-Large-2411) rather than state-of-the-art proprietary systems like GPT-4o or Claude. Our attempts to replicate Fish et al.'s (2025) core findings using smaller, more accessible models were only partially successful, highlighting the sensitivity of LLM coordination to specific model architectures and raising important questions about robustness across different technological platforms.
+
+External validity concerns arise from the synthetic nature of our experimental environment. Real markets exhibit complexities—asymmetric information, heterogeneous products, regulatory oversight, demand uncertainty—that could fundamentally alter coordination dynamics in practice.
+
+\subsection{Policy Implications}
+
+Our findings have important implications for competition policy in AI-mediated markets. The systematic coordination breakdown as market concentration decreases provides quantitative guidance for merger analysis, with the 3.7% per-competitor effect offering a concrete benchmark for assessing competitive effects in markets where algorithmic pricing is prevalent.
+
+These experimental findings complement the empirical evidence from Assad et al. (2024), whose finding that coordination effects emerged only when all competitors adopted algorithmic pricing aligns with our experimental evidence that coordination requires stable strategic frameworks across participants—frameworks that become harder to maintain as participant numbers increase.
+
+However, the demonstrated coordination capabilities—even in five-agent markets, prices remained substantially above competitive levels—highlight ongoing risks from algorithmic coordination. The accessibility of coordination-capable models, combined with their rapid deployment potential, suggests that algorithmic collusion threats may be more widespread than previously recognized.
+
+The prompt sensitivity results reveal new dimensions of regulatory concern not captured in traditional antitrust frameworks. The substantial price differences arising from seemingly innocuous prompt modifications suggest that algorithmic coordination can emerge from design choices that firms might not recognize as strategically significant, creating novel compliance challenges for firms deploying LLM-based pricing systems.
+
+\subsection{Future Research Directions}
+
+**Price shock analysis** represents perhaps the most immediate and policy-relevant extension of this research. Testing how LLM coordination patterns respond to external market disruptions—cost shocks, demand shifts, or regulatory interventions—would provide crucial insights into the robustness of algorithmic collusion and inform regulatory strategies for market intervention. Unlike the stable environments examined here, real markets face constant perturbations that test coordination resilience in ways our controlled experiments cannot capture.
+
+Additional research priorities include systematic analysis across state-of-the-art proprietary models (GPT-4o, Claude, Gemini) to determine whether coordination capabilities scale with model sophistication, examination of heterogeneous environments where algorithms compete against human decision-makers, and development of detection strategies for competition authorities. The methodological framework established here provides a foundation for such extensions while demonstrating that meaningful coordination research can be conducted using accessible models rather than resource-intensive proprietary systems.
