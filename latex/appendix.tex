@@ -2,9 +2,9 @@
 
 \section{Appendix}
 
-\subsection{Duopoloy}
+\subsection*{Duopoloy}
 
-\begin{table}[htpb!]
+\begin{table}[H]
     \centering
     \caption{Welch's t-test: Average Prices Across Prompt Prefixes}
     \label{tab:welch_test_1}
@@ -33,7 +33,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Table of failed Fish et al. replication
-\begin{table}[htpb!]
+\begin{table}[H]
     \centering
     \caption{\textcite[p. 18]{fish_algorithmic_2025} -- Table 2 replication}
     \label{tab:fe_fish}
@@ -67,10 +67,10 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Oligopolies}
+\subsection*{Oligopolies}
 
 % Plot of all runs
-\begin{figure}[htpb]
+\begin{figure}[H]
     \centering
     \includesvg[width=1\linewidth]{latex/imgs/res/price_over_time_by_prompt_prefix_combined.svg}
     \caption{Average Price by Prompt and Experiment, shaded areas are 95\% confidence intervals, lines are averaged values out of all 21 runs per prompt (7 runs $\times$ 3 alphas).}
@@ -79,3 +79,123 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\subsection*{Robustness checks}\label{app:robust}
+
+% Robustness Check: Different Time Windows (Log Prices)
+\begin{table}[H]
+    \centering
+    \caption{Robustness Check: Different Time Windows (Log Prices)}
+    \label{tab:robustness_time_windows}
+    \begin{threeparttable}
+    \begin{tabular}{lccc}
+    \toprule
+     & \multicolumn{3}{c}{Dependent Variable: $\ln(\text{Price})$} \\
+    \cmidrule(lr){2-4}
+     & Last 25 Periods & Last 75 Periods & Last 100 Periods \\
+    \midrule
+    Group Size & $-0.0375^{***}$ & $-0.0369^{***}$ & $-0.0366^{***}$ \\
+     & $(0.0053)$ & $(0.0056)$ & $(0.0057)$ \\
+    \\
+    P2 Prompt & $-0.2066^{***}$ & $-0.2108^{***}$ & $-0.2122^{***}$ \\
+     & $(0.0123)$ & $(0.0127)$ & $(0.0129)$ \\
+    \\
+    $\alpha = 3.2$ & $0.0313^{**}$ & $0.0302^{**}$ & $0.0300^{**}$ \\
+     & $(0.0138)$ & $(0.0143)$ & $(0.0145)$ \\
+    \\
+    $\alpha = 10.0$ & $0.0188$ & $0.0157$ & $0.0132$ \\
+     & $(0.0155)$ & $(0.0160)$ & $(0.0162)$ \\
+    \\
+    Constant & $0.6378^{***}$ & $0.6440^{***}$ & $0.6472^{***}$ \\
+     & $(0.0215)$ & $(0.0221)$ & $(0.0226)$ \\
+    \midrule
+    Observations & 168 & 168 & 168 \\
+    R-squared & 0.679 & 0.672 & 0.667 \\
+    \bottomrule
+    \end{tabular}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average log price for one experimental run over the specified final periods. Group Size ranges from 2 to 5 agents. P2 Prompt is a dummy variable for the alternative prompt specification. Results demonstrate stability of Folk Theorem findings across different convergence windows.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{table}
+
+% Robustness Check: Price Levels vs Log Prices
+\begin{table}[H]
+    \centering
+    \caption{Robustness Check: Price Levels vs Log Transformation}
+    \label{tab:robustness_price_specification}
+    \begin{threeparttable}
+    \begin{tabular}{lcc}
+    \toprule
+     & Log Prices & Level Prices \\
+     & (Last 50 Periods) & (Last 50 Periods) \\
+    \midrule
+    Group Size & $-0.0373^{***}$ & $-0.0528^{***}$ \\
+     & $(0.0054)$ & $(0.0091)$ \\
+    \\
+    P2 Prompt & $-0.2082^{***}$ & $-0.3330^{***}$ \\
+     & $(0.0125)$ & $(0.0209)$ \\
+    \\
+    $\alpha = 3.2$ & $0.0303^{**}$ & $0.0555^{**}$ \\
+     & $(0.0140)$ & $(0.0238)$ \\
+    \\
+    $\alpha = 10.0$ & $0.0166$ & $0.0308$ \\
+     & $(0.0157)$ & $(0.0260)$ \\
+    \\
+    Constant & $0.6417^{***}$ & $1.8692^{***}$ \\
+     & $(0.0218)$ & $(0.0371)$ \\
+    \midrule
+    Observations & 168 & 168 \\
+    R-squared & 0.675 & 0.648 \\
+    \bottomrule
+    \end{tabular}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average price for one experimental run over the final 50 periods. The left column uses log-transformed prices (normalized by $\alpha$), while the right column uses price levels (normalized by $\alpha$). Group Size ranges from 2 to 5 agents. Results confirm Folk Theorem predictions are robust to functional form specification.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{table}
+
+% Robustness Check: Non-linear and Interaction Effects
+\begin{table}[H]
+    \centering
+    \caption{Robustness Check: Non-linear and Interaction Effects}
+    \label{tab:robustness_nonlinear}
+    \begin{threeparttable}
+    \begin{tabular}{lcc}
+    \toprule
+     & \multicolumn{2}{c}{Dependent Variable: $\ln(\text{Price})$} \\
+    \cmidrule(lr){2-3}
+     & Squared Terms & Interaction Effects \\
+    \midrule
+    Group Size & $-0.0412$ & $-0.0292^{***}$ \\
+     & $(0.0437)$ & $(0.0095)$ \\
+    \\
+    Group Size$^2$ & $0.0006$ &  \\
+     & $(0.0063)$ &  \\
+    \\
+    P2 Prompt & $-0.2082^{***}$ & $-0.1515^{***}$ \\
+     & $(0.0125)$ & $(0.0388)$ \\
+    \\
+    Group Size $\times$ P2 &  & $-0.0162$ \\
+     &  & $(0.0109)$ \\
+    \\
+    $\alpha = 3.2$ & $0.0303^{**}$ & $0.0303^{**}$ \\
+     & $(0.0141)$ & $(0.0138)$ \\
+    \\
+    $\alpha = 10.0$ & $0.0166$ & $0.0166$ \\
+     & $(0.0158)$ & $(0.0158)$ \\
+    \\
+    Constant & $0.6478^{***}$ & $0.6133^{***}$ \\
+     & $(0.0709)$ & $(0.0337)$ \\
+    \midrule
+    Observations & 168 & 168 \\
+    R-squared & 0.675 & 0.679 \\
+    \bottomrule
+    \end{tabular}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average log price for one experimental run over the final 50 periods. Left column tests for non-linear Folk Theorem effects via squared terms. Right column tests for differential group size effects across prompt types. Neither squared terms nor interaction effects are statistically significant, confirming linear Folk Theorem predictions.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{table}
