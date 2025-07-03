@@ -19,3 +19,12 @@
     \multicolumn{3}{p{0.9\linewidth}}{\footnotesize \textit{Notes:} Welch’s t-test compares the mean prices set under each prompt prefix across the 21 experiments, assuming unequal variances. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. Mean prices are calculated using the final 50 rounds of each experiment.}
     \end{tabular}
 \end{table}
+
+
+
+\begin{figure}[htpb]
+    \centering
+    \includesvg[width=1\linewidth]{latex/imgs/res/price_over_time_by_prompt_prefix_combined.svg}
+    \caption{Average Price by Prompt and Experiment, shaded areas are 95\% confidence intervals, lines are averaged values out of all 21 runs per prompt (7 runs $\times$ 3 alphas).}
+    \label{fig:ts_prices_comb}
+\end{figure}
