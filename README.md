@@ -146,7 +146,9 @@ Moving from **duopoly** (n=2) to **five-agent competition** (n=5):
 
 ### 🔄 **Oligopoly Breakdown Patterns**
 
-![Group Size Effects](./latex/imgs/res/convergence_prices_by_num_agents.svg)
+<center>
+  <img src="./latex/imgs/res/convergence_prices_by_num_agents.svg" width="90%" />
+</center>
 
 **Folk Theorem Validation**:
 
@@ -180,6 +182,10 @@ R-squared          0.666           0.675
 Notes: *** p<0.01, ** p<0.05, * p<0.1
 Robust standard errors (HC3) in parentheses.
 ```
+
+<center>
+  <img src="./latex/imgs/res/price_over_time_by_prompt_prefix_combined.svg" width="90%" />
+</center>
 
 ---
 
