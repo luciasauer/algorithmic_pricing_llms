@@ -6,8 +6,9 @@
 
 \begin{table}[htpb!]
     \centering
-    \caption{Welch’s t-test: Average Prices Across Prompt Prefixes}
+    \caption{Welch's t-test: Average Prices Across Prompt Prefixes}
     \label{tab:welch_test_1}
+    \begin{threeparttable}
     \begin{tabular}{lcc}
     \toprule
     & P1 & P2 \\
@@ -21,8 +22,12 @@
     Degrees of Freedom          & \multicolumn{2}{c}{} \\
     p-value                     & \multicolumn{2}{c}{<} \\
     \bottomrule
-    \multicolumn{3}{p{0.9\linewidth}}{\footnotesize \textit{Notes:} Welch’s t-test compares the mean prices set under each prompt prefix across the 21 experiments, assuming unequal variances. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. Mean prices are calculated using the final 50 rounds of each experiment.}
     \end{tabular}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item \textbf{Notes:} Welch's t-test compares the mean prices set under each prompt prefix across the 21 experiments, assuming unequal variances. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. Mean prices are calculated using the final 50 rounds of each experiment.
+    \end{tablenotes}
+    \end{threeparttable}
 \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -32,6 +37,7 @@
     \centering
     \caption{\textcite[p. 18]{fish_algorithmic_2025} -- Table 2 replication}
     \label{tab:fe_fish}
+    \begin{threeparttable}
     {\small
     \begin{tabular}{lcc}
     \toprule
@@ -52,11 +58,11 @@
     \bottomrule
     \end{tabular}
     }
-    \vspace{1mm}
-    
-    \begin{minipage}{\textwidth}
-    \footnotesize{\parbox{1\textwidth}{\textbf{Note}: Robust standard errors in parentheses. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. Models (1) and (2) examine P1 and P2's pricing responses, respectively. The high self-price coefficients (near 1.0) indicate strong price stickiness. P1 agents show marginally significant reward-punishment dynamics in response to competitor pricing, while P2 agents show no significant response to competitor moves.}}
-    \end{minipage}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item \textbf{Notes}: Robust standard errors in parentheses. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. Models (1) and (2) examine P1 and P2's pricing responses, respectively. The high self-price coefficients (near 1.0) indicate strong price stickiness. P1 agents show marginally significant reward-punishment dynamics in response to competitor pricing, while P2 agents show no significant response to competitor moves.
+    \end{tablenotes}
+    \end{threeparttable}
 \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

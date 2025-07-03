@@ -170,3 +170,25 @@ The experimental design enables us to determine whether LLM agents adhere to tra
 
 \subsection{Measurement Strategy}
 %[Convergence criteria, collusion metrics, breakdown point identification]
+
+\subsubsection*{Econometric Specification}
+
+Our primary analytical approach examines equilibrium price differences across group sizes using run-level averages from the final 50 periods (rounds 251-300). This methodological choice is motivated by three key considerations. First, the final 50 periods represent converged behavior, eliminating the confounding effects of learning and adjustment dynamics that dominate earlier periods, as noted by \textcite{fish_algorithmic_2025}. Second, run-level aggregation addresses potential price persistence observed in period-to-period data, which would otherwise obscure the structural relationship between group size and collusion sustainability. Third, this approach directly tests the Folk Theorem's core prediction about equilibrium differences across market structures rather than short-run dynamic responses. Hence, we estimate the following econometric models:
+
+\begin{equation}\label{eq:baseline}
+    \ln(\bar{p}_{i,r}) = \beta_0 + \beta_1 \cdot \text{GroupSize}_r + \beta_2 \cdot \text{P2Prompt}_r + \varepsilon_{i,r}
+\end{equation}
+
+\begin{equation}\label{eq:controls}
+    \ln(\bar{p}_{i,r}) = \beta_0 + \beta_1 \cdot \text{GroupSize}_r + \beta_2 \cdot \text{P2Prompt}_r + \sum_{j \in \{3.2, 10\}} \gamma_j \cdot \mathbb{I}[\alpha_r = \alpha_j] + \varepsilon_{i,r}
+\end{equation}
+
+where equation~\eqref{eq:baseline} represents our baseline specification and equation~\eqref{eq:controls} includes demand parameter controls $\gamma_j$. Moreover, $\ln(\bar{p}_{i,r})$ represents the logarithm of the average normalized price\footnote{Prices are normalized by dividing by the demand parameter $\alpha$ to ensure comparability across experimental conditions with different demand intensities.} for run $r$, $\text{GroupSize}_r \in \{2,3,4,5\}$ is the number of competing agents, and $\text{P2Prompt}_r$ is a dummy variable for the alternative prompt specification.
+
+The logarithmic transformation serves multiple purposes: it stabilizes the variance of price data, allows for straightforward interpretation of coefficients as percentage effects, and addresses potential concerns about heteroskedasticity. The coefficient $\beta_1$ captures the marginal impact of market concentration on collusive pricing, with the Folk Theorem predicting $\beta_1 < 0$ (i.e., larger groups sustain lower prices).
+
+\subsubsection{Identification Strategy}
+
+Our identification strategy relies on experimental variation in group size while holding all other market characteristics constant. The Calvano demand structure, symmetric cost parameters, and identical LLM agents ensure that differences in pricing behavior can be attributed to group size effects rather than confounding factors. The random assignment of prompt types across runs provides additional variation to test the robustness of group size effects across different algorithmic specifications.
+
+To verify that our results are not driven by heterogeneity in experimental parameters, we include controls for the demand intensity parameter $\alpha \in \{1, 3.2, 10\}$. These controls test whether the group size effect remains stable across different market conditions, providing a robustness check on our core findings.

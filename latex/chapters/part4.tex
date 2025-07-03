@@ -97,6 +97,7 @@ This differenced specification successfully addresses the persistence issue and 
     \centering
     \caption{Tit for Tat Response – Duopoly Setting}
     \label{tab:fe_duopoly}
+    \begin{threeparttable}
     {\small
     \begin{tabular}{lcc}
     \toprule
@@ -117,11 +118,11 @@ This differenced specification successfully addresses the persistence issue and 
     \bottomrule
     \end{tabular}
     }
-    \vspace{1mm}
-    
-    \begin{minipage}{\textwidth}
-    \footnotesize{\parbox{1\textwidth}{\textbf{Note}: Robust standard errors in parentheses. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. Models (1) and (2) examine P1 and P2's pricing responses, respectively. }}
-    \end{minipage}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item \textbf{Notes}: Robust standard errors in parentheses. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. Models (1) and (2) examine P1 and P2's pricing responses, respectively.
+    \end{tablenotes}
+    \end{threeparttable}
 \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -136,11 +137,70 @@ This behavioral pattern has important methodological implications. Since price d
 
 \subsection*{Oligopoly}
 
-The oligopolistic scenario constitutes our main innovation as we extend the \textcite{fish_algorithmic_2025} framework by multi-firm scenarios. \figureref{fig:oligopols} summarizes our findings across all runs.
+The oligopolistic scenario constitutes our main innovation as we extend the \textcite{fish_algorithmic_2025} framework by multi-firm scenarios. \figureref{fig:oligopols} visually summarizes our findings across all runs.
 
 \begin{figure}[H]
     \centering
     \includesvg[width=1\linewidth]{latex/imgs/res/convergence_prices_by_num_agents.svg}
-    \caption{Oligopolistic data distribution, 42--168 data points ($\bullet$) per supergroup (3 alphas $\times$ 7 runs $\times$ number of firms), triangles ($\blacktriangle$) represent subgroup averages, dashed lines ($\text{- -}$) represent Nash prices following \equationref{eq:nash} and Monopoly prices according to \equationref{eq:monop} per supergroup.}
+    \caption{Oligopolistic data distribution, 42--168 data points ($\bullet$) per supergroup (3 alphas $\times$ 7 runs $\times$ number of firms; average of last 50 rounds), triangles ($\blacktriangle$) represent subgroup averages, dashed lines ($\text{- -}$) represent Nash prices following \equationref{eq:nash} and Monopoly prices according to \equationref{eq:monop} per supergroup.}
     \label{fig:oligopols}
 \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Run-Level Equilibrium Analysis}\label{sec:run_level}
+
+Having established that our LLM agents can successfully engage in tacit collusion in duopoly settings, we now turn to our central research question: Does algorithmic collusion break down as market concentration decreases, consistent with the predictions of the Folk Theorem? To address this question rigorously, we employ a run-level equilibrium analysis that focuses on the final pricing outcomes after agents have had sufficient time to converge to stable strategies.
+
+\subsubsection{Results}
+
+Table~\ref{tab:run_level_results} presents our main empirical findings from estimating equations~\eqref{eq:baseline} and~\eqref{eq:controls}. Both specifications yield statistically identical group size coefficients, confirming the robustness of our core findings across different experimental conditions.
+
+\begin{table}[htbp!]
+    \centering
+    \caption{Run-Level Equilibrium Analysis: Group Size Effects on Algorithmic Collusion}
+    \label{tab:run_level_results}
+    \begin{threeparttable}
+    \begin{tabular}{lcc}
+    \toprule
+     & \multicolumn{2}{c}{Dependent Variable: $\ln(\text{Price})$} \\
+    \cmidrule(lr){2-3}
+     & (1) Equation~\eqref{eq:baseline} & (2) Equation~\eqref{eq:controls} \\
+    \midrule
+    Group Size & $-0.0373^{***}$ & $-0.0373^{***}$ \\
+     & $(0.0055)$ & $(0.0054)$ \\
+    \\
+    P2 Prompt & $-0.2082^{***}$ & $-0.2082^{***}$ \\
+     & $(0.0125)$ & $(0.0125)$ \\
+    \\
+    $\alpha = 3.2$ &  & $0.0303^{**}$ \\
+     &  & $(0.0140)$ \\
+    \\
+    $\alpha = 10.0$ &  & $0.0166$ \\
+     &  & $(0.0157)$ \\
+    \\
+    Constant & $0.6573^{***}$ & $0.6417^{***}$ \\
+     & $(0.0203)$ & $(0.0218)$ \\
+    \midrule
+    Observations & 168 & 168 \\
+    R-squared & 0.666 & 0.675 \\
+    \bottomrule
+    \end{tabular}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average log price for one experimental run over the final 50 periods (rounds 251-300). Group Size ranges from 2 to 5 agents. P2 Prompt is a dummy variable for the alternative prompt specification. Alpha controls represent different demand intensity parameters.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{table}
+
+The results provide strong empirical support for the Folk Theorem's predictions regarding the sustainability of collusion. The group size coefficient of $-0.0373$ is highly statistically significant ($p < 0.001$) and economically meaningful. Interpreted as a percentage effect, each additional competitor reduces equilibrium prices by approximately 3.7\%, representing a substantial erosion of collusive power as market concentration decreases.
+
+To illustrate the economic magnitude of this effect, consider the progression from duopoly to five-agent competition. Moving from $n=2$ to $n=5$ represents a cumulative effect of $(e^{-0.0373 \times 3} - 1) \times 100\% = -10.6\%$, demonstrating that algorithmic collusion faces substantial constraints as the number of market participants increases, consistent with the theoretical prediction that coordination becomes increasingly difficult in larger groups.
+
+The prompt heterogeneity coefficient provides additional insights into the mechanisms underlying algorithmic collusion. The P2 prompt specification results in systematically lower prices ($e^{-0.2082} - 1 = -18.8\%$ relative to P1), suggesting that prompt design significantly influences agents' propensity to engage in collusive behavior. Importantly, this effect operates independently of group size, indicating that while prompt specification affects the level of collusion, it does not alter the fundamental relationship between market structure and the sustainability of collusion, thereby confirming the findings of \textcite{fish_algorithmic_2025}.
+
+The experimental controls in Column (2) demonstrate the robustness of our findings across different market conditions. While the $\alpha = 3.2$ condition shows a modest positive effect on prices, the group size coefficient remains virtually unchanged, confirming that our core results are not driven by experimental heterogeneity.
+
+The high explanatory power of our models (R-squared values above 0.66) indicates that group size and prompt specification account for the majority of variation in equilibrium pricing behavior, suggesting our specification successfully captures the key determinants of algorithmic collusion in these experimental markets.
+
+The systematic relationship between market concentration and collusion sustainability demonstrates that algorithmic pricing creates measurable anticompetitive effects that scale predictably with market structure in our controlled setting. The 3.7\% price reduction per additional competitor offers a theoretical benchmark for assessing competitive effects in algorithm-mediated markets.
