@@ -1,4 +1,4 @@
-# 🤖 Algorithmic Collusion in Multi-Agent Markets: Testing Folk Theorem Predictions
+# 🤖 Folk Around and Find Out: Algorithmic Collusion and the Limits of Coordination
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -10,14 +10,19 @@
 
 <div align="center">
 
-## 🎓 Master's Thesis: Folk Around and Find Out: Algorithmic Collusion and the Limits of Coordination
+## 🎓 Master's Thesis: Algorithmic Collusion in Multi-Agent Markets: Testing Folk Theorem Predictions
 
 ![BSE Logo](./latex/imgs/BSE%20Barcelona%20Graduate%20School%20of%20Economics.svg)
 ---
 
 **Authors**: Julian Romero, Lucia Sauer, Moritz Peist
 
-**Institution**: Barcelona School of Economics | **Programme**: Data Science for Decision Making | 📅 **Academic Year**: 2024-2025  
+**Institution**: Barcelona School of Economics
+
+**Programme**: Data Science for Decision Making
+
+**Academic Year**: 2024-2025
+
 **Supervisor**: Christopher Rauh
 
 ---
