@@ -195,7 +195,35 @@
     \end{tabular}
     \begin{tablenotes}[flushleft]
     \footnotesize
-    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average log price for one experimental run over the final 50 periods. Left column tests for non-linear Folk Theorem effects via squared terms. Right column tests for differential group size effects across prompt types. Neither squared terms nor interaction effects are statistically significant, confirming linear Folk Theorem predictions.
+    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average log price for one experimental run over the final 50 periods. Left column tests for non-linear Folk Theorem effects via squared terms. The right column tests for differential group size effects across prompt types. Neither squared terms nor interaction effects are statistically significant, confirming linear Folk Theorem predictions.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Bootstrap Robustness Check: Folk Theorem Coefficient Stability}
+    \label{tab:bootstrap_robustness}
+    \begin{threeparttable}
+    \begin{tabular}{lcc}
+    \toprule
+     & \multicolumn{2}{c}{Group Size Coefficient} \\
+    \cmidrule(lr){2-3}
+     & Without Alpha Controls & With Alpha Controls \\
+    \midrule
+    Original OLS Estimate & $-0.0373^{***}$ & $-0.0373^{***}$ \\
+    \\
+    \multicolumn{3}{l}{\textbf{Bootstrap Results (n=1,000):}} \\
+    \quad Bootstrap Mean & $-0.0373$ & $-0.0375$ \\
+    \quad Bootstrap SE & $0.0055$ & $0.0054$ \\
+    \quad 95\% Confidence Interval & $[-0.0477, -0.0263]$ & $[-0.0475, -0.0267]$ \\
+    \quad Relative SE & $0.149$ & $0.145$ \\
+    \\
+    \bottomrule
+    \end{tabular}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item \textbf{Notes:} Bootstrap resampling (n=1,000) validates the stability of our main Folk Theorem coefficient. Both specifications show that the group size effect is robust across different sample compositions. The bootstrap mean closely matches the original OLS estimate, and the 95\% confidence intervals exclude zero, confirming that algorithmic collusion systematically decreases with group size. Relative standard errors below 0.15 indicate moderate parameter stability, supporting robust inference despite the novel "converge-and-persist" coordination patterns of LLM agents. $^{***}$ p$<$0.01.
     \end{tablenotes}
     \end{threeparttable}
 \end{table}
