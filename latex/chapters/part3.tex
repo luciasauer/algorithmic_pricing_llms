@@ -1,8 +1,8 @@
 \section{Methodology}\label{sec:meth}
 
 We build on the synthetic market environment developed by \textcite{fish_algorithmic_2025}, replicating their setup as a foundation for our analysis. While preserving the core structure of their environment, we introduce two key modifications that enable us to investigate a central implication of the \emph{Folk Theorem} in repeated games:
-
-\begin{enumerate}
+\setlist{nolistsep}
+\begin{enumerate}[noitemsep]
     \item We replace the proprietary LLMs used in the original study with open-source alternatives.\footnote{\noindent\textcite{fish_algorithmic_2025} determined their model selection through monopoly-price convergence testing, which we also conducted on the open-source models to inform our model selection (cf. \chapterref{sec:res}).} 
     \item We extend the analysis from duopoly to oligopoly settings, enabling us to study how LLMs behave as pricing agents in markets with more than two competitors. 
 \end{enumerate}
@@ -31,7 +31,8 @@ The reward structure depends on the demand function, which is defined following 
 \end{equation}
 
 where:
-\begin{itemize}
+\setlist{nolistsep}
+\begin{itemize}[noitemsep]
     \item $\mu > 0$ captures the degree of horizontal product differentiation between firms
     \item $a_i$ represents firm-specific brand effects or vertical differentiation parameters
     \item $a_0$ captures aggregate demand and serves as the utility of the outside option
@@ -50,8 +51,8 @@ where $c_i^t$ is the marginal cost of firm $i$ at period $t$. This setup enables
 Due to budget constraints, we focus exclusively on open-source LLMs: DeepSeek, Llama, and Mistral (both Small and Large variants). However, DeepSeek and Llama require local deployment, have relatively few parameters, and lack the capacity needed for our task. In contrast, Mistral is the only provider offering a free API for large, high-performance models, enabling us to run experiments at scale with more model capabilities. Therefore, while we initially tested all models, we proceeded exclusively with Mistral models\footnote{Specifically, the \texttt{mistral-large-2411} and \texttt{mistral-small-2406}.} for both practical and performance reasons.
 
 Each agent sets prices by generating responses to a structured prompt that is updated every round. The prompt includes:
-
-\begin{enumerate}
+\setlist{nolistsep}
+\begin{enumerate}[noitemsep]
     \item \textbf{Prompt prefix:} An instruction that sets the agent's strategic objective (e.g., maximizing profit over time).
     \item \textbf{Cost information:} The current marginal cost $c_i^t$.
     \item \textbf{Market history:} Prices charged by all firms in the previous 100 rounds.
@@ -96,7 +97,7 @@ Next, we turn to investigate the behavior of LLM-based pricing agents in a duopo
 
 \emph{Collusive} prefix encourages stable pricing and long-term profitability, while \emph{Competitive} prefix promotes short-term profit-seeking with allowance for exploratory undercutting strategies. Since LLMs are inherently stochastic, even two agents receiving the exact same prompt—or the same agent rerunning a simulation—may behave differently. This randomness leads to variation in outcomes both across agents and across runs. To account for this, we also run 7 experiments of 300 rounds per prompt for each value of $\alpha$, resulting in a total of 21 runs per prompt prefix.
 
-Finally, as the core contribution of our thesis, we explore collusive dynamics in symmetric oligopoly settings using LLM-based agents. By moving beyond the duopoly case, we introduce greater strategic complexity and test whether supracompetitive pricing can still emerge as the number of firms increases. This shift brings the analysis closer to realistic market conditions and allows us to assess how LLM agents navigate environments where the incentives to deviate from cooperation are substantially stronger.
+Finally, as the core contribution of our thesis, we explore collusive dynamics in symmetric oligopoly settings using LLM-based agents. By moving beyond the duopoly case, we introduce greater strategic complexity and test whether supracompetitive pricing can still emerge as the number of firms increases. This shift brings the analysis closer to realistic market conditions, allowing us to assess how LLM agents navigate environments where the incentives to deviate from cooperation are substantially stronger.
 
 \subsection{Theoretical Benchmarks}
 
@@ -154,9 +155,9 @@ As $n$ grows, $\pi^C$ falls, and the threshold $\delta^*$ approaches one, meanin
 
 \subsubsection*{Empirical Framework}
 
-This theoretical framework enables us to investigate the central research question of whether and how LLM agent coordination varies with market participation. By comparing observed pricing patterns against these benchmarks across different market structures ($n = 2, 3, 4, 5+$), we can assess:
-
-\begin{itemize}
+This theoretical framework enables us to investigate the central research question of whether and how LLM agent coordination varies with market participation. By comparing observed pricing patterns against these benchmarks across different market structures ($n = 2, 3, 4, 5$), we can assess:
+\setlist{nolistsep}
+\begin{itemize}[noitemsep]
     \item \textbf{Coordination sustainability:} Whether agents maintain supracompetitive pricing above Nash levels as market participation increases
     \item \textbf{Breakdown patterns:} How pricing dynamics evolve when coordination becomes unsustainable, including the timing and completeness of any transitions toward competitive outcomes  
     \item \textbf{Theoretical alignment:} Whether observed breakdown thresholds align with \emph{Folk Theorem} predictions or suggest alternative coordination mechanisms specific to LLM agents
@@ -176,26 +177,26 @@ Our primary analytical approach examines equilibrium price differences across gr
 Hence, we estimate the following econometric models:
 
 \begin{equation}\label{eq:baseline}
-    \ln(\bar{p}_{i,r}) = \beta_0 + \beta_1 \cdot \text{GroupSize}_r + \beta_2 \cdot \text{P2Prompt}_r + \varepsilon_{i,r}
+    \ln(\bar{p}_r) = \beta_0 + \beta_1 \cdot \text{GroupSize}_r + \beta_2 \cdot \text{P2Prompt}_r + \varepsilon_r
 \end{equation}
 
 \begin{equation}\label{eq:controls}
-    \ln(\bar{p}_{i,r}) = \beta_0 + \beta_1 \cdot \text{GroupSize}_r + \beta_2 \cdot \text{P2Prompt}_r + \sum_{j \in \{3.2, 10\}} \gamma_j \cdot \mathbb{I}[\alpha_r = \alpha_j] + \varepsilon_{i,r}
+    \ln(\bar{p}_r) = \beta_0 + \beta_1 \cdot \text{GroupSize}_r + \beta_2 \cdot \text{P2Prompt}_r + \sum_{j \in \{3.2, 10\}} \gamma_j \cdot \mathbb{I}[\alpha_r = \alpha_j] + \varepsilon_r
 \end{equation}
 
-where equation~\eqref{eq:baseline} represents our baseline specification and equation~\eqref{eq:controls} includes demand parameter controls $\gamma_j$. Moreover, $\ln(\bar{p}_{i,r})$ represents the logarithm of the average normalized price\footnote{Prices are normalized by dividing by the demand parameter $\alpha$ to ensure comparability across experimental conditions with different demand intensities.} for run $r$, $\text{GroupSize}_r \in \{2,3,4,5\}$ is the number of competing agents, and $\text{P2Prompt}_r$ is a dummy variable for the alternative prompt specification.
+where equation~\eqref{eq:baseline} represents our baseline specification and equation~\eqref{eq:controls} includes demand parameter controls $\gamma_j$. Moreover $\ln(\bar{p}_r)$ represents the logarithm of the average normalized price\footnote{Prices are normalized by dividing by the demand parameter $\alpha$ to ensure comparability across experimental conditions with different demand intensities.} for run $r$, $\text{GroupSize}_r \in \{2,3,4,5\}$ is the number of competing agents, and $\text{P2Prompt}_r$ is a dummy variable for the alternative prompt specification.
 
 The logarithmic transformation serves multiple purposes: it stabilizes the variance of price data, allows for straightforward interpretation of coefficients as percentage effects, and addresses potential concerns about heteroskedasticity. The coefficient $\beta_1$ captures the marginal impact of market concentration on collusive pricing, with the \emph{Folk Theorem} predicting $\beta_1 < 0$ (i.e., larger groups sustain lower prices).
 
 \subsubsection*{Complementary Dynamic Analysis}
 
-To complement our primary run-level analysis and test for strategic interaction mechanisms, we also examine period-by-period dynamics. As detailed in Section \ref{sec:res}, our empirical discoveries necessitate adaptive approaches to capture the unique coordination patterns exhibited by LLM agents.
-
-The initial planned approach followed \textcite{fish_algorithmic_2025} using dynamic panel specification:
+To complement our primary run-level analysis and test for strategic interaction mechanisms, we also examine period-by-period dynamics. As detailed in Section \ref{sec:res}, our empirical discoveries necessitate adaptive approaches to capture the unique coordination patterns exhibited by LLM agents. The initial planned approach followed \textcite{fish_algorithmic_2025} using dynamic panel specification:
 
 \begin{equation}\label{eq:dynamic_panel}
     p_{i,r}^t = \alpha_i + \beta_1 p_{i,r}^{t-1} + \beta_2 p_{j,r}^{t-1} + \varepsilon_{i,r}^t
 \end{equation}
+
+where $p_{i,r}^t$ denotes firm $i$'s price in round $r$ at time $t$, $\alpha_i$ captures firm-specific effects, and $\beta_1, \beta_2$ measure own and competitor price persistence respectively.
 
 However, our empirical findings reveal extreme price persistence requiring alternative specifications. When standard approaches prove inadequate due to non-stationarity concerns, we employ differenced specifications:
 
@@ -203,7 +204,7 @@ However, our empirical findings reveal extreme price persistence requiring alter
     \Delta \log p_{i,r}^{t} = \gamma \, \Delta \log p_{i,r}^{t-1} + \delta \, \Delta \log p_{j,r}^{t-1} + \Delta \epsilon_{i,r}^t
 \end{equation}
 
-This differenced approach successfully addresses persistence issues while enabling identification of strategic interaction patterns during transition periods.
+where $\gamma$ and $\delta$ capture autoregressive dynamics and strategic interactions in price changes. This differenced approach successfully addresses persistence issues while enabling identification of strategic interaction patterns during transition periods.
 
 \subsection{Identification Strategy}
 

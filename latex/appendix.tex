@@ -2,33 +2,33 @@
 
 \section{Appendix}
 
-\subsection*{Duopoloy}
+\subsection*{Duopoly}
 
+This section presents supplementary statistical analyses that support our findings on duopoly. We provide formal statistical tests comparing prompt specifications, stationarity analysis of price series, and an attempted replication of the core empirical framework from \textcite{fish_algorithmic_2025}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Welch Ttest for unequal variances
 \begin{table}[H]
     \centering
-    \caption{Welch's t-test: Average Prices Across Prompt Prefixes}
-    \label{tab:welch_test_1}
+    \caption{Welch's t-test: Mean Prices Across Prompt Prefixes by Market Size}
+    \label{tab:welch_by_market_size}
     \begin{threeparttable}
-    \begin{tabular}{lcc}
+    \begin{tabular}{lcccc}
     \toprule
-    & P1 & P2 \\
+    Market Size & Mean P1 & Mean P2 & Welch's t-statistic & p-value \\
     \midrule
-    Mean Price (last 50 rounds) &  &  \\
-    Standard Deviation          &  &  \\
-    Observations                &  &  \\
-    \midrule
-    Difference in Means         & \multicolumn{2}{c}{$^{***}$} \\
-    Welch's t-statistic         & \multicolumn{2}{c}{} \\
-    Degrees of Freedom          & \multicolumn{2}{c}{} \\
-    p-value                     & \multicolumn{2}{c}{<} \\
+    2 Agents & 1.768 & 1.478 & 7.423 & $<$0.001$^{***}$ \\
+    3 Agents & 1.741 & 1.423 & 7.774 & $<$0.001$^{***}$ \\
+    4 Agents & 1.706 & 1.315 & 8.820 & $<$0.001$^{***}$ \\
+    5 Agents & 1.637 & 1.304 & 7.859 & $<$0.001$^{***}$ \\
     \bottomrule
     \end{tabular}
     \begin{tablenotes}[flushleft]
     \footnotesize
-    \item \textbf{Notes:} Welch's t-test compares the mean prices set under each prompt prefix across the 21 experiments, assuming unequal variances. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. Mean prices are calculated using the final 50 rounds of each experiment.
+    \item \textbf{Notes:} Welch’s t-tests compare the average prices between Prompt 1 (P1) and Prompt 2 (P2) across different market sizes (2 to 5 agents), assuming unequal variances. Each condition includes 21 observations per group. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01.
     \end{tablenotes}
     \end{threeparttable}
 \end{table}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Table of Augmented DF Test
@@ -95,17 +95,23 @@
 
 \subsection*{Oligopolies}
 
+This section presents the main empirical results, demonstrating a systematic breakdown of collusion as market concentration decreases. The analysis covers markets with 2 to 5 competing agents across different prompt specifications, providing direct evidence for Folk Theorem predictions in algorithmic settings.
+
+Results visually demonstrate a systematic price decline with increasing market participants, consistent with the Folk Theorem predictions regarding the sustainability of collusion. Across both prompt specifications (P1, P2), average prices exhibit a monotonic decrease as $n$ increases from 2 to 5 agents, with minimal overlap in 95\% confidence intervals between different market structures. The pronounced price dispersion during initial rounds converges to distinct equilibrium levels, with duopoly markets ($n=2$) sustaining significantly higher prices than markets with four or five competitors. This pattern supports the theoretical prediction that tacit coordination becomes increasingly complex as the required discount factor $\delta \geq \frac{\pi^D - \pi^C}{\pi^D}$ approaches unity with larger $n$, ultimately rendering collusive equilibria unsustainable in less concentrated markets.
+
 % Plot of all runs
 \begin{figure}[H]
     \centering
     \includesvg[width=1\linewidth]{latex/imgs/res/price_over_time_by_prompt_prefix_combined.svg}
-    \caption{Average Price by Prompt and Experiment, shaded areas are 95\% confidence intervals, lines are averaged values out of all 21 runs per prompt (7 runs $\times$ 3 alphas).}
+    \caption{Average prices over 300 rounds for markets with 2, 3, 4, and 5 agents under two prompt specifications (P1, P2). Shaded areas represent 95\% confidence intervals across 21 experimental runs per condition (7 runs × 3 $\alpha$-parameters). Prices systematically decline as the number of competing agents increases, consistent with Folk Theorem predictions on collusion sustainability.}
     \label{fig:ts_prices_comb}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection*{Robustness checks}\label{app:robust}
+
+We conduct extensive robustness tests to validate our core Folk Theorem findings. These include alternative time window specifications, functional form comparisons between log and level prices, tests for non-linear effects, and bootstrap validation of coefficient stability.
 
 % Robustness Check: Different Time Windows (Log Prices)
 \begin{table}[H]
