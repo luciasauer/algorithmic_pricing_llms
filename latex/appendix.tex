@@ -1,4 +1,9 @@
 \appendix
+
+\section{Appendix}
+
+\subsection{Duopoloy}
+
 \begin{table}[htpb!]
     \centering
     \caption{Welch’s t-test: Average Prices Across Prompt Prefixes}
@@ -20,11 +25,51 @@
     \end{tabular}
 \end{table}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Table of failed Fish et al. replication
+\begin{table}[htpb!]
+    \centering
+    \caption{\textcite[p. 18]{fish_algorithmic_2025} -- Table 2 replication}
+    \label{tab:fe_fish}
+    {\small
+    \begin{tabular}{lcc}
+    \toprule
+    & \multicolumn{2}{c}{Dependent variable: Self Price} \\
+    \cmidrule(lr){2-3}
+    & (1) & (2) \\
+    \midrule
+    Self Price $t-1$                      & $0.9934^{***}$ & $0.9788^{***}$ \\
+                                         & (0.0026)       & (0.0108)       \\
+    Competitor's Price $t-1$             & $0.0029^{*}$   & $0.0081$       \\
+                                         & (0.0017)       & (0.0082)       \\
+    \midrule
+    Model                                & P1 vs P1       & P2 vs P2       \\          
+    Firm fixed effects                   & Yes            & Yes            \\
+    \midrule
+    Observations                         & 2,100          & 2,100          \\
+    R-squared                           & 0.998          & 0.988          \\
+    \bottomrule
+    \end{tabular}
+    }
+    \vspace{1mm}
+    
+    \begin{minipage}{\textwidth}
+    \footnotesize{\parbox{1\textwidth}{\textbf{Note}: Robust standard errors in parentheses. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. Models (1) and (2) examine P1 and P2's pricing responses, respectively. The high self-price coefficients (near 1.0) indicate strong price stickiness. P1 agents show marginally significant reward-punishment dynamics in response to competitor pricing, while P2 agents show no significant response to competitor moves.}}
+    \end{minipage}
+\end{table}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Oligopolies}
+
+% Plot of all runs
 \begin{figure}[htpb]
     \centering
     \includesvg[width=1\linewidth]{latex/imgs/res/price_over_time_by_prompt_prefix_combined.svg}
     \caption{Average Price by Prompt and Experiment, shaded areas are 95\% confidence intervals, lines are averaged values out of all 21 runs per prompt (7 runs $\times$ 3 alphas).}
     \label{fig:ts_prices_comb}
 \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

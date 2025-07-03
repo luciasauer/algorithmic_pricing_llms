@@ -124,21 +124,23 @@ This differenced specification successfully addresses the persistence issue and 
     \end{minipage}
 \end{table}
 
-\subsection*{Oligopoly}
-
-
-\begin{figure}[H]
-    \centering
-    \includesvg[width=1\linewidth]{latex/imgs/res/convergence_prices_by_num_agents.svg}
-    \caption{Oligopolistic data distribution, 21 data points ($\bullet$) per supergroup (3 alphas $\times$ 7 runs $\times$ number of firms), triangles ($\blacktriangle$) represent subgroup averages, dashed lines ($\text{- -}$) represent Nash prices following \equationref{eq:nash} and Monopoly prices according to \equationref{eq:monop} per supergroup.}
-    \label{fig:oligopols}
-\end{figure}
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection*{Towards convergence}
 
-While \textcite[p. 18]{fish_algorithmic_2025} found moderate price stickiness $(\gamma_{P1} \approx 0.48)$ alongside meaningful strategic responsiveness in duopoly settings, our duopoly analysis reveals a fundamental behavioral shift when employing the same methodology: LLM agents exhibit near-unit root persistence $(\gamma_{P1} \approx 0.997)$ with virtually no period-to-period strategic interaction. Although we detect strategic responses when using log-differenced specifications (cf. \tableref{tab:fe_duopoly}), we cannot reproduce their exact dynamic patterns for the last 200 periods. This suggests our agents follow \emph{converge-and-persist coordination}---initially finding focal price levels, then maintaining them with minimal deviation---rather than active reward-punishment schemes with period-by-period adjustments.
+While \textcite[p. 18]{fish_algorithmic_2025} found moderate price stickiness $(\gamma_{P1} \approx 0.48)$ alongside meaningful strategic responsiveness in duopoly settings, our duopoly analysis reveals a fundamental behavioral shift. Although we detect strategic responses when using log-differenced specifications (cf. \tableref{tab:fe_duopoly}), we are unable to reproduce their exact dynamic patterns for the last 200 periods when replicating their methodology (cf. \tableref{tab:fe_fish}). In our case, agents exhibit near-unit root persistence $(\gamma_{P1} \approx 0.993)$ with minimal period-to-period strategic interaction. This suggests our agents follow \emph{converge-and-persist coordination}---initially finding focal price levels, then maintaining them with minimal deviation---rather than active reward-punishment schemes with period-by-period adjustments. \figureref{fig:ts_prices_comb} shows this persistence across runs and especially in later rounds where virtually no price deviations occur anymore. As visible in the figure, this observation is also consistent in the following oligopoly settings.
 
 This behavioral pattern has important methodological implications. Since price dynamics are dominated by persistence rather than strategic interaction, standard dynamic panel approaches become uninformative for testing predictions of the \emph{Folk theorem}. Instead, we focus on two complementary analyses: (1) run-level equilibrium differences that capture the \emph{Folk theorem}'s core predictions about group size effects on collusion sustainability, and (2) convergence behavior in early periods where coordination occurs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection*{Oligopoly}
+
+The oligopolistic scenario constitutes our main innovation as we extend the \textcite{fish_algorithmic_2025} framework by multi-firm scenarios. \figureref{fig:oligopols} summarizes our findings across all runs.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=1\linewidth]{latex/imgs/res/convergence_prices_by_num_agents.svg}
+    \caption{Oligopolistic data distribution, 42--168 data points ($\bullet$) per supergroup (3 alphas $\times$ 7 runs $\times$ number of firms), triangles ($\blacktriangle$) represent subgroup averages, dashed lines ($\text{- -}$) represent Nash prices following \equationref{eq:nash} and Monopoly prices according to \equationref{eq:monop} per supergroup.}
+    \label{fig:oligopols}
+\end{figure}
