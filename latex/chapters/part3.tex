@@ -1,17 +1,17 @@
 \section{Methodology}\label{sec:meth}
 
-We build on the synthetic market environment developed by \textcite{fish_algorithmic_2025}, replicating their setup as a foundation for our own analysis. While preserving the core structure of their environment, we introduce two key modifications that enable us to investigate a central implication of the \emph{Folk Theorem} in repeated games:
+We build on the synthetic market environment developed by \textcite{fish_algorithmic_2025}, replicating their setup as a foundation for our analysis. While preserving the core structure of their environment, we introduce two key modifications that enable us to investigate a central implication of the \emph{Folk Theorem} in repeated games:
 
 \begin{enumerate}
     \item We replace the proprietary LLMs used in the original study with open-source alternatives.\footnote{\noindent\textcite{fish_algorithmic_2025} determined their model selection through monopoly-price convergence testing, which we also conducted on the open-source models to inform our model selection (cf. \chapterref{sec:res}).} 
     \item We extend the analysis from duopoly to oligopoly settings, enabling us to study how LLMs behave as pricing agents in markets with more than two competitors. 
 \end{enumerate}
 
-These extensions allow us to investigate how sustaining collusion becomes more difficult as the number of firms increases, since the per-firm share of collusive profits diminishes while making deviation more attractive. To maintain cooperation, firms must place greater weight on future payoffs—reflected in a discount factor $\delta$ approaching one—which implies a high degree of patience required for coordination sustainability.
+These extensions enable us to investigate how sustaining collusion becomes more difficult as the number of firms increases, as the per-firm share of collusive profits diminishes, making deviation more attractive. To maintain cooperation, firms must place greater weight on future payoffs—reflected in a discount factor $\delta$ approaching one—which implies a high degree of patience required for coordination sustainability.
 
 \subsection{Experimental Framework}
 
-The following subsections detail our experimental setup by describing the experiment design, the agents themselves, and the market configuration, building systematically toward our core oligopoly analysis.
+The following subsections detail our experimental setup by describing the experiment design, the agents themselves, and the market configuration, building systematically toward our core analysis of oligopoly.
 
 \subsubsection*{Experiment Design}
 
