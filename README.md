@@ -146,9 +146,9 @@ Moving from **duopoly** (n=2) to **five-agent competition** (n=5):
 
 ### 🔄 **Oligopoly Breakdown Patterns**
 
-<center>
+<div align="center">
   <img src="./latex/imgs/res/convergence_prices_by_num_agents.svg" width="90%" />
-</center>
+</div>
 
 **Folk Theorem Validation**:
 
@@ -183,9 +183,9 @@ Notes: *** p<0.01, ** p<0.05, * p<0.1
 Robust standard errors (HC3) in parentheses.
 ```
 
-<center>
+<div align="center">
   <img src="./latex/imgs/res/price_over_time_by_prompt_prefix_combined.svg" width="90%" />
-</center>
+</div>
 
 ---
 
@@ -414,36 +414,6 @@ Extending meta-analytic insights from [Engel (2007)](https://doi.org/10.1093/joc
 8. **Athey, S., & Bagwell, K.** (2001). Optimal collusion with private information. *The RAND Journal of Economics*, 32(3), 428-465. [https://doi.org/10.2307/2696363](https://doi.org/10.2307/2696363)
 
 9. **Kuhn, K. U., & Vives, X.** (1995). *Information exchanges among firms and their impact on competition*. Office for Official Publications of the European Communities. [https://op.europa.eu/en/publication-detail/-/publication/90fa6d91-de13-4c87-be75-ccb175427a61](https://op.europa.eu/en/publication-detail/-/publication/90fa6d91-de13-4c87-be75-ccb175427a61)
-
----
-
-## 📄 Citation
-
-### 📖 **Academic Citation**
-
-```bibtex
-@mastersthesis{author2025algorithmic,
-  title={Algorithmic Collusion in Multi-Agent Markets: Testing Folk Theorem Predictions},
-  author={[Author Name]},
-  year={2025},
-  school={[University Name]},
-  type={Master's Thesis},
-  url={https://github.com/[username]/algorithmic-collusion-thesis},
-  note={Available at: https://github.com/[username]/algorithmic-collusion-thesis}
-}
-```
-
-### 📊 **Software Citation**
-
-```bibtex
-@software{author2025repo,
-  title={Algorithmic Collusion Analysis Framework},
-  author={[Author Name]},
-  year={2025},
-  url={https://github.com/[username]/algorithmic-collusion-thesis},
-  version={1.0.0}
-}
-```
 
 ---
 
