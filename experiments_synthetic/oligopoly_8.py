@@ -13,7 +13,7 @@ from pathlib import Path
 from src.agents.LLM_agent import LLMAgent
 from src.environment.calvano import CalvanoDemandEnvironment
 from src.experiment.experiment import Experiment
-from src.prompts.prompts import GENERAL_PROMPT, P2
+from src.prompts.prompts import GENERAL_PROMPT, P1
 from src.prompts.prompts_models import create_pricing_response_model
 
 current_file_path = Path(__file__).resolve()
@@ -24,8 +24,8 @@ MODEL_NAME = os.getenv("MODEL_NAME")
 
 MEMORY_LENGTH = 100
 N_ROUNDS = 300
-N_RUNS = 7
-ALPHAS_TO_TRY = [1, 3.2, 10]
+N_RUNS = 1
+ALPHAS_TO_TRY = [3.2]
 
 
 async def main(prompt_prefix, alpha=1, experiment_name="oligopoly_setting_8_firms"):
@@ -133,7 +133,7 @@ async def main(prompt_prefix, alpha=1, experiment_name="oligopoly_setting_8_firm
 if __name__ == "__main__":
     for _ in range(N_RUNS):
         for alpha in ALPHAS_TO_TRY:
-            for n, prompt in enumerate([P2], start=1):
+            for n, prompt in enumerate([P1], start=1):
                 print(f"Running experiment with alpha={alpha}")
                 asyncio.run(
                     main(

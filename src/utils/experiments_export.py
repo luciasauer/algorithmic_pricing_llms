@@ -129,11 +129,10 @@ def rebalance_experiments(df_all, min_required=7, keep_exacly_min_required=True)
                 df_exps = df_all.filter(mask_exp)
 
                 unique_exps = (
-                        df_exps
-                        .select(["experiment_timestamp", "experiment_name"])
-                        .unique()
-                        .sort(["experiment_timestamp", "experiment_name"])  # <--- Add this
-                    )
+                    df_exps.select(["experiment_timestamp", "experiment_name"])
+                    .unique()
+                    .sort(["experiment_timestamp", "experiment_name"])  # <--- Add this
+                )
 
                 n_unique = unique_exps.height
                 if n_unique <= n_samples:

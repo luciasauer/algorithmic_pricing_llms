@@ -123,52 +123,51 @@ def welch_ttest_with_normality(
     }
 
 
-
 def bootstrap_ttest(data1, data2, n_iterations=10000, alpha=0.05):
     """
     Performs a bootstrap test for difference in means between two datasets.
-    
+
     Parameters:
     - data1, data2: Arrays or lists of numerical data
     - n_iterations: Number of bootstrap samples (default is 10000)
     - alpha: Significance level (default is 0.05)
-    
+
     Returns:
     - p_value: The p-value for the test
     - mean_diff: The observed difference in means
     """
     # Observed difference in means
     observed_diff = np.mean(data1) - np.mean(data2)
-    
+
     # Combine data
     combined_data = np.concatenate([data1, data2])
-    
+
     # Perform bootstrap sampling
     bootstrap_diffs = []
     for _ in range(n_iterations):
         # Resample with replacement
         sample1 = np.random.choice(combined_data, size=len(data1), replace=True)
         sample2 = np.random.choice(combined_data, size=len(data2), replace=True)
-        
+
         # Calculate the difference in means
         bootstrap_diffs.append(np.mean(sample1) - np.mean(sample2))
-    
+
     # Convert to a numpy array
     bootstrap_diffs = np.array(bootstrap_diffs)
-    
+
     # Calculate p-value (two-tailed test)
     p_value = np.mean(np.abs(bootstrap_diffs) >= np.abs(observed_diff))
-    
+
     # Print the conclusions
     print("\nBootstrap Test for Difference in Means:")
     print(f"Observed difference in means: {observed_diff:.4f}")
     print(f"Bootstrap p-value: {p_value:.4f}")
-    
+
     if p_value < alpha:
         print(f"Conclusion: Statistically significant difference (p < {alpha})")
     else:
         print(f"Conclusion: No statistically significant difference (p ≥ {alpha})")
-    
+
     # Return results
     return p_value, observed_diff
 
@@ -176,27 +175,27 @@ def bootstrap_ttest(data1, data2, n_iterations=10000, alpha=0.05):
 def mann_whitney_u_test(data1, data2, alpha=0.05):
     """
     Performs the Mann-Whitney U test to compare the medians of two datasets.
-    
+
     Parameters:
     - data1, data2: Arrays or lists of numerical data
     - alpha: Significance level (default is 0.05)
-    
+
     Returns:
     - p_value: The p-value for the test
     - U_statistic: The U statistic for the test
     """
     # Perform the Mann-Whitney U test
-    U_statistic, p_value = stats.mannwhitneyu(data1, data2, alternative='two-sided')
-    
+    U_statistic, p_value = stats.mannwhitneyu(data1, data2, alternative="two-sided")
+
     # Print the results and conclusion
     print("\nMann-Whitney U Test:")
     print(f"U-statistic: {U_statistic:.4f}")
     print(f"p-value: {p_value:.4f}")
-    
+
     if p_value < alpha:
         print(f"Conclusion: Statistically significant difference (p < {alpha})")
     else:
         print(f"Conclusion: No significant difference (p ≥ {alpha})")
-    
+
     # Return results
     return p_value, U_statistic

@@ -1,742 +1,8 @@
-#############################################################################################################################################################
-#                                                                                                                                                           #
-#   In this file, we define two methodological approaches to estimating the effect of group sizes on collusion. We deem the second approach more robust.    #
-#                                                                                                                                                           #
-#   1. approach only uses interleaving to estimate the effect. This might still include autocorrelation, as we do not account for firm level variation      #
-#                                                                                                                                                           #
-#   2. approach uses interleaving (2) AND firm level alteration (if n=2, for groups >2: Uses average of all other agents as "competitor")                   #
-#                                                                                                                                                           #
-#                                                                                                                                                           #
-#                                                                                                                                                           #
-#############################################################################################################################################################
-
-
-##################################################################### Approach 1 ############################################################################
-# import warnings
-
-# import matplotlib.pyplot as plt
-# import polars as pl
-# import seaborn as sns
-# from linearmodels import PanelOLS
-# from statsmodels.formula.api import ols
-
-# warnings.filterwarnings("ignore")
-
-
-# class CollusionAnalysis:
-#     def __init__(self, df: pl.DataFrame):
-#         """
-#         Initialize with a Polars DataFrame containing experimental data
-
-#         Required columns: run_id, period, agent_id, group_size, prompt_type, price, alpha, monopoly_prices, nash_prices
-#         """
-#         self.df = df
-#         self.validate_data()
-#         self.results = {}
-#         self._store_raw_benchmarks()
-
-#     def validate_data(self):
-#         """Validate input data has required columns"""
-#         required = [
-#             "run_id",
-#             "period",
-#             "agent_id",
-#             "group_size",
-#             "prompt_type",
-#             "price",
-#             "alpha",
-#             "monopoly_prices",
-#             "nash_prices",
-#         ]
-#         missing = [col for col in required if col not in self.df.columns]
-#         if missing:
-#             raise ValueError(f"Missing required columns: {missing}")
-#         print(f"✓ Data validation passed. Shape: {self.df.shape}")
-
-#         # Check for any obvious issues with benchmarks
-#         benchmark_check = self.df.select(
-#             ["group_size", "monopoly_prices", "nash_prices", "alpha"]
-#         ).unique()
-
-#         # Verify monopoly prices > nash prices (should be true for proper benchmarks)
-#         invalid_benchmarks = benchmark_check.filter(
-#             pl.col("monopoly_prices") <= pl.col("nash_prices")
-#         )
-
-#         if invalid_benchmarks.height > 0:
-#             print("⚠️  Warning: Found group sizes where monopoly_prices <= nash_prices:")
-#             print(invalid_benchmarks)
-#         else:
-#             print("✓ Benchmark price relationships appear valid (monopoly > nash)")
-
-#     def _store_raw_benchmarks(self):
-#         """
-#         Store raw benchmark prices by group size from the data for reference
-#         These will be normalized during preprocessing
-#         """
-#         self.benchmarks_raw = (
-#             self.df.select(["group_size", "monopoly_prices", "nash_prices", "alpha"])
-#             .unique()
-#             .sort("group_size")
-#         )
-#         print(f"✓ Stored raw benchmarks for {self.benchmarks_raw.height} group sizes")
-#         print("Raw benchmark prices by group size:")
-#         print(self.benchmarks_raw)
-
-#     def preprocess_data(
-#         self,
-#         normalize_prices: bool = True,
-#         start_period: int = 101,
-#         end_period: int = 300,
-#     ):
-#         """
-#         Preprocess data following Fish et al. methodology
-#         Normalize first at observation level, then aggregate
-#         """
-#         processed = self.df.filter(
-#             (pl.col("period") >= start_period) & (pl.col("period") <= end_period)
-#         )
-
-#         if normalize_prices:
-#             # Normalize all prices at observation level first
-#             processed = processed.with_columns(
-#                 [
-#                     (pl.col("price") / pl.col("alpha")).alias("price_normalized"),
-#                     (pl.col("monopoly_prices") / pl.col("alpha")).alias(
-#                         "monopoly_prices_normalized"
-#                     ),
-#                     (pl.col("nash_prices") / pl.col("alpha")).alias(
-#                         "nash_prices_normalized"
-#                     ),
-#                 ]
-#             )
-#             price_col = "price_normalized"
-#             monopoly_col = "monopoly_prices_normalized"
-#             nash_col = "nash_prices_normalized"
-#             print("✓ All prices normalized by alpha at observation level")
-#         else:
-#             price_col = "price"
-#             monopoly_col = "monopoly_prices"
-#             nash_col = "nash_prices"
-
-#         # Create period and run numeric IDs for panel regression
-#         processed = processed.with_columns(
-#             [
-#                 pl.col("run_id")
-#                 .cast(pl.Categorical)
-#                 .to_physical()
-#                 .alias("run_numeric"),
-#                 pl.col("agent_id")
-#                 .cast(pl.Categorical)
-#                 .to_physical()
-#                 .alias("agent_numeric"),
-#                 pl.col("prompt_type")
-#                 .cast(pl.Categorical)
-#                 .to_physical()
-#                 .alias("prompt_numeric"),
-#                 pl.col(price_col).alias("price_analysis"),
-#                 pl.col(monopoly_col).alias("monopoly_analysis"),
-#                 pl.col(nash_col).alias("nash_analysis"),
-#             ]
-#         )
-
-#         self.processed_df = processed
-#         self.price_col = "price_analysis"
-#         self.monopoly_col = "monopoly_analysis"
-#         self.nash_col = "nash_analysis"
-
-#         print(
-#             f"✓ Preprocessing complete. Analysis periods: {start_period}-{end_period}"
-#         )
-#         return processed
-
-#     def create_interleaved_data(self, interval: int = 2):
-#         """
-#         Create interleaved dataset to reduce autocorrelation (following Fish et al. Table 2)
-#         """
-#         if not hasattr(self, "processed_df"):
-#             raise ValueError("Must run preprocess_data() first")
-
-#         # Sample every nth period to reduce autocorrelation
-#         min_period = self.processed_df["period"].min()
-#         max_period = self.processed_df["period"].max()
-#         sampled_periods = list(range(min_period, max_period + 1, interval))
-
-#         interleaved = self.processed_df.filter(pl.col("period").is_in(sampled_periods))
-
-#         self.interleaved_df = interleaved
-#         print(f"✓ Interleaved data created. Periods sampled: {len(sampled_periods)}")
-#         return interleaved
-
-#     def estimate_group_size_effects(self, use_interleaved: bool = True):
-#         """
-#         Main regression: estimate effect of group size on prices
-#         Two specifications: time FE only (for run-level vars) and agent FE (for within-run variation)
-#         """
-#         df_to_use = self.interleaved_df if use_interleaved else self.processed_df
-
-#         # Convert to pandas for regression
-#         pandas_df = df_to_use.to_pandas()
-
-#         # Specification 1: Time FE only (for run-level variables like group_size, prompt_type)
-#         pandas_df_time = pandas_df.set_index(["run_numeric", "period"])
-#         formula_time = f"{self.price_col} ~ group_size + C(prompt_type) + TimeEffects"
-
-#         model_time = PanelOLS.from_formula(
-#             formula_time, data=pandas_df_time, drop_absorbed=True, check_rank=False
-#         )
-#         results_time = model_time.fit(cov_type="clustered", cluster_entity=True)
-
-#         # Specification 2: Agent-period level with time FE (more observations)
-#         pandas_df_agent = pandas_df.copy()
-#         pandas_df_agent["agent_run"] = (
-#             pandas_df_agent["run_numeric"].astype(str)
-#             + "_"
-#             + pandas_df_agent["agent_numeric"].astype(str)
-#         )
-#         pandas_df_agent = pandas_df_agent.set_index(["agent_run", "period"])
-
-#         model_agent = PanelOLS.from_formula(
-#             formula_time, data=pandas_df_agent, drop_absorbed=True, check_rank=False
-#         )
-#         results_agent = model_agent.fit(cov_type="clustered", cluster_entity=True)
-
-#         self.results["main_time_fe"] = results_time
-#         self.results["main_agent_fe"] = results_agent
-#         print("✓ Main regressions estimated (time FE and agent-level)")
-#         return results_time, results_agent
-
-#     def estimate_nonlinear_effects(self):
-#         """
-#         Test for non-linear group size effects (Folk Theorem predictions)
-#         """
-#         if not hasattr(self, "interleaved_df"):
-#             self.create_interleaved_data()
-
-#         pandas_df = self.interleaved_df.to_pandas()
-
-#         # Agent-level analysis
-#         pandas_df["agent_run"] = (
-#             pandas_df["run_numeric"].astype(str)
-#             + "_"
-#             + pandas_df["agent_numeric"].astype(str)
-#         )
-#         pandas_df = pandas_df.set_index(["agent_run", "period"])
-
-#         # Add squared term
-#         pandas_df["group_size_sq"] = pandas_df["group_size"] ** 2
-
-#         # Non-linear specification
-#         formula = f"{self.price_col} ~ group_size + group_size_sq + C(prompt_type) + TimeEffects"
-
-#         model = PanelOLS.from_formula(
-#             formula, data=pandas_df, drop_absorbed=True, check_rank=False
-#         )
-#         results = model.fit(cov_type="clustered", cluster_entity=True)
-
-#         self.results["nonlinear"] = results
-#         print("✓ Non-linear effects estimated")
-#         return results
-
-#     def estimate_threshold_effects(self, threshold: int = 3):
-#         """
-#         Test Folk Theorem threshold (collusion breaks down at n > threshold)
-#         """
-#         if not hasattr(self, "interleaved_df"):
-#             self.create_interleaved_data()
-
-#         pandas_df = self.interleaved_df.to_pandas()
-#         pandas_df["agent_run"] = (
-#             pandas_df["run_numeric"].astype(str)
-#             + "_"
-#             + pandas_df["agent_numeric"].astype(str)
-#         )
-#         pandas_df = pandas_df.set_index(["agent_run", "period"])
-
-#         # Create threshold dummy
-#         pandas_df["small_group"] = (pandas_df["group_size"] <= threshold).astype(int)
-
-#         formula = f"{self.price_col} ~ small_group + C(prompt_type) + TimeEffects"
-
-#         model = PanelOLS.from_formula(
-#             formula, data=pandas_df, drop_absorbed=True, check_rank=False
-#         )
-#         results = model.fit(cov_type="clustered", cluster_entity=True)
-
-#         self.results["threshold"] = results
-#         print(f"✓ Threshold effects estimated (threshold = {threshold})")
-#         return results
-
-#     def estimate_prompt_interactions(self):
-#         """
-#         Test if group size effects vary by prompt type - using run-level OLS instead
-#         """
-#         # Use run-level analysis for interactions since both variables are run-level
-#         if not hasattr(self, "processed_df"):
-#             self.preprocess_data()
-
-#         # Collapse to run-level averages (final 50 periods)
-#         max_period = self.processed_df["period"].max()
-#         final_periods_start = max_period - 49
-
-#         run_level = (
-#             self.processed_df.filter(pl.col("period") >= final_periods_start)
-#             .group_by(["run_id", "group_size", "prompt_type"])
-#             .agg(
-#                 [
-#                     pl.col(self.price_col).mean().alias("avg_price"),
-#                     pl.col(self.price_col).std().alias("price_volatility"),
-#                     pl.count().alias("n_obs"),
-#                 ]
-#             )
-#         ).to_pandas()
-
-#         # OLS with interactions
-#         formula = "avg_price ~ group_size * C(prompt_type)"
-#         model = ols(formula, data=run_level).fit(cov_type="HC3")
-
-#         self.results["interactions"] = model
-#         print("✓ Prompt interaction effects estimated (run-level OLS)")
-#         return model
-
-#     def convergence_analysis(self, final_periods: int = 50):
-#         """
-#         Focus on final periods only (following Fish et al. main results)
-#         """
-#         max_period = self.processed_df["period"].max()
-#         start_period = max_period - final_periods + 1
-
-#         convergence_df = self.processed_df.filter(
-#             pl.col("period") >= start_period
-#         ).to_pandas()
-
-#         convergence_df["agent_run"] = (
-#             convergence_df["run_numeric"].astype(str)
-#             + "_"
-#             + convergence_df["agent_numeric"].astype(str)
-#         )
-#         convergence_df = convergence_df.set_index(["agent_run", "period"])
-
-#         formula = f"{self.price_col} ~ group_size + C(prompt_type) + TimeEffects"
-
-#         model = PanelOLS.from_formula(
-#             formula, data=convergence_df, drop_absorbed=True, check_rank=False
-#         )
-#         results = model.fit(cov_type="clustered", cluster_entity=True)
-
-#         self.results["convergence"] = results
-#         print(f"✓ Convergence analysis complete (final {final_periods} periods)")
-#         return results
-
-#     def estimate_run_level_ols(self):
-#         """
-#         Alternative: Collapse to run-level averages and use OLS
-#         This is most appropriate for testing group size effects since they vary at run level
-#         """
-#         if not hasattr(self, "processed_df"):
-#             self.preprocess_data()
-
-#         # Collapse to run-level averages (final 50 periods)
-#         max_period = self.processed_df["period"].max()
-#         final_periods_start = max_period - 49
-
-#         run_level = (
-#             self.processed_df.filter(pl.col("period") >= final_periods_start)
-#             .group_by(["run_id", "group_size", "prompt_type"])
-#             .agg(
-#                 [
-#                     pl.col(self.price_col).mean().alias("avg_price"),
-#                     pl.col(self.price_col).std().alias("price_volatility"),
-#                     pl.count().alias("n_obs"),
-#                 ]
-#             )
-#         ).to_pandas()
-
-#         # Multiple OLS specifications
-
-#         # Basic specification
-#         formula_basic = "avg_price ~ group_size + C(prompt_type)"
-#         model_basic = ols(formula_basic, data=run_level).fit(cov_type="HC3")
-
-#         # Non-linear specification
-#         run_level["group_size_sq"] = run_level["group_size"] ** 2
-#         formula_nonlinear = "avg_price ~ group_size + group_size_sq + C(prompt_type)"
-#         model_nonlinear = ols(formula_nonlinear, data=run_level).fit(cov_type="HC3")
-
-#         # Threshold specification
-#         run_level["small_group"] = (run_level["group_size"] <= 3).astype(int)
-#         formula_threshold = "avg_price ~ small_group + C(prompt_type)"
-#         model_threshold = ols(formula_threshold, data=run_level).fit(cov_type="HC3")
-
-#         self.results["run_level_basic"] = model_basic
-#         self.results["run_level_nonlinear"] = model_nonlinear
-#         self.results["run_level_threshold"] = model_threshold
-#         self.run_level_data = run_level
-
-#         print("✓ Run-level OLS estimated (basic, nonlinear, threshold)")
-#         return model_basic, model_nonlinear, model_threshold
-
-#     def calculate_collusion_metrics(self):
-#         """
-#         Calculate key collusion metrics by group size using normalized benchmarks
-#         Now using observation-level normalized benchmarks, then aggregating
-#         """
-#         if not hasattr(self, "processed_df"):
-#             self.preprocess_data()
-
-#         # Use final 50 periods for convergence
-#         max_period = self.processed_df["period"].max()
-#         final_periods_start = max_period - 49
-
-#         # Calculate metrics by group size and prompt type
-#         # Now we can aggregate the already-normalized benchmark prices
-#         metrics = (
-#             self.processed_df.filter(pl.col("period") >= final_periods_start)
-#             .group_by(["group_size", "prompt_type"])
-#             .agg(
-#                 [
-#                     pl.col(self.price_col).mean().alias("avg_price"),
-#                     pl.col(self.price_col).std().alias("price_volatility"),
-#                     pl.col(self.price_col).quantile(0.25).alias("price_p25"),
-#                     pl.col(self.price_col).quantile(0.75).alias("price_p75"),
-#                     pl.col(self.monopoly_col).mean().alias("avg_monopoly_price"),
-#                     pl.col(self.nash_col).mean().alias("avg_nash_price"),
-#                     pl.count().alias("n_observations"),
-#                 ]
-#             )
-#             .sort(["group_size", "prompt_type"])
-#         )
-
-#         # Calculate collusion index using the aggregated normalized benchmarks
-#         metrics = metrics.with_columns(
-#             [
-#                 (
-#                     (pl.col("avg_price") - pl.col("avg_nash_price"))
-#                     / (pl.col("avg_monopoly_price") - pl.col("avg_nash_price"))
-#                 ).alias("collusion_index")
-#             ]
-#         )
-
-#         # Add a sanity check for the collusion index
-#         print(
-#             "✓ Collusion metrics calculated with observation-level normalized benchmarks"
-#         )
-
-#         # Check for any unusual collusion index values
-#         metrics_summary = metrics.to_pandas()
-#         extreme_values = metrics_summary[
-#             (metrics_summary["collusion_index"] < -0.5)
-#             | (metrics_summary["collusion_index"] > 1.5)
-#         ]
-
-#         if len(extreme_values) > 0:
-#             print("⚠️  Warning: Found extreme collusion index values:")
-#             print(
-#                 extreme_values[
-#                     [
-#                         "group_size",
-#                         "prompt_type",
-#                         "avg_price",
-#                         "avg_nash_price",
-#                         "avg_monopoly_price",
-#                         "collusion_index",
-#                     ]
-#                 ]
-#             )
-#         else:
-#             print("✓ Collusion index values appear reasonable (mostly between 0 and 1)")
-
-#         self.collusion_metrics = metrics
-#         return metrics
-
-#     def plot_results(self):
-#         """
-#         Create visualization of results with normalized benchmarks
-#         """
-#         if not hasattr(self, "collusion_metrics"):
-#             self.calculate_collusion_metrics()
-
-#         fig, axes = plt.subplots(2, 2, figsize=(15, 12))
-
-#         # Convert to pandas for seaborn
-#         plot_df = self.collusion_metrics.to_pandas()
-
-#         # Create benchmark dataframe from the aggregated data
-#         benchmark_df = (
-#             plot_df[["group_size", "avg_nash_price", "avg_monopoly_price"]]
-#             .drop_duplicates()
-#             .sort_values("group_size")
-#         )
-
-#         # Price by group size
-#         sns.lineplot(
-#             data=plot_df,
-#             x="group_size",
-#             y="avg_price",
-#             hue="prompt_type",
-#             marker="o",
-#             ax=axes[0, 0],
-#         )
-
-#         # Add dynamic benchmark lines
-#         axes[0, 0].plot(
-#             benchmark_df["group_size"],
-#             benchmark_df["avg_nash_price"],
-#             color="red",
-#             linestyle="--",
-#             alpha=0.7,
-#             label="Nash Equilibrium",
-#         )
-#         axes[0, 0].plot(
-#             benchmark_df["group_size"],
-#             benchmark_df["avg_monopoly_price"],
-#             color="green",
-#             linestyle="--",
-#             alpha=0.7,
-#             label="Monopoly",
-#         )
-
-#         axes[0, 0].set_title("Average Price by Group Size")
-#         axes[0, 0].set_ylabel("Normalized Price")
-#         axes[0, 0].legend()
-
-#         # Collusion index by group size
-#         sns.lineplot(
-#             data=plot_df,
-#             x="group_size",
-#             y="collusion_index",
-#             hue="prompt_type",
-#             marker="s",
-#             ax=axes[0, 1],
-#         )
-#         axes[0, 1].set_title("Collusion Index by Group Size")
-#         axes[0, 1].set_ylabel("Collusion Index (0=Nash, 1=Monopoly)")
-#         axes[0, 1].axhline(y=0, color="red", linestyle="--", alpha=0.5, label="Nash")
-#         axes[0, 1].axhline(
-#             y=1, color="green", linestyle="--", alpha=0.5, label="Monopoly"
-#         )
-#         axes[0, 1].legend()
-
-#         # Price volatility
-#         sns.lineplot(
-#             data=plot_df,
-#             x="group_size",
-#             y="price_volatility",
-#             hue="prompt_type",
-#             marker="^",
-#             ax=axes[1, 0],
-#         )
-#         axes[1, 0].set_title("Price Volatility by Group Size")
-#         axes[1, 0].set_ylabel("Price Standard Deviation")
-
-#         # Sample size check
-#         sns.barplot(
-#             data=plot_df,
-#             x="group_size",
-#             y="n_observations",
-#             hue="prompt_type",
-#             ax=axes[1, 1],
-#         )
-#         axes[1, 1].set_title("Number of Observations")
-#         axes[1, 1].set_ylabel("Count")
-
-#         plt.tight_layout()
-#         plt.show()
-
-#         # Additional plot: Run-level scatter if available
-#         if hasattr(self, "run_level_data"):
-#             plt.figure(figsize=(12, 8))
-
-#             # Create subplots for run-level analysis
-#             fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-
-#             # Scatter plot
-#             sns.scatterplot(
-#                 data=self.run_level_data,
-#                 x="group_size",
-#                 y="avg_price",
-#                 hue="prompt_type",
-#                 s=100,
-#                 alpha=0.7,
-#                 ax=axes[0, 0],
-#             )
-
-#             # Add benchmark lines to scatter plot
-#             axes[0, 0].plot(
-#                 benchmark_df["group_size"],
-#                 benchmark_df["avg_nash_price"],
-#                 color="red",
-#                 linestyle="--",
-#                 alpha=0.7,
-#                 label="Nash",
-#             )
-#             axes[0, 0].plot(
-#                 benchmark_df["group_size"],
-#                 benchmark_df["avg_monopoly_price"],
-#                 color="green",
-#                 linestyle="--",
-#                 alpha=0.7,
-#                 label="Monopoly",
-#             )
-
-#             axes[0, 0].set_title("Run-Level Average Prices by Group Size")
-#             axes[0, 0].set_xlabel("Group Size")
-#             axes[0, 0].set_ylabel("Average Price (Final 50 Periods)")
-#             axes[0, 0].legend()
-
-#             # Box plot
-#             sns.boxplot(
-#                 data=self.run_level_data,
-#                 x="group_size",
-#                 y="avg_price",
-#                 hue="prompt_type",
-#                 ax=axes[0, 1],
-#             )
-#             axes[0, 1].set_title("Price Distribution by Group Size")
-
-#             # Volatility by group size
-#             sns.scatterplot(
-#                 data=self.run_level_data,
-#                 x="group_size",
-#                 y="price_volatility",
-#                 hue="prompt_type",
-#                 s=100,
-#                 alpha=0.7,
-#                 ax=axes[1, 0],
-#             )
-#             axes[1, 0].set_title("Price Volatility by Group Size")
-#             axes[1, 0].set_xlabel("Group Size")
-#             axes[1, 0].set_ylabel("Price Volatility")
-
-#             # Sample sizes
-#             group_counts = (
-#                 self.run_level_data.groupby(["group_size", "prompt_type"])
-#                 .size()
-#                 .reset_index(name="count")
-#             )
-#             sns.barplot(
-#                 data=group_counts,
-#                 x="group_size",
-#                 y="count",
-#                 hue="prompt_type",
-#                 ax=axes[1, 1],
-#             )
-#             axes[1, 1].set_title("Number of Runs by Group Size")
-#             axes[1, 1].set_ylabel("Number of Runs")
-
-#             plt.tight_layout()
-#             plt.show()
-
-#     def print_summary(self):
-#         """
-#         Print summary of all results including benchmark comparison
-#         """
-#         print("\n" + "=" * 60)
-#         print("COLLUSION BREAKDOWN ANALYSIS - SUMMARY RESULTS")
-#         print("=" * 60)
-
-#         # Print benchmark summary
-#         print("\nTHEORETICAL BENCHMARKS BY GROUP SIZE:")
-#         print("-" * 40)
-
-#         if hasattr(self, "benchmarks_raw"):
-#             print("Raw benchmarks (before normalization):")
-#             raw_summary = self.benchmarks_raw.to_pandas()
-#             for _, row in raw_summary.iterrows():
-#                 print(
-#                     f"  Group Size {int(row['group_size'])}: Nash={row['nash_prices']:.3f}, Monopoly={row['monopoly_prices']:.3f}, Alpha={row['alpha']:.3f}"
-#                 )
-
-#         if hasattr(self, "collusion_metrics"):
-#             print("Normalized benchmarks (used in analysis):")
-#             benchmark_summary = (
-#                 self.collusion_metrics.select(
-#                     ["group_size", "avg_nash_price", "avg_monopoly_price"]
-#                 )
-#                 .unique()
-#                 .sort("group_size")
-#                 .to_pandas()
-#             )
-#             for _, row in benchmark_summary.iterrows():
-#                 print(
-#                     f"  Group Size {int(row['group_size'])}: Nash={row['avg_nash_price']:.3f}, Monopoly={row['avg_monopoly_price']:.3f}"
-#                 )
-
-#         # Print regression results
-#         for name, results in self.results.items():
-#             print(f"\n{name.upper().replace('_', ' ')} REGRESSION:")
-#             print("-" * 40)
-#             if hasattr(results, "summary"):
-#                 try:
-#                     # Try calling as method first (statsmodels)
-#                     print(results.summary())
-#                 except TypeError:
-#                     # If that fails, access as property (PanelOLS)
-#                     print(results.summary)
-#             else:
-#                 print(f"R-squared: {results.rsquared:.3f}")
-#                 print(results.summary().tables[1])
-
-#         # Print key statistics
-#         if hasattr(self, "collusion_metrics"):
-#             print("\nCOLLUSION METRICS BY GROUP SIZE:")
-#             print("-" * 40)
-#             metrics_summary = self.collusion_metrics.select(
-#                 [
-#                     "group_size",
-#                     "prompt_type",
-#                     "avg_price",
-#                     "collusion_index",
-#                     "avg_nash_price",
-#                     "avg_monopoly_price",
-#                     "n_observations",
-#                 ]
-#             ).to_pandas()
-
-#             for group_size in sorted(metrics_summary["group_size"].unique()):
-#                 group_data = metrics_summary[
-#                     metrics_summary["group_size"] == group_size
-#                 ]
-#                 print(f"\nGroup Size {int(group_size)}:")
-#                 for _, row in group_data.iterrows():
-#                     print(
-#                         f"  {row['prompt_type']}: Price={row['avg_price']:.3f}, "
-#                         f"Collusion Index={row['collusion_index']:.3f}, N={int(row['n_observations'])}"
-#                     )
-
-#         # Folk Theorem test summary
-#         if "run_level_basic" in self.results:
-#             coef = self.results["run_level_basic"].params.get("group_size", None)
-#             if coef is not None:
-#                 pval = self.results["run_level_basic"].pvalues.get("group_size", None)
-#                 print("\nFOLK THEOREM TEST (Run-Level Analysis):")
-#                 print("-" * 40)
-#                 print(f"Group size coefficient: {coef:.4f}")
-#                 print(f"P-value: {pval:.4f}")
-#                 print(f"Significant at 5%: {'Yes' if pval < 0.05 else 'No'}")
-#                 print(
-#                     f"Direction: {'Collusion decreases with group size' if coef < 0 else 'Collusion increases with group size'}"
-#                 )
-
-#         # Print threshold test if available
-#         if "run_level_threshold" in self.results:
-#             coef = self.results["run_level_threshold"].params.get("small_group", None)
-#             if coef is not None:
-#                 pval = self.results["run_level_threshold"].pvalues.get(
-#                     "small_group", None
-#                 )
-#                 print("\nTHRESHOLD EFFECT TEST (Groups ≤3 vs >3):")
-#                 print("-" * 40)
-#                 print(f"Small group coefficient: {coef:.4f}")
-#                 print(f"P-value: {pval:.4f}")
-#                 print(f"Significant at 5%: {'Yes' if pval < 0.05 else 'No'}")
-
-
-##################################################################### Approach 2 ############################################################################
-
 import warnings
 
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import polars as pl
 import seaborn as sns
 from linearmodels import PanelOLS
@@ -823,18 +89,20 @@ class CollusionAnalysis:
             # Normalize all prices at observation level first
             processed = processed.with_columns(
                 [
-                    (pl.col("price") / pl.col("alpha")).alias("price_normalized"),
-                    (pl.col("monopoly_prices") / pl.col("alpha")).alias(
-                        "monopoly_prices_normalized"
-                    ),
-                    (pl.col("nash_prices") / pl.col("alpha")).alias(
-                        "nash_prices_normalized"
-                    ),
+                    (pl.col("price") / pl.col("alpha"))
+                    .log()
+                    .alias("price_log_normalized"),
+                    (pl.col("monopoly_prices") / pl.col("alpha"))
+                    .log()
+                    .alias("monopoly_prices_log_normalized"),
+                    (pl.col("nash_prices") / pl.col("alpha"))
+                    .log()
+                    .alias("nash_prices_log_normalized"),
                 ]
             )
-            price_col = "price_normalized"
-            monopoly_col = "monopoly_prices_normalized"
-            nash_col = "nash_prices_normalized"
+            price_col = "price_log_normalized"
+            monopoly_col = "monopoly_prices_log_normalized"
+            nash_col = "nash_prices_log_normalized"
             print("✓ All prices normalized by alpha at observation level")
         else:
             price_col = "price"
@@ -1296,35 +564,6 @@ class CollusionAnalysis:
         print("✓ Prompt interaction effects estimated (run-level OLS)")
         return model
 
-    def convergence_analysis(self, final_periods: int = 50):
-        """
-        Focus on final periods only (following Fish et al. main results)
-        """
-        max_period = self.processed_df["period"].max()
-        start_period = max_period - final_periods + 1
-
-        convergence_df = self.processed_df.filter(
-            pl.col("period") >= start_period
-        ).to_pandas()
-
-        convergence_df["agent_run"] = (
-            convergence_df["run_numeric"].astype(str)
-            + "_"
-            + convergence_df["agent_numeric"].astype(str)
-        )
-        convergence_df = convergence_df.set_index(["agent_run", "period"])
-
-        formula = f"{self.price_col} ~ group_size + C(prompt_type) + TimeEffects"
-
-        model = PanelOLS.from_formula(
-            formula, data=convergence_df, drop_absorbed=True, check_rank=False
-        )
-        results = model.fit(cov_type="clustered", cluster_entity=True)
-
-        self.results["convergence"] = results
-        print(f"✓ Convergence analysis complete (final {final_periods} periods)")
-        return results
-
     def estimate_run_level_ols(self):
         """
         Alternative: Collapse to run-level averages and use OLS
@@ -1704,7 +943,7 @@ class CollusionAnalysis:
                             # If that fails, access as property (PanelOLS)
                             print(results.summary)
                     else:
-                        print(f"R-squared: {results.rsquared:.3f}")
+                        print(results)
                         print(results.summary().tables[1])
 
         # Print key statistics
@@ -1893,7 +1132,423 @@ class CollusionAnalysis:
         else:
             print("No interleaved data created yet")
 
+    def convergence_analysis_fixed(self, final_periods: int = 50):
+        """
+        Proper convergence analysis avoiding the time-invariant variable problem
+        """
 
+        print("CONVERGENCE ANALYSIS - FIXED SPECIFICATION")
+        print("=" * 60)
+
+        max_period = self.processed_df["period"].max()
+        start_period = max_period - final_periods + 1
+
+        convergence_df = self.processed_df.filter(
+            pl.col("period") >= start_period
+        ).to_pandas()
+
+        # ================================================================
+        # Option 1: Time Effects Only (No Entity FE)
+        # ================================================================
+        print("\n1. TIME EFFECTS ONLY (Proper for time-invariant treatments)")
+        print("-" * 50)
+
+        # Create time dummies manually
+        convergence_df["period_factor"] = pd.Categorical(convergence_df["period"])
+
+        # Regression with time effects only
+        formula_time = (
+            f"{self.price_col} ~ group_size + C(prompt_type) + C(period_factor)"
+        )
+        model_time = ols(formula_time, data=convergence_df).fit(
+            cov_type="cluster", cov_kwds={"groups": convergence_df["run_id"]}
+        )
+
+        # print("Time Effects Model:")
+        # print(
+        #     f"  Group size: {model_time.params['group_size']:.4f} (SE: {model_time.bse['group_size']:.4f})"
+        # )
+        # print(
+        #     f"  Prompt P1: {model_time.params['C(prompt_type)[T.P1]']:.4f} (SE: {model_time.bse['C(prompt_type)[T.P1]']:.4f})"
+        # )
+        # print(f"  R-squared: {model_time.rsquared:.4f}")
+        # print(f"  N: {len(convergence_df):,}")
+        print(model_time.summary())
+
+        # ================================================================
+        # Option 2: Random Effects (Better for time-invariant variables)
+        # ================================================================
+        print("\n2. RANDOM EFFECTS (Alternative approach)")
+        print("-" * 50)
+
+        # Prepare for statsmodels RandomEffects
+        convergence_df["agent_run"] = (
+            convergence_df["run_numeric"].astype(str)
+            + "_"
+            + convergence_df["agent_numeric"].astype(str)
+        )
+        convergence_df = convergence_df.set_index(["agent_run", "period"])
+
+        try:
+            from linearmodels import RandomEffects
+
+            formula_re = f"{self.price_col} ~ group_size + C(prompt_type) + TimeEffects"
+            model_re = RandomEffects.from_formula(formula_re, data=convergence_df).fit(
+                cov_type="clustered", cluster_entity=True
+            )
+
+            print(model_re)
+
+        except Exception as e:
+            print(f"Random Effects failed: {e}")
+            model_re = None
+
+        # ================================================================
+        # Option 3: Run-Level Analysis (Most Appropriate)
+        # ================================================================
+        print("\n3. RUN-LEVEL ANALYSIS (Most appropriate for convergence)")
+        print("-" * 50)
+
+        # Collapse to run-level averages for final periods
+        run_level_convergence = (
+            self.processed_df.filter(pl.col("period") >= start_period)
+            .group_by(["run_id", "group_size", "prompt_type"])
+            .agg(
+                [
+                    pl.col(self.price_col).mean().alias("avg_price_final"),
+                    pl.col(self.price_col).std().alias("price_volatility_final"),
+                    pl.col(self.monopoly_col).mean().alias("monopoly_price"),
+                    pl.col(self.nash_col).mean().alias("nash_price"),
+                    pl.count().alias("n_obs"),
+                ]
+            )
+        ).to_pandas()
+
+        # Calculate convergence metrics
+        run_level_convergence["collusion_index_final"] = (
+            run_level_convergence["avg_price_final"]
+            - run_level_convergence["nash_price"]
+        ) / (
+            run_level_convergence["monopoly_price"]
+            - run_level_convergence["nash_price"]
+        )
+
+        # Run-level convergence regression
+        formula_run = "avg_price_final ~ group_size + C(prompt_type)"
+        model_run = ols(formula_run, data=run_level_convergence).fit(cov_type="HC3")
+
+        print(model_run.summary())
+
+        # ================================================================
+        # Convergence Diagnostics
+        # ================================================================
+        print("\n4. CONVERGENCE DIAGNOSTICS")
+        print("-" * 50)
+
+        # Price volatility by group size (convergence indicator)
+        volatility_by_group = run_level_convergence.groupby("group_size")[
+            "price_volatility_final"
+        ].agg(["mean", "std", "count"])
+
+        print("Price volatility in final periods (convergence indicator):")
+        for group_size, row in volatility_by_group.iterrows():
+            print(
+                f"  Group size {group_size}: volatility = {row['mean']:.4f} (N={row['count']})"
+            )
+
+        # Test if volatility decreases with time (within final periods)
+        if len(convergence_df) > 0:
+            # Reset index for this analysis
+            volatility_df = convergence_df.reset_index()
+            volatility_by_period = (
+                volatility_df.groupby("period")[self.price_col].std().reset_index()
+            )
+            volatility_by_period.columns = ["period", "price_std"]
+
+            # Simple trend test
+            from scipy.stats import pearsonr
+
+            if len(volatility_by_period) > 1:
+                corr, p_value = pearsonr(
+                    volatility_by_period["period"], volatility_by_period["price_std"]
+                )
+                print("\nVolatility trend over final periods:")
+                print(f"  Correlation with time: {corr:.4f} (p = {p_value:.4f})")
+                if corr < 0 and p_value < 0.05:
+                    print("  ✓ Evidence of convergence (volatility decreasing)")
+                else:
+                    print("  ⚠️ Limited evidence of convergence")
+
+        # Store results
+        self.results["convergence_time_fe"] = model_time
+        self.results["convergence_run_level"] = model_run
+        if model_re:
+            self.results["convergence_random_effects"] = model_re
+
+        self.convergence_data = {
+            "period_level": convergence_df.reset_index(),
+            "run_level": run_level_convergence,
+            "volatility_by_group": volatility_by_group,
+        }
+
+        print(f"\n✓ Convergence analysis complete (final {final_periods} periods)")
+        print(
+            "✓ Used appropriate specifications avoiding time-invariant variable problems"
+        )
+
+        return {
+            "time_effects_model": model_time,
+            "run_level_model": model_run,
+            "random_effects_model": model_re,
+            "convergence_diagnostics": volatility_by_group,
+        }
+
+    ##########################################################  convergence ########################################################
+
+    def simple_convergence_test(self, stability_threshold=0.01, min_stable_periods=15):
+        """
+        Simple test:
+        1. When do prices converge for each run?
+        2. Do smaller groups converge faster than larger groups?
+
+        Add this method to your existing analysis class in group_size.py
+        """
+
+        print("SIMPLE CONVERGENCE ANALYSIS")
+        print("=" * 50)
+
+        convergence_data = []
+
+        # Test each run individually
+        for run_id in self.processed_df["run_id"].unique():
+            run_data = (
+                self.processed_df.filter(pl.col("run_id") == run_id)
+                .sort("period")
+                .to_pandas()
+            )
+
+            if len(run_data) < 30:  # Need minimum data
+                continue
+
+            group_size = run_data["group_size"].iloc[0]
+            prompt_type = run_data["prompt_type"].iloc[0]
+            prices = run_data[self.price_col].values
+            periods = run_data["period"].values
+
+            # Find convergence point: when price changes become small and stay small
+            convergence_period = None
+
+            for i in range(10, len(prices) - min_stable_periods):
+                # Look at next min_stable_periods
+                future_prices = prices[i : i + min_stable_periods]
+
+                # Check if prices are stable (small changes)
+                price_changes = np.abs(np.diff(future_prices))
+                max_change = np.max(price_changes)
+
+                if max_change <= stability_threshold:
+                    convergence_period = periods[i]
+                    break
+
+            # Calculate final equilibrium stats
+            if convergence_period is not None:
+                final_mask = periods >= convergence_period
+                final_prices = prices[final_mask]
+                final_mean = np.mean(final_prices)
+                final_std = np.std(final_prices)
+            else:
+                final_mean = np.mean(prices[-min_stable_periods:])  # Use last periods
+                final_std = np.std(prices[-min_stable_periods:])
+
+            convergence_data.append(
+                {
+                    "run_id": run_id,
+                    "group_size": group_size,
+                    "prompt_type": prompt_type,
+                    "convergence_period": convergence_period,
+                    "converged": convergence_period is not None,
+                    "final_price": final_mean,
+                    "final_volatility": final_std,
+                    "total_periods": len(prices),
+                }
+            )
+
+        convergence_df = pd.DataFrame(convergence_data)
+
+        # ================================================================
+        # ANALYSIS 1: Convergence Success by Group Size
+        # ================================================================
+        print("\n1. CONVERGENCE SUCCESS BY GROUP SIZE")
+        print("-" * 40)
+
+        convergence_summary = (
+            convergence_df.groupby("group_size")
+            .agg(
+                {
+                    "converged": ["count", "sum", "mean"],
+                    "convergence_period": ["mean", "std"],
+                    "final_price": ["mean", "std"],
+                }
+            )
+            .round(3)
+        )
+
+        print(convergence_summary)
+
+        # ================================================================
+        # ANALYSIS 2: Do Smaller Groups Converge Faster?
+        # ================================================================
+        print("\n2. CONVERGENCE TIMING ANALYSIS")
+        print("-" * 40)
+
+        converged_only = convergence_df[convergence_df["converged"]].copy()
+
+        if len(converged_only) > 10:
+            # Simple regression: convergence_period ~ group_size
+            from scipy import stats
+
+            group_sizes = converged_only["group_size"].values
+            conv_periods = converged_only["convergence_period"].values
+
+            # Correlation test
+            correlation, p_value = stats.pearsonr(group_sizes, conv_periods)
+
+            print("Correlation between group size and convergence timing:")
+            print(f"  Correlation: {correlation:.4f}")
+            print(f"  P-value: {p_value:.4f}")
+
+            if correlation > 0 and p_value < 0.05:
+                print("  ✓ Larger groups take significantly longer to converge")
+            elif correlation < 0 and p_value < 0.05:
+                print("  ✓ Smaller groups take significantly longer to converge")
+            else:
+                print("  ○ No significant difference in convergence timing")
+
+            # Group averages
+            timing_by_group = converged_only.groupby("group_size")[
+                "convergence_period"
+            ].agg(["count", "mean", "std"])
+            print("\nAverage convergence periods by group size:")
+            for group_size, row in timing_by_group.iterrows():
+                print(
+                    f"  {group_size} agents: {row['mean']:.1f} ± {row['std']:.1f} periods (n={row['count']})"
+                )
+
+            # Simple ANOVA test
+            group_data = [
+                converged_only[converged_only["group_size"] == gs][
+                    "convergence_period"
+                ].values
+                for gs in converged_only["group_size"].unique()
+            ]
+            group_data = [
+                g for g in group_data if len(g) > 1
+            ]  # Remove groups with only 1 observation
+
+            if len(group_data) > 1:
+                f_stat, p_anova = stats.f_oneway(*group_data)
+                print("\nANOVA test for timing differences:")
+                print(f"  F-statistic: {f_stat:.4f}")
+                print(f"  P-value: {p_anova:.4f}")
+
+                if p_anova < 0.05:
+                    print(
+                        "  ✓ Significant differences in convergence timing across group sizes"
+                    )
+                else:
+                    print("  ○ No significant differences in convergence timing")
+
+        else:
+            print("Not enough converged runs for timing analysis")
+
+        # ================================================================
+        # ANALYSIS 3: Final Price Analysis (Your Existing Folk Theorem Test)
+        # ================================================================
+        print("\n3. FINAL PRICE DIFFERENCES (FOLK THEOREM)")
+        print("-" * 40)
+
+        # Use all runs (converged and non-converged) for final price comparison
+        formula = "final_price ~ group_size + C(prompt_type)"
+        model = ols(formula, data=convergence_df).fit(cov_type="HC3")
+
+        print("Group size effect on final prices:")
+        print(f"  Coefficient: {model.params['group_size']:.4f}")
+        print(f"  P-value: {model.pvalues['group_size']:.4f}")
+        print(f"  R-squared: {model.rsquared:.4f}")
+
+        if model.params["group_size"] < 0 and model.pvalues["group_size"] < 0.05:
+            print(
+                "  ✓ Folk Theorem confirmed: Prices decrease significantly with group size"
+            )
+        else:
+            print("  ○ Folk Theorem not confirmed")
+
+        # ================================================================
+        # SIMPLE VISUALIZATION
+        # ================================================================
+        self.plot_simple_convergence(convergence_df)
+
+        # Store results
+        self.results["simple_convergence"] = convergence_df
+
+        return convergence_df
+
+    def plot_simple_convergence(self, convergence_df):
+        """
+        Simple plots for convergence analysis
+        """
+
+        fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+        # Plot 1: Convergence success rate
+        conv_rates = convergence_df.groupby("group_size")["converged"].agg(
+            ["count", "mean"]
+        )
+
+        axes[0].bar(conv_rates.index, conv_rates["mean"], alpha=0.7, color="steelblue")
+        axes[0].set_title("Convergence Success Rate")
+        axes[0].set_xlabel("Number of Agents")
+        axes[0].set_ylabel("Success Rate")
+        axes[0].set_ylim(0, 1)
+
+        # Add count labels
+        for i, (idx, row) in enumerate(conv_rates.iterrows()):
+            axes[0].text(
+                idx,
+                row["mean"] + 0.02,
+                f"n={row['count']}",
+                ha="center",
+                va="bottom",
+                fontsize=10,
+            )
+
+        # Plot 2: Convergence timing (only converged runs)
+        converged_data = convergence_df[convergence_df["converged"]]
+        if len(converged_data) > 0:
+            sns.boxplot(
+                data=converged_data, x="group_size", y="convergence_period", ax=axes[1]
+            )
+            axes[1].set_title("Convergence Timing")
+            axes[1].set_xlabel("Number of Agents")
+            axes[1].set_ylabel("Convergence Period")
+
+        # Plot 3: Final prices
+        sns.boxplot(data=convergence_df, x="group_size", y="final_price", ax=axes[2])
+        axes[2].set_title("Final Price Levels")
+        axes[2].set_xlabel("Number of Agents")
+        axes[2].set_ylabel("Final Price")
+
+        plt.tight_layout()
+        plt.show()
+
+        return fig
+
+    # ================================================================
+    # HOW TO USE: Add this to your existing analysis
+    # ================================================================
+
+
+################################################################################################################################
 # Updated usage function
 def run_analysis(df: pl.DataFrame):
     """
