@@ -73,125 +73,209 @@ This repository contains the complete research infrastructure for our master's t
 The following flowchart illustrates the complete data flow and module interactions within our research pipeline. The system is designed as a modular, scalable framework that handles everything from experimental configuration and LLM agent orchestration to statistical analysis and results visualization. Each component is carefully designed to ensure reproducibility while managing the inherent stochasticity of LLM responses.
 
 ```mermaid
+---
+config:
+  theme: mc
+  layout: elk
+---
 flowchart TD
-    subgraph CONFIG ["🔧 Configuration & Setup"]
-        A[Experimental Configuration]
-        A --> A1["Market Parameters<br/>α, β, μ, costs"]
-        A --> A2["Agent Configuration<br/>n = 2,3,4,5"]
-        A --> A3["Prompt Engineering<br/>P1/P2 variants"]
-        A --> A4["Run Parameters<br/>periods, iterations"]
-    end
-
-    subgraph LLM ["🤖 LLM Infrastructure & Prompts"]
-        B[LLM Infrastructure]
-        B --> B1["Mistral API<br/>Authentication"]
-        B1 --> B2["Model Selection<br/>mistral-large-2411"]
-        B2 --> B3["Rate Limiting &<br/>Error Handling"]
-        B3 --> B4["Response Validation<br/>& Parsing"]
-        
-        C[Dynamic Prompt System]
-        C --> C1["Base Prompt Templates<br/>P0, P1, P2"]
-        C1 --> C2["Market History<br/>Injection (100 periods)"]
-        C2 --> C3["Cost Information<br/>Integration"]
-        C3 --> C4["Planning Context<br/>Memory Proxy"]
-        C4 --> C5["Formatted Agent<br/>Prompt"]
-    end
-
-    subgraph SIM ["🏪 Market Simulation & Orchestration"]
-        D[Market Simulation Engine]
-        D --> D1["Calvano Demand<br/>Function"]
-        D1 --> D2["Logit Market Share<br/>Calculation"]
-        D2 --> D3["Profit Computation<br/>π = (p-c)×q"]
-        D3 --> D4["Nash/Monopoly<br/>Benchmarks"]
-
-        E[Multi-Agent Orchestration]
-        E --> E1["Parallel Agent<br/>Initialization"]
-        E1 --> E2["Synchronous Price<br/>Elicitation"]
-        E2 --> E3["Price Validation &<br/>Bounds Checking"]
-        E3 --> E4["Market Clearing &<br/>Outcome Computation"]
-
-        F[Experimental Controller]
-        F --> F1["Run Configuration<br/>Matrix Generation"]
-        F1 --> F2["Sequential Experiment<br/>Execution"]
-        F2 --> F3["Real-time Progress<br/>Monitoring"]
-        F3 --> F4["Crash Recovery &<br/>Restart Logic"]
-    end
-
-    subgraph DATA ["📊 Data Collection & Processing"]
-        G[Data Collection Pipeline]
-        G --> G1["Raw Response<br/>Storage (JSON)"]
-        G1 --> G2["Price Series<br/>Extraction"]
-        G2 --> G3["Agent Reasoning<br/>Text Capture"]
-        G3 --> G4["Market Outcome<br/>Calculation"]
-        G4 --> G5["Structured Dataset<br/>Generation (Polars)"]
-    end
-
-    subgraph ANALYSIS ["🔬 Statistical & Text Analysis"]
-        H[Statistical Analysis]
-        H --> H1["Data Preprocessing<br/>& Validation"]
-        H1 --> H2["Run-level<br/>Aggregation"]
-        H2 --> H3["Stationarity Testing<br/>(ADF Tests)"]
-        H3 --> H4["Econometric Models<br/>(OLS, Robust SE)"]
-        H4 --> H5["Bootstrap Validation<br/>& Robustness Checks"]
-
-        I[Agent Reasoning Analysis]
-        I --> I1["Text Preprocessing<br/>& Sentence Extraction"]
-        I1 --> I2["Embedding Generation<br/>(SentenceTransformer)"]
-        I2 --> I3["Dimensionality Reduction<br/>(PCA)"]
-        I3 --> I4["Clustering Analysis<br/>(K-means)"]
-        I4 --> I5["Strategic Pattern<br/>Identification"]
-    end
-
-    subgraph OUTPUT ["📈 Visualization & Reports"]
-        J[Results Visualization]
-        J --> J1["Time Series Plots<br/>(Price Dynamics)"]
-        J1 --> J2["Distribution Analysis<br/>(Convergence Patterns)"]
-        J2 --> J3["Regression Tables<br/>(Folk Theorem Tests)"]
-        J3 --> J4["Robustness Charts<br/>(Bootstrap Results)"]
-        J4 --> J5["Interactive Dashboards<br/>(Policy Analysis)"]
-
-        K[Report Generation]
-        K --> K1["Automated Table<br/>Generation (LaTeX)"]
-        K1 --> K2["Figure Compilation<br/>(Seaborn/Matplotlib)"]
-        K2 --> K3["Statistical Summary<br/>Reports"]
-        K3 --> K4["Policy Briefing<br/>Documents"]
-    end
-
-    %% Inter-module connections
+ subgraph CONFIG["🔧 Configuration & Setup"]
+        A["Experimental Configuration"]
+        A1["Market Parameters<br>α, β, μ, costs"]
+        A2["Agent Configuration<br>n = 2,3,4,5"]
+        A3["Prompt Engineering<br>P1/P2 variants"]
+        A4["Run Parameters<br>periods, iterations"]
+  end
+ subgraph LLM["🤖 LLM Infrastructure & Prompts"]
+        B["LLM Infrastructure"]
+        B1["Mistral API<br>Authentication"]
+        B2["Model Selection<br>mistral-large-2411"]
+        B3["Rate Limiting &amp;<br>Error Handling"]
+        B4["Response Validation<br>&amp; Parsing"]
+        C["Dynamic Prompt System"]
+        C1["Base Prompt Templates<br>P0, P1, P2"]
+        C2["Market History<br>Injection (100 periods)"]
+        C3["Cost Information<br>Integration"]
+        C4["Planning Context<br>Memory Proxy"]
+        C5["Formatted Agent<br>Prompt"]
+  end
+ subgraph SIM["🏪 Market Simulation & Orchestration"]
+        D["Market Simulation Engine"]
+        D1["Calvano Demand<br>Function"]
+        D2["Logit Market Share<br>Calculation"]
+        D3["Profit Computation<br>π = (p-c)×q"]
+        D4["Nash/Monopoly<br>Benchmarks"]
+        E["Multi-Agent Orchestration"]
+        E1["Parallel Agent<br>Initialization"]
+        E2["Synchronous Price<br>Elicitation"]
+        E3["Price Validation &amp;<br>Bounds Checking"]
+        E4["Market Clearing &amp;<br>Outcome Computation"]
+        F["Experimental Controller"]
+        F1["Run Configuration<br>Matrix Generation"]
+        F2["Sequential Experiment<br>Execution"]
+        F3["Real-time Progress<br>Monitoring"]
+        F4["Crash Recovery &amp;<br>Restart Logic"]
+  end
+ subgraph DATA["📊 Data Collection & Processing"]
+        G["Data Collection Pipeline"]
+        G1["Raw Response<br>Storage (JSON)"]
+        G2["Price Series<br>Extraction"]
+        G3["Agent Reasoning<br>Text Capture"]
+        G4["Market Outcome<br>Calculation"]
+        G5["Structured Dataset<br>Generation (Polars)"]
+  end
+ subgraph ANALYSIS["🔬 Statistical & Text Analysis"]
+        H["Statistical Analysis"]
+        H1["Data Preprocessing<br>&amp; Validation"]
+        H2["Run-level<br>Aggregation"]
+        H3["Stationarity Testing<br>(ADF Tests)"]
+        H4["Econometric Models<br>(OLS, Robust SE)"]
+        H5["Bootstrap Validation<br>&amp; Robustness Checks"]
+        I["Agent Reasoning Analysis"]
+        I1["Text Preprocessing<br>&amp; Sentence Extraction"]
+        I2["Embedding Generation<br>(SentenceTransformer)"]
+        I3["Dimensionality Reduction<br>(PCA)"]
+        I4["Clustering Analysis<br>(K-means)"]
+        I5["Strategic Pattern<br>Identification"]
+  end
+ subgraph OUTPUT["📈 Visualization & Reports"]
+        J["Results Visualization"]
+        J1["Time Series Plots<br>(Price Dynamics)"]
+        J2["Distribution Analysis<br>(Convergence Patterns)"]
+        J3["Regression Tables<br>(Folk Theorem Tests)"]
+        J4["Robustness Charts<br>(Bootstrap Results)"]
+        J5["Interactive Dashboards<br>(Policy Analysis)"]
+        K["Report Generation"]
+        K1["Automated Table<br>Generation (LaTeX)"]
+        K2["Figure Compilation<br>(Seaborn/Matplotlib)"]
+        K3["Statistical Summary<br>Reports"]
+        K4["Policy Briefing<br>Documents"]
+  end
+    A --> A1 & A2 & A3 & A4
+    B --> B1
+    B1 --> B2
+    B2 --> B3
+    B3 --> B4
+    C --> C1
+    C1 --> C2
+    C2 --> C3
+    C3 --> C4
+    C4 --> C5
+    D --> D1
+    D1 --> D2
+    D2 --> D3
+    D3 --> D4
+    E --> E1
+    E1 --> E2
+    E2 --> E3
+    E3 --> E4
+    F --> F1
+    F1 --> F2
+    F2 --> F3
+    F3 --> F4
+    G --> G1
+    G1 --> G2
+    G2 --> G3
+    G3 --> G4 & I1
+    G4 --> G5
+    H --> H1
+    H1 --> H2
+    H2 --> H3
+    H3 --> H4
+    H4 --> H5
+    I --> I1
+    I1 --> I2
+    I2 --> I3
+    I3 --> I4
+    I4 --> I5
+    J --> J1
+    J1 --> J2
+    J2 --> J3
+    J3 --> J4
+    J4 --> J5
+    K --> K1
+    K1 --> K2
+    K2 --> K3
+    K3 --> K4
     A1 --> D1
     A2 --> E1
     A3 --> C1
     A4 --> F1
-    
     B4 --> E2
     C5 --> B1
-    
     D4 --> G4
     E4 --> G1
     F4 --> G1
-    
     G5 --> H1
-    G3 --> I1
-    
     H5 --> J3
     I5 --> J4
-    
     J5 --> K1
-
-    %% Styling
+     A:::configStyle
+     A1:::configStyle
+     A2:::configStyle
+     A3:::configStyle
+     A4:::configStyle
+     B:::llmStyle
+     B1:::llmStyle
+     B2:::llmStyle
+     B3:::llmStyle
+     B4:::llmStyle
+     C:::llmStyle
+     C1:::llmStyle
+     C2:::llmStyle
+     C3:::llmStyle
+     C4:::llmStyle
+     C5:::llmStyle
+     D:::simStyle
+     D1:::simStyle
+     D2:::simStyle
+     D3:::simStyle
+     D4:::simStyle
+     E:::simStyle
+     E1:::simStyle
+     E2:::simStyle
+     E3:::simStyle
+     E4:::simStyle
+     F:::simStyle
+     F1:::simStyle
+     F2:::simStyle
+     F3:::simStyle
+     F4:::simStyle
+     G:::dataStyle
+     G1:::dataStyle
+     G2:::dataStyle
+     G3:::dataStyle
+     G4:::dataStyle
+     G5:::dataStyle
+     H:::analysisStyle
+     H1:::analysisStyle
+     H2:::analysisStyle
+     H3:::analysisStyle
+     H4:::analysisStyle
+     H5:::analysisStyle
+     I:::analysisStyle
+     I1:::analysisStyle
+     I2:::analysisStyle
+     I3:::analysisStyle
+     I4:::analysisStyle
+     I5:::analysisStyle
+     J:::outputStyle
+     J1:::outputStyle
+     J2:::outputStyle
+     J3:::outputStyle
+     J4:::outputStyle
+     J5:::outputStyle
+     K:::outputStyle
+     K1:::outputStyle
+     K2:::outputStyle
+     K3:::outputStyle
+     K4:::outputStyle
     classDef configStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     classDef llmStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
     classDef simStyle fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
     classDef dataStyle fill:#fff8e1,stroke:#f57f17,stroke-width:2px
     classDef analysisStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px
     classDef outputStyle fill:#fce4ec,stroke:#880e4f,stroke-width:2px
-
-    class A,A1,A2,A3,A4 configStyle
-    class B,B1,B2,B3,B4,C,C1,C2,C3,C4,C5 llmStyle
-    class D,D1,D2,D3,D4,E,E1,E2,E3,E4,F,F1,F2,F3,F4 simStyle
-    class G,G1,G2,G3,G4,G5 dataStyle
-    class H,H1,H2,H3,H4,H5,I,I1,I2,I3,I4,I5 analysisStyle
-    class J,J1,J2,J3,J4,J5,K,K1,K2,K3,K4 outputStyle
 ```
 
 ---
