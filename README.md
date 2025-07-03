@@ -68,6 +68,132 @@ This repository contains the complete research infrastructure for our master's t
 
 **Key Innovation**: Unlike traditional reinforcement learning algorithms requiring extensive training, LLMs arrive pre-trained on vast corpora about markets and strategic behavior, enabling rapid implementation of sophisticated coordination strategies with unprecedented effectiveness.
 
+### ⁉️ How it works
+
+The following flowchart illustrates the complete data flow and module interactions within our research pipeline. The system is designed as a modular, scalable framework that handles everything from experimental configuration and LLM agent orchestration to statistical analysis and results visualization. Each component is carefully designed to ensure reproducibility while managing the inherent stochasticity of LLM responses.
+
+```mermaid
+flowchart TD
+    subgraph CONFIG ["🔧 Configuration & Setup"]
+        A[Experimental Configuration]
+        A --> A1["Market Parameters<br/>α, β, μ, costs"]
+        A --> A2["Agent Configuration<br/>n = 2,3,4,5"]
+        A --> A3["Prompt Engineering<br/>P1/P2 variants"]
+        A --> A4["Run Parameters<br/>periods, iterations"]
+    end
+
+    subgraph LLM ["🤖 LLM Infrastructure & Prompts"]
+        B[LLM Infrastructure]
+        B --> B1["Mistral API<br/>Authentication"]
+        B1 --> B2["Model Selection<br/>mistral-large-2411"]
+        B2 --> B3["Rate Limiting &<br/>Error Handling"]
+        B3 --> B4["Response Validation<br/>& Parsing"]
+        
+        C[Dynamic Prompt System]
+        C --> C1["Base Prompt Templates<br/>P0, P1, P2"]
+        C1 --> C2["Market History<br/>Injection (100 periods)"]
+        C2 --> C3["Cost Information<br/>Integration"]
+        C3 --> C4["Planning Context<br/>Memory Proxy"]
+        C4 --> C5["Formatted Agent<br/>Prompt"]
+    end
+
+    subgraph SIM ["🏪 Market Simulation & Orchestration"]
+        D[Market Simulation Engine]
+        D --> D1["Calvano Demand<br/>Function"]
+        D1 --> D2["Logit Market Share<br/>Calculation"]
+        D2 --> D3["Profit Computation<br/>π = (p-c)×q"]
+        D3 --> D4["Nash/Monopoly<br/>Benchmarks"]
+
+        E[Multi-Agent Orchestration]
+        E --> E1["Parallel Agent<br/>Initialization"]
+        E1 --> E2["Synchronous Price<br/>Elicitation"]
+        E2 --> E3["Price Validation &<br/>Bounds Checking"]
+        E3 --> E4["Market Clearing &<br/>Outcome Computation"]
+
+        F[Experimental Controller]
+        F --> F1["Run Configuration<br/>Matrix Generation"]
+        F1 --> F2["Sequential Experiment<br/>Execution"]
+        F2 --> F3["Real-time Progress<br/>Monitoring"]
+        F3 --> F4["Crash Recovery &<br/>Restart Logic"]
+    end
+
+    subgraph DATA ["📊 Data Collection & Processing"]
+        G[Data Collection Pipeline]
+        G --> G1["Raw Response<br/>Storage (JSON)"]
+        G1 --> G2["Price Series<br/>Extraction"]
+        G2 --> G3["Agent Reasoning<br/>Text Capture"]
+        G3 --> G4["Market Outcome<br/>Calculation"]
+        G4 --> G5["Structured Dataset<br/>Generation (Polars)"]
+    end
+
+    subgraph ANALYSIS ["🔬 Statistical & Text Analysis"]
+        H[Statistical Analysis]
+        H --> H1["Data Preprocessing<br/>& Validation"]
+        H1 --> H2["Run-level<br/>Aggregation"]
+        H2 --> H3["Stationarity Testing<br/>(ADF Tests)"]
+        H3 --> H4["Econometric Models<br/>(OLS, Robust SE)"]
+        H4 --> H5["Bootstrap Validation<br/>& Robustness Checks"]
+
+        I[Agent Reasoning Analysis]
+        I --> I1["Text Preprocessing<br/>& Sentence Extraction"]
+        I1 --> I2["Embedding Generation<br/>(SentenceTransformer)"]
+        I2 --> I3["Dimensionality Reduction<br/>(PCA)"]
+        I3 --> I4["Clustering Analysis<br/>(K-means)"]
+        I4 --> I5["Strategic Pattern<br/>Identification"]
+    end
+
+    subgraph OUTPUT ["📈 Visualization & Reports"]
+        J[Results Visualization]
+        J --> J1["Time Series Plots<br/>(Price Dynamics)"]
+        J1 --> J2["Distribution Analysis<br/>(Convergence Patterns)"]
+        J2 --> J3["Regression Tables<br/>(Folk Theorem Tests)"]
+        J3 --> J4["Robustness Charts<br/>(Bootstrap Results)"]
+        J4 --> J5["Interactive Dashboards<br/>(Policy Analysis)"]
+
+        K[Report Generation]
+        K --> K1["Automated Table<br/>Generation (LaTeX)"]
+        K1 --> K2["Figure Compilation<br/>(Seaborn/Matplotlib)"]
+        K2 --> K3["Statistical Summary<br/>Reports"]
+        K3 --> K4["Policy Briefing<br/>Documents"]
+    end
+
+    %% Inter-module connections
+    A1 --> D1
+    A2 --> E1
+    A3 --> C1
+    A4 --> F1
+    
+    B4 --> E2
+    C5 --> B1
+    
+    D4 --> G4
+    E4 --> G1
+    F4 --> G1
+    
+    G5 --> H1
+    G3 --> I1
+    
+    H5 --> J3
+    I5 --> J4
+    
+    J5 --> K1
+
+    %% Styling
+    classDef configStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef llmStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef simStyle fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef dataStyle fill:#fff8e1,stroke:#f57f17,stroke-width:2px
+    classDef analysisStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef outputStyle fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+
+    class A,A1,A2,A3,A4 configStyle
+    class B,B1,B2,B3,B4,C,C1,C2,C3,C4,C5 llmStyle
+    class D,D1,D2,D3,D4,E,E1,E2,E3,E4,F,F1,F2,F3,F4 simStyle
+    class G,G1,G2,G3,G4,G5 dataStyle
+    class H,H1,H2,H3,H4,H5,I,I1,I2,I3,I4,I5 analysisStyle
+    class J,J1,J2,J3,J4,J5,K,K1,K2,K3,K4 outputStyle
+```
+
 ---
 
 ## 🔬 Research Questions
@@ -274,6 +400,7 @@ $$\ln(Price_{run}) = \beta_0 + \beta_1 \cdot GroupSize + \beta_2 \cdot PromptTyp
 ```
 
 ---
+
 ## ⚡ Quick Start
 
 ### 🚀 **Installation**
