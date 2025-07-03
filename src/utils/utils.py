@@ -1,5 +1,4 @@
 import numpy as np
-from scipy import stats
 
 
 def has_converged_to_price(price_history, price_monopoly, tolerance=0.05):
@@ -72,4 +71,3 @@ def has_converged_to_price(price_history, price_monopoly, tolerance=0.05):
         print(
             "All prices converged within bounds, for periods 201-300, monopoly and mean price."
         )
-
