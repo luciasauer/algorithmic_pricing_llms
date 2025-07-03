@@ -72,7 +72,7 @@ These findings (see \tableref{tab:fe_fish}) indicate that LLM agents coordinate 
 
 \subsubsection*{Addressing Non-Stationarity and Strategic Interaction}
 
-Given the extreme price persistence observed in our data, we formally test for unit roots using the Augmented Dickey-Fuller test. The results confirm that most price series are indeed non-stationary, violating the fundamental assumptions of standard dynamic panel models and raising concerns about spurious regression.
+Given the extreme price persistence observed in our data, we formally test for unit roots using the Augmented Dickey-Fuller test. The results (see Appendix Table~\ref{tab:adf_comparison}) confirm that most price series are indeed non-stationary, violating the fundamental assumptions of standard dynamic panel models and raising concerns about spurious regression.
 
 To address these issues and test for strategic interaction during transition periods, we apply a logarithmic transformation and first-difference the series using the equation in \eqref{eq:differenced_fe}. This differenced specification successfully addresses the persistence issue and enables the identification of strategic interaction patterns. \tableref{tab:fe_duopoly} presents results from this analysis, revealing evidence of strategic reciprocity mechanisms operating during transition periods.
 
