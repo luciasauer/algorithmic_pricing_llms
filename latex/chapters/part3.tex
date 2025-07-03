@@ -8,7 +8,7 @@ We build on the synthetic market environment developed by \textcite{fish_algorit
 
 These extension allows us to investigate a central implication of the \emph{Folk Theorem} in repeated games. As the number of firms increases, sustaining collusion becomes more difficult because the per-firm share of collusive profits diminishes, making deviation more attractive. To maintain cooperation, firms must place greater weight on future payoffs—reflected in a discount factor $\delta$ approaching one—which implies a high degree of patience.
 
-\subsection{Simulation Design}
+\subsection{Experimental Framework}
 
 In the following section, we dive into the details of the experimental setup by describing the experiment design, the agents themselves, and the market configuration.
 
@@ -25,7 +25,7 @@ We build directly on the framework introduced by \textcite{fish_algorithmic_2025
 
 
 The reward structure depends on the demand function, which is defined following the work by \textcite{calvano_artificial_2020}, where market shares respond smoothly to price differences. Specifically, the demand for firm $i$ at time $t$ is given by:
-\begin{equation}
+\begin{equation}\label{eq:calvano}
     q_i^t = \beta \times \frac{e^{\frac{a_i - p_i^t/\alpha}{\mu}}}{\sum_{j=1}^{n} e^{\frac{a_j - p_j^t/\alpha}{\mu}} + e^{\frac{a_0}{\mu}}}
 \end{equation}
 
@@ -93,14 +93,43 @@ Next, we turn to investigate the behavior of LLM-based pricing agents in a duopo
 \end{tcolorbox}
 \end{center}
 
-\en{Collusive} prefix encourages stable pricing and long-term profitability, while \en{Competitive} prefix promotes short-term profit-seeking with allowance for exploratory undercutting strategies. Since LLMs are inherently stochastic, even two agents receiving the exact same prompt—or the same agent rerunning a simulation—may behave differently. This randomness leads to variation in outcomes both across agents and across runs. To account for this, we also run 7 experiments per prefix for each value of $\alpha$, resulting in a total of 21 runs per prompt prefix.
+\en{Collusive} prefix encourages stable pricing and long-term profitability, while \en{Competitive} prefix promotes short-term profit-seeking with allowance for exploratory undercutting strategies. Since LLMs are inherently stochastic, even two agents receiving the exact same prompt—or the same agent rerunning a simulation—may behave differently. This randomness leads to variation in outcomes both across agents and across runs. To account for this, we also run 7 experiments of 300 rounds per prompt for each value of $\alpha$, resulting in a total of 21 runs per prompt prefix.
 
 
 And finally, as the core contribution of our thesis, we explore collusive dynamics in symmetric oligopoly settings using LLM-based agents. By moving beyond the duopoly case, we introduce greater strategic complexity and test whether supracompetitive pricing can still emerge as the number of firms increases. This shift brings the analysis closer to realistic market conditions and allows us to assess how LLM agents navigate environments where the incentives to deviate from cooperation are substantially stronger.
 
-From a theoretical standpoint, the \emph{Folk Theorem} in repeated games suggests that collusion can be sustained indefinitely, provided firms are sufficiently patient—i.e., they value future profits highly, which corresponds to a discount factor $\delta$ close to one. However, as the number of firms $n$ increases, the individual share of the collusive profit $\pi^C = \frac{\pi^M}{n}$ declines, while the immediate gain from undercutting competitors $\pi^D$ becomes more tempting \parencite{ivaldi_chapter_2007, tirole_theory_1988}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This trade-off is captured by the standard trigger strategy, where firms cooperate by charging the collusive price as long as no one deviates, but revert permanently to competitive pricing if a deviation occurs. Under this strategy, the value of cooperating is:
+\subsection{Theoretical Benchmarks}
+% [Nash equilibrium, monopoly prices, Folk Theorem predictions/thresholds]
+
+Our empirical analysis relies on three key theoretical benchmarks derived from the logit demand system described above (cf. \equationref{eq:calvano}). These benchmarks enable us to assess whether LLM agents exhibit competitive, collusive, or intermediate coordination patterns, and to test the core predictions of the \emph{Folk Theorem} regarding collusion sustainability across varying market structures.
+
+\subsubsection*{Nash Equilibrium Prices}
+
+The competitive baseline assumes firms maximize individual profits, taking competitors' prices as given. For firm $i$, the Nash equilibrium price solves:
+
+\begin{equation}
+    p_i^{N} = \arg\max_{p_i} \pi_i = (p_i - c_i) \cdot q_i(p_i, \mathbf{p}_{-i}^N)
+\end{equation}
+
+where $q_i$ follows the logit demand function specified in \equationref{eq:calvano}. Nash equilibrium prices are computed via iterative best-response dynamics, where each firm sequentially optimizes against current rivals' prices until convergence is achieved with tolerance $\epsilon = 10^{-8}$. These prices represent the theoretical floor for sustained pricing outcomes under competitive conditions.
+
+\subsubsection*{Monopoly Prices}
+
+The collusive upper bound represents joint profit maximization across all firms, solving:
+
+\begin{equation}
+    \mathbf{p}^M = \arg\max_{p_1,...,p_n} \sum_{i=1}^n \pi_i = \sum_{i=1}^n (p_i - c_i) \cdot q_i(\mathbf{p})
+\end{equation}
+
+These prices yield maximum total industry profits $\pi^M = \sum_{i=1}^n \pi_i^M$ and serve as the theoretical ceiling for collusive outcomes. The monopoly benchmark represents perfect coordination, where agents internalize competitive externalities and maximize joint payoffs rather than individual ones.
+
+\subsubsection*{Folk Theorem Predictions}
+
+From a theoretical standpoint, the \emph{Folk Theorem} in repeated games suggests that collusion can be sustained indefinitely, provided firms are sufficiently patient---i.e., they value future profits highly, which corresponds to a discount factor $\delta$ close to one. However, as the number of firms $n$ increases, the individual share of the collusive profit $\pi^C = \frac{\pi^M}{n}$ declines, while the immediate gain from undercutting competitors $\pi^D$ becomes more tempting \parencite{ivaldi_chapter_2007, tirole_theory_1988}.
+
+The standard trigger strategy captures this trade-off, where firms cooperate by charging the collusive price as long as no one deviates, but revert permanently to competitive pricing if a deviation occurs. Under this strategy, the value of cooperating is:
 
 \begin{equation}
     V_C = \frac{\pi^C}{1 - \delta}
@@ -118,18 +147,26 @@ In the case of a grim trigger, where punishment is permanent, we assume $\pi^N =
     \frac{\pi^C}{1 - \delta} \geq \pi^D
 \end{equation}
 
-While this condition is derived under the assumption that a deviating firm captures the full market in a single period, this does not strictly apply in our setting. According to the demand function used by \textcite{calvano_artificial_2020}, lower prices result in higher—but not exclusive—market shares, reflecting product differentiation. Thus, deviation yields only a partial market gain. Nevertheless, we adopt this simplified condition for expositional clarity, as it still captures the qualitative effect of increasing the number of firms on the incentives to defect. Multiplying both sides in \equationref{eq:inc} by $1 - \delta$ and rearranging gives:
+While this condition is derived under the assumption that a deviating firm captures the full market in a single period, this does not strictly apply in our setting. According to the demand function used by \textcite{calvano_artificial_2020}, lower prices result in higher---but not exclusive---market shares, reflecting product differentiation. Thus, deviation yields only a partial market gain. Nevertheless, we adopt this simplified condition for expositional clarity, as it still captures the qualitative effect of increasing the number of firms on the incentives to defect. Multiplying both sides in \equationref{eq:inc} by $1 - \delta$ and rearranging gives:
 
 \begin{equation}
-    \delta \geq \frac{\pi^D - \pi^C}{\pi^D}
+    \delta \geq \delta^* = \frac{\pi^D - \pi^C}{\pi^D}
 \end{equation}
 
-As $n$ grows, $\pi^C$ falls, and the threshold $\delta^*$ approaches one, meaning firms must be increasingly patient for collusion to be sustainable. This theoretical insight motivates our key experiment: testing whether LLM-based agents can maintain supracompetitive prices in a four-firm setting, where the incentives to defect are more substantial and the theoretical conditions for stable collusion are tighter.
+As $n$ grows, $\pi^C$ falls, and the threshold $\delta^*$ approaches one, meaning firms must be increasingly patient for collusion to be sustainable. This creates the central theoretical prediction that larger markets should exhibit systematically less collusive behavior, with coordination breaking down entirely when the required patience exceeds realistic bounds.
 
+\subsubsection*{Empirical Framework}
 
-So for that, we run several experiments with 3, 4, and 5 firms to test the responses of the agents to this environment.
+This theoretical framework enables us to investigate the central research question of whether and how LLM agent coordination varies with market participation. By comparing observed pricing patterns against these benchmarks across different market structures ($n = 2, 3, 4, 5+$), we can assess:
 
+\begin{itemize}
+    \item \textbf{Coordination sustainability:} Whether agents maintain supracompetitive pricing above Nash levels as market participation increases
+    \item \textbf{Breakdown patterns:} How pricing dynamics evolve when coordination becomes unsustainable, including the timing and completeness of any transitions toward competitive outcomes  
+    \item \textbf{Theoretical alignment:} Whether observed breakdown thresholds align with \emph{Folk Theorem} predictions or suggest alternative coordination mechanisms specific to LLM agents
+    \item \textbf{Behavioral mechanisms:} What strategic patterns emerge in agent decision-making as coordination complexity increases
+\end{itemize}
 
+The experimental design enables us to determine whether LLM agents adhere to traditional \emph{Folk Theorem} patterns, exhibit enhanced coordination capabilities that surpass theoretical predictions, or encounter distinct limitations that result in different breakdown dynamics. This empirical approach provides crucial evidence for understanding the boundaries of algorithmic coordination in strategic environments.
 
-
-
+\subsection{Measurement Strategy}
+%[Convergence criteria, collusion metrics, breakdown point identification]
