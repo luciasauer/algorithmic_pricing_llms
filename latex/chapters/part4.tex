@@ -1,47 +1,39 @@
 \section{Experiments \& Results}\label{sec:res}
 
-%Synthetic experiments: convergence behavior, comparison to Nash/monopoly
-%
-%- We replicated Fish et al. successfully with Mistral
-%- Smaller models have troubles converging to monopoly prices
-%- We show that multiform oligpol settings also collude
-%
-%
-%
-%Real market simulations: price following, margin formation, focal point behavior
-%
-%Tables, graphs, timelines
-%
-%Interpret results carefully
+This section presents our empirical findings across four main areas: model validation through monopoly pricing, discovery of novel LLM coordination patterns, tests of \emph{Folk Theorem} predictions, and analysis of agent reasoning mechanisms. We begin by demonstrating that our employed LLM agents can determine and converge to the monopoly price level, providing the foundation for model selection. We then proceed by replicating the findings of \textcite{fish_algorithmic_2025} for duopoly cases, while discovering distinctive coordination patterns that inform our analytical approach. Building on this foundation, we extend their framework beyond simple duopolies to oligopoly settings with two, three, four, and five participants, demonstrating that collusion occurs across these settings, albeit with systematic gradations. We continue by providing empirical evidence for \emph{Folk theorem}-style effects in algorithmic frameworks and conclude by examining the underlying coordination mechanisms revealed through agent reasoning analysis.
 
-We begin by demonstrating that our employed LLM agents can determine and converge to the monopoly price level. Based on this ability, we select our agentic model. We then proceed by replicating the \textcite{fish_algorithmic_2025} findings for the duopoly cases. In connection, we then extend their framework beyond simple duopolies to oligopoly settings with two, three, four, five, and eight participants. We also demonstrate that collusion occurs in these settings, albeit with gradations. We continue by providing empirical evidence for \emph{Folk theorem}-style effects in agentic frameworks and conclude by conducting a textual analysis of the LLM outputs to reinforce our findings.
+\subsection{Monopoly Validation and Model Selection}
 
-\subsection*{Monopoly Results}
+We begin by verifying that our selected LLM agents possess the capability to identify and converge to optimal pricing strategies in monopoly settings. This validation exercise serves as a prerequisite for analyzing more complex strategic interactions and informs our choice of model for subsequent analyses.
 
-To analyze the convergence of the monopoly setting, we compute the $95th$ and $5th$ percentiles of the observed prices and verify whether they fall within a 5\% margin of the theoretical monopoly price.
+\subsubsection*{Monopoly Convergence Results}
 
-The results in \tableref{tab:monopoly_stats} show near-perfect convergence across all runs for both models. Specifically, Mistral Large exhibits no prices outside the convergence band in any experiment, while Mistral Small has only four outlying prices across all runs, considering the final 100 rounds. \textcolor{red}{Although both models demonstrate strong robustness, we choose to proceed with Mistral Large for subsequent analyses due to its larger parameter count, which implies greater representational capacity and decision-making precision}.
+To analyze convergence behavior, we compute the 95th and 5th percentiles of observed prices and verify whether they fall within a 5\% margin of the theoretical monopoly price. \tableref{tab:monopoly_stats} presents convergence statistics for both Mistral models across all experimental conditions.
 
 \input{latex/tables/monopoly_statistics}
 
-\figureref{fig:monopoly_convergence} visualizes the experiment results using Mistral Large. The model converges within 25 rounds to the monopoly price (indicated by the dashed line), clearly demonstrating its ability to identify and sustain optimal pricing in this economic scenario.
+The results demonstrate near-perfect convergence across all runs for both models. Mistral Large exhibits no prices outside the convergence band in any experiment, while Mistral Small shows only four outlying prices across all runs when considering the final 100 rounds. Although both models demonstrate strong robustness, we choose to proceed with Mistral Large for subsequent analyses due to its larger parameter count, which implies greater representational capacity and decision-making precision. Based on these performance metrics, we proceed with Mistral Large for all subsequent analyses.
 
-\begin{figure}[H]
-\centering
-\includesvg[width=1\linewidth]{latex/imgs/res/monopoly/monopoly_experiment_complete.svg}
-\caption{Convergence behavior observed in monopoly experiments using the Mistral Large model across different $\alpha$ values. The convergence band represents prices within $\pm 5\%$ of the theoretical monopoly price, computed by solving: $\max_{p_i} \pi = (p_i - c) q_i$.}
-\label{fig:monopoly_convergence}
+\figureref{fig:monopoly_convergence} visualizes convergence behavior using Mistral Large across different demand intensity parameters. The model consistently converges within 25 rounds to the theoretical monopoly price (indicated by the dashed line), demonstrating robust capability to identify and sustain optimal pricing strategies across varying market conditions.
+
+\begin{figure}[htpb!]
+    \centering
+    \includesvg[width=1\linewidth]{latex/imgs/res/monopoly/monopoly_experiment_complete.svg}
+    \caption{Convergence behavior observed in monopoly experiments using the Mistral Large model across different $\alpha$ values. The convergence band represents prices within $\pm 5\%$ of the theoretical monopoly price, computed by solving: $\max_{p_i} \pi = (p_i - c) q_i$.}
+    \label{fig:monopoly_convergence}
 \end{figure}
 
-\subsection*{Duopoly}
+These validation results establish that our selected LLM agent possesses the fundamental capabilities required for strategic pricing analysis, providing confidence in our experimental framework as we proceed to examine more complex multi-agent interactions.
 
-For each of the 21 experiments conducted per prompt prefix, we compute the average price over the last 50 rounds—i.e., after agents have stabilized their pricing strategies. We then compare how closely the prices under P1 align with the Nash equilibrium, and how those under P2 approach the monopoly benchmark. \figureref{fig:duopoly_1} display these results. P1 shows a clear cluster of prices around the orange dotted line, representing the Nash price, while P2 exhibits a sparser distribution that trends upward toward the monopoly price. The separation between the two distributions highlights the distinct pricing behaviors induced by each prompt.
+\subsection{Duopoly Coordination Patterns and Mechanisms}
 
+Our analysis of duopoly interactions replicates key findings from \textcite{fish_algorithmic_2025} while revealing distinctive coordination patterns that differ from traditional reward-punishment mechanisms documented in the algorithmic collusion literature. These discoveries have important implications for our analytical approach and interpretation of oligopoly results.
 
-\figureref{fig:duopoly_2} displays the isoprofit curves for the symmetric duopoly setting. Each black dashed line represents the Bertrand–Nash equilibrium profit for a single firm in a static one-shot game (denoted as $\pi$ Nash). In contrast, the purple dotted line marks the joint profit level attainable under full collusion ($\pi^M$). Agents using P1 tend to consistently achieve profits near the collusive frontier, indicating sustained coordination and alignment with monopoly-like outcomes. In contrast, while agents under P2 also attain positive profits, several observations fall below the Nash isoprofit curve, suggesting suboptimal strategies that yield less than the standard competitive benchmark. Nevertheless, a clear pattern emerges: P1 systematically promotes more collusive behavior, while P2 drives outcomes closer to competitive dynamics. These findings are in line with the results from \cite{fish_algorithmic_2025}.
+\subsubsection*{Duopoly Coordination Results}
 
+\figureref{fig:duopoly} presents comprehensive results from our duopoly experiments, comparing pricing behavior and profit outcomes across two prompt specifications (P1 and P2). For each of the 21 experiments conducted per prompt prefix, we compute the average price over the last 50 rounds—i.e., after agents have stabilized their pricing strategies. \figureref{fig:duopoly_1} displays these results, revealing distinct coordination patterns. P1 shows a clear cluster of prices around the orange dotted line representing the Nash price, while P2 exhibits a sparser distribution that trends upward toward the monopoly price. The separation between the two distributions highlights the distinct pricing behaviors induced by each prompt specification.
 
-\begin{figure}[H]
+\begin{figure}[htpb!]
     \centering
     \begin{subfigure}[b]{0.475\linewidth}
     \includesvg[width=1\linewidth]{latex/imgs/res/duopoly/duopoly_jointplot.svg}
@@ -54,48 +46,39 @@ For each of the 21 experiments conducted per prompt prefix, we compute the avera
     \caption{Duopoly profits}
     \label{fig:duopoly_2}
     \end{subfigure}
-    \caption{Duopoly experiment}
+    \caption{Duopoly Experiment Results: Pricing behavior and profit outcomes across prompt specifications. Notes: For each $\alpha \in \{1, 3.2, 10\}$ and prompt prefix (P1, P2), seven 300-period runs were conducted. Prices and profits shown are normalized by dividing by $\alpha$. Red dashed lines mark Bertrand-Nash equilibrium prices; green dotted lines mark monopoly prices.}
     \label{fig:duopoly}
 \end{figure}
 
-To formally assess whether the difference in average prices between the two prompt conditions is statistically significant, we conduct a two-sided Welch’s t-test. This approach accounts for the unequal variances observed between P1 and P2 outcomes. The test confirms that the difference in means is highly significant at the 1\% level, reinforcing the interpretation that prompt formulation has a meaningful impact on pricing behavior and strategic interaction.
+\figureref{fig:duopoly_2} displays the isoprofit curves for the symmetric duopoly setting. Each black dashed line represents the Bertrand-Nash equilibrium profit for a single firm in a static one-shot game (denoted as $\pi$ Nash). In contrast, the purple dotted line marks the joint profit level attainable under full collusion ($\pi^M$). Agents using P1 tend to consistently achieve profits near the collusive frontier, indicating sustained coordination and alignment with monopoly-like outcomes. In contrast, while agents under P2 also attain positive profits, several observations fall below the Nash isoprofit curve, suggesting suboptimal strategies that yield less than the standard competitive benchmark. Nevertheless, a clear pattern emerges: P1 systematically promotes more collusive behavior, while P2 drives outcomes closer to competitive dynamics. These findings align with the results from \textcite{fish_algorithmic_2025}.
 
-\subsubsection*{\textit{Tit for Tat} Response - Fixed Effect Regression}
-%mechanisms that might explain this behavior.
+To formally assess whether the difference in average prices between the two prompt conditions is statistically significant, we conduct a two-sided Welch's t-test. This approach accounts for the unequal variances observed between P1 and P2 outcomes. The test confirms that the difference in means is highly significant at the 1\% level, reinforcing the interpretation that prompt formulation has a meaningful impact on pricing behavior and strategic interaction.
 
-Reciprocal strategies such as \textit{Tit for Tat}, where firms match a competitor's prior action, are central to sustaining cooperation in repeated price-setting environments. Given the experimental design, we expect this behavior to emerge more clearly in P1 than in P2.
+\subsubsection*{Discovery of Converge-and-Persist Coordination}
 
-However, identifying and interpreting these strategies is inherently challenging. First, price data only captures realized actions, not counterfactual behaviors (i.e., what the agent might have done under different beliefs or plans). Second, LLMs are highly nonlinear \en{black box} systems, meaning their decision-making processes are complex and not directly interpretable—a broader limitation shared across foundation models.
+Our analysis of period-by-period price dynamics reveals that LLM agents follow a distinctive \emph{converge-and-persist} coordination pattern rather than the expected dynamic reward-punishment mechanisms characteristic of traditional algorithmic collusion studies. This behavioral discovery has profound implications for both our analytical approach and understanding of AI coordination mechanisms.
 
-To test whether agents engage in strategic reciprocity, we follow the methodology used by the authors \cite{fish_algorithmic_2025} and estimate the fixed effects panel regression expressed below (cf. \equationref{eq:fish_fe}), examining whether firms adjust their prices in response to their own and their rivals’ lagged prices. This approach allows us to capture strategic interaction patterns consistent with reward-punishment dynamics in repeated games:
+Agents rapidly identify focal price levels within the first 25-50 periods, then maintain these prices with minimal subsequent variation. This pattern contrasts sharply with the ongoing strategic adjustment cycles typically observed in human or Q-learning algorithmic coordination, where agents continuously respond to competitor actions through reward-punishment mechanisms.
 
-\begin{equation}\label{eq:fish_fe}
-    p_{i,r}^{t} = \alpha_{i,r} + \gamma p_{i,r}^{t-1} + \delta p_{j,r}^{t-1} + \epsilon_{i,r}^t
-\end{equation}
+When attempting to replicate the dynamic panel analysis of \textcite{fish_algorithmic_2025} using their specification (see \ref{eq:dynamic_panel}), we encounter several concerning patterns that reveal the fundamental difference in LLM coordination mechanisms:
 
-The dependent variable $p_{i,r}^{t}$ is the price set by agent $i$ at time $t$ in experiment $r$. We include lagged self-price and lagged competitor price as regressors. The fixed effects $\alpha_{i,r}$ capture agent-experiment-level heterogeneity. 
+\begin{enumerate}
+    \item \textbf{Extreme price persistence}: Coefficients on lagged own prices approach unity ($\beta_1 \approx 0.993$), suggesting potential unit root behavior
+    \item \textbf{Limited strategic interaction}: While statistically significant, coefficients on competitor prices are economically small ($\beta_2 \approx 0.003$)
+    \item \textbf{Rapid convergence}: Agents quickly settle into stable pricing patterns with minimal subsequent variation
+\end{enumerate}
 
-To mitigate the endogeneity concerns---particularly the potential correlation between lagged dependent variables and the error term---we construct the panel using disjoint pairs of periods, ensuring that no two observations share a time index. This design reduces serial correlation in the error term by skipping periods between observations. Additionally, we alternate which agent is designated as \textit{self} across period pairs, breaking firm-specific time dependencies and preventing the formation of continuous time series per firm.
+These findings (see \tableref{tab:fe_fish}) indicate that LLM agents coordinate through rapid convergence to mutually acceptable price levels, followed by persistent adherence to these focal points, rather than engaging in ongoing strategic punishment and reward cycles.
 
-As a result, the panel is defined at the \texttt{experiment\_id}–agent level, yielding 21 units (7 experiments × 3 firms with alternation). Combined with the controlled experimental environment---free of external confounders and driven solely by the manipulation of observable variables---this setup helps isolate each observation’s error term, $\epsilon_{i,r}^t$, from other periods.
+\subsubsection*{Addressing Non-Stationarity and Strategic Interaction}
 
-Altogether, the use of disjoint periods, firm alternation, and a clean experimental structure effectively breaks the feedback loop that typically generates endogeneity in dynamic panel settings, thereby supporting the validity of our fixed effects regression approach.
+Given the extreme price persistence observed in our data, we formally test for unit roots using the Augmented Dickey-Fuller test. The results confirm that most price series are indeed non-stationary, violating the fundamental assumptions of standard dynamic panel models and raising concerns about spurious regression.
 
-However, when replicating this regression, we encountered strong persistence in the price series. Agents tend to converge rapidly to stable pricing strategies, leading to limited price variation and coefficients on lagged prices close to one---suggesting potential non-stationarity. This violates standard assumptions in dynamic panels and raises concerns about the potential for spurious regression.
-
-To address this, we initially considered System GMM \parencite{blundell_initial_1998}, which is well-suited to settings with endogenous regressors and high persistence. However, the rapid convergence in agent behavior meant that additional lags provided little identifying variation, and key diagnostic tests (e.g., Hansen overidentification tests) failed to validate the instruments.
-
-We therefore formally tested for unit roots using the Augmented Dickey-Fuller test and found that most series were indeed non-stationary. To restore stationarity, we applied a logarithmic transformation and first-differenced the series. The following model was then estimated:
-
-\begin{equation}
-    \Delta \log p_{i,r}^{t} = \gamma \, \Delta \log p_{i,r}^{t-1} + \delta \, \Delta \log p_{j,r}^{t-1} + \Delta \epsilon_{i,r}^t
-\end{equation}
-
-This differenced specification successfully addresses the persistence issue and reveals meaningful patterns of strategic interaction. As shown in \tableref{tab:fe_duopoly}, firms respond positively and significantly to changes in their competitors’ prices, consistent with Tit-for-Tat or punishment-based coordination. Moreover, the competitor effect is nearly twice as strong in P1 compared to P2, suggesting a more credible or aggressive enforcement of coordination. In contrast, the negative coefficient on the firm’s own lagged price change suggests mild mean reversion, consistent with the observed convergence to stable price levels. 
+To address these issues and test for strategic interaction during transition periods, we apply a logarithmic transformation and first-difference the series following equation \eqref{eq:differenced_fe}. This differenced specification successfully addresses the persistence issue and enables the identification of strategic interaction patterns. \tableref{tab:fe_duopoly} presents results from this analysis, revealing evidence of strategic reciprocity mechanisms operating during transition periods.
 
 \begin{table}[htpb!]
     \centering
-    \caption{Tit for Tat Response – Duopoly Setting}
+    \caption{\emph{Tit for Tat} Response -- Duopoly Setting}
     \label{tab:fe_duopoly}
     \begin{threeparttable}
     {\small
@@ -125,36 +108,38 @@ This differenced specification successfully addresses the persistence issue and 
     \end{threeparttable}
 \end{table}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The results show that agents respond positively and significantly to changes in their competitors' prices, consistent with \emph{Tit for Tat} or punishment-based coordination mechanisms. The competitor effect is nearly twice as strong in P1 compared to P2, suggesting more credible enforcement of coordination under the P1 prompt specification. The negative coefficient on the firm's own lagged price change indicates mild mean reversion, consistent with the observed convergence to stable price levels.
 
-\subsubsection*{Towards convergence}
+These findings suggest that while LLM agents primarily coordinate through rapid convergence to focal points, they also retain some capacity for strategic adjustment mechanisms during periods of price instability. However, the economic magnitude of these effects is small relative to the overall coordination achieved through the converge-and-persist mechanism.
 
-While \textcite[p. 18]{fish_algorithmic_2025} found moderate price stickiness $(\gamma_{P1} \approx 0.48)$ alongside meaningful strategic responsiveness in duopoly settings, our duopoly analysis reveals a fundamental behavioral shift. Although we detect strategic responses when using log-differenced specifications (cf. \tableref{tab:fe_duopoly}), we are unable to reproduce their exact dynamic patterns for the last 200 periods when replicating their methodology (cf. \tableref{tab:fe_fish}). In our case, agents exhibit near-unit root persistence $(\gamma_{P1} \approx 0.993)$ with minimal period-to-period strategic interaction. This suggests our agents follow \emph{converge-and-persist coordination}---initially finding focal price levels, then maintaining them with minimal deviation---rather than active reward-punishment schemes with period-by-period adjustments. \figureref{fig:ts_prices_comb} shows this persistence across runs and especially in later rounds where virtually no price deviations occur anymore. As visible in the figure, this observation is also consistent in the following oligopoly settings.
+\subsubsection*{Methodological Implications}
 
-This behavioral pattern has important methodological implications. Since price dynamics are dominated by persistence rather than strategic interaction, standard dynamic panel approaches become uninformative for testing predictions of the \emph{Folk theorem}. Instead, we focus on two complementary analyses: (1) run-level equilibrium differences that capture the \emph{Folk theorem}'s core predictions about group size effects on collusion sustainability, and (2) convergence behavior in early periods where coordination occurs.
+This behavioral pattern has important methodological implications for analyzing LLM coordination. Since price dynamics are dominated by persistence rather than strategic interaction, standard dynamic panel approaches become uninformative for testing predictions of the \emph{Folk theorem}. The converge-and-persist pattern suggests that the economically meaningful variation occurs across experimental runs with different market structures, rather than within runs over time.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Consequently, our primary analysis focuses on run-level equilibrium differences that capture the \emph{Folk theorem}'s core predictions about group size effects on collusion sustainability, complemented by analysis of convergence behavior in early periods where coordination initially occurs. This approach recognizes that LLM agents coordinate through distinctive mechanisms that require adapted analytical frameworks rather than forcing traditional methodologies that may obscure their unique behavioral patterns.
 
-\subsection*{Oligopoly}
+\subsection{Oligopoly Results: Testing \emph{Folk Theorem} Predictions}
 
-The oligopolistic scenario constitutes our main innovation as we extend the \textcite{fish_algorithmic_2025} framework by multi-firm scenarios. \figureref{fig:oligopols} visually summarizes our findings across all runs.
+Having established that LLM agents can engage in tacit collusion and identified their distinctive coordination mechanisms, we now examine our central research question: whether algorithmic collusion breaks down as market concentration decreases, consistent with \emph{Folk Theorem} predictions. Our oligopoly analysis represents the core contribution of this research, extending beyond existing duopoly studies to test theoretical boundaries of AI coordination.
 
-\begin{figure}[H]
+\subsubsection*{Oligopoly Overview and Visual Evidence}
+
+\figureref{fig:oligopols} presents a comprehensive view of pricing behavior across different market structures, ranging from duopoly (n=2) to five-agent competition (n=5). The figure displays 42-168 data points per market structure, with each observation representing the average price over the final 50 periods of an experimental run, capturing converged behavior after agents have established stable coordination patterns.
+
+\begin{figure}[htpb!]
     \centering
     \includesvg[width=1\linewidth]{latex/imgs/res/convergence_prices_by_num_agents.svg}
     \caption{Oligopolistic data distribution, 42--168 data points ($\bullet$) per supergroup (3 alphas $\times$ 7 runs $\times$ number of firms; average of last 50 rounds), triangles ($\blacktriangle$) represent subgroup averages, dashed lines ($\text{- -}$) represent Nash prices following \equationref{eq:nash} and Monopoly prices according to \equationref{eq:monop} per supergroup.}
     \label{fig:oligopols}
 \end{figure}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The figure reveals several key patterns that provide initial visual evidence supporting \emph{Folk Theorem} predictions. First, there is a clear downward trend in prices as the number of agents increases, indicating systematic erosion of collusive power with greater market participation. Second, prices remain consistently above Nash equilibrium levels across all market structures, confirming that LLM agents maintain some degree of coordination even in larger groups. Third, the degree of elevation above competitive levels diminishes systematically as group size increases, suggesting that coordination becomes increasingly difficult to sustain as predicted by theory.
 
-\subsection{Run-Level Equilibrium Analysis}\label{sec:run_level}
+The triangular markers representing subgroup averages show a smooth progression from near-monopoly levels in duopoly settings toward competitive outcomes as group size expands. Importantly, even in the five-agent setting, average prices remain substantially above Nash equilibrium levels, indicating that while coordination weakens, it does not completely collapse within the range of group sizes tested.
 
-Having established that our LLM agents can successfully engage in tacit collusion in duopoly settings, we now turn to our central research question: Does algorithmic collusion break down as market concentration decreases, consistent with the predictions of the Folk Theorem? To address this question rigorously, we employ a run-level equilibrium analysis that focuses on the final pricing outcomes after agents have had sufficient time to converge to stable strategies.
+\subsubsection*{Run-Level Equilibrium Analysis}
 
-\subsubsection{Results}
-
-Table~\ref{tab:run_level_results} presents our main empirical findings from estimating equations~\eqref{eq:baseline} and~\eqref{eq:controls}. Both specifications yield statistically identical group size coefficients, confirming the robustness of our core findings across different experimental conditions.
+\tableref{tab:run_level_results} presents our main empirical findings from the run-level equilibrium analysis specified in equations \ref{eq:baseline} and \ref{eq:controls}. Both baseline and controlled specifications yield nearly identical group size coefficients, confirming the robustness of our core findings across different experimental conditions and strengthening confidence in our causal interpretation.
 
 \begin{table}[htbp!]
     \centering
@@ -165,7 +150,7 @@ Table~\ref{tab:run_level_results} presents our main empirical findings from esti
     \toprule
      & \multicolumn{2}{c}{Dependent Variable: $\ln(\text{Price})$} \\
     \cmidrule(lr){2-3}
-     & (1) Equation~\eqref{eq:baseline} & (2) Equation~\eqref{eq:controls} \\
+     & (1) Baseline -- \equationref{eq:baseline} & (2) With Controls -- \equationref{eq:controls} \\
     \midrule
     Group Size & $-0.0373^{***}$ & $-0.0373^{***}$ \\
      & $(0.0055)$ & $(0.0054)$ \\
@@ -188,19 +173,282 @@ Table~\ref{tab:run_level_results} presents our main empirical findings from esti
     \end{tabular}
     \begin{tablenotes}[flushleft]
     \footnotesize
-    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average log price for one experimental run over the final 50 periods (rounds 251-300). Group Size ranges from 2 to 5 agents. P2 Prompt is a dummy variable for the alternative prompt specification. Alpha controls represent different demand intensity parameters.
+    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average log price for one experimental run over the final 50 periods. Group Size ranges from 2 to 5 agents. P2 Prompt is a dummy variable for the alternative prompt specification.
     \end{tablenotes}
     \end{threeparttable}
 \end{table}
 
-The results provide strong empirical support for the Folk Theorem's predictions regarding the sustainability of collusion. The group size coefficient of $-0.0373$ is highly statistically significant ($p < 0.001$) and economically meaningful. Interpreted as a percentage effect, each additional competitor reduces equilibrium prices by approximately 3.7\%, representing a substantial erosion of collusive power as market concentration decreases.
+The results provide strong empirical support for \emph{Folk Theorem} predictions regarding the relationship between market structure and collusion sustainability. The group size coefficient of $-0.0373$ is highly statistically significant ($p < 0.001$) and economically meaningful. Interpreted as a percentage effect, each additional competitor reduces equilibrium prices by approximately 3.7\%, representing substantial erosion of collusive power as market concentration decreases and suggesting that prices move systematically closer to competitive levels as group size increases.
 
-To illustrate the economic magnitude of this effect, consider the progression from duopoly to five-agent competition. Moving from $n=2$ to $n=5$ represents a cumulative effect of $(e^{-0.0373 \times 3} - 1) \times 100\% = -10.6\%$, demonstrating that algorithmic collusion faces substantial constraints as the number of market participants increases, consistent with the theoretical prediction that coordination becomes increasingly difficult in larger groups.
+To illustrate the cumulative economic magnitude of this effect, consider the progression from duopoly to five-agent competition. Moving from $n=2$ to $n=5$ represents a total price reduction of $(e^{-0.0373 \times 3} - 1) \times 100\% = -10.6\%$. This demonstrates that algorithmic collusion faces substantial constraints as the number of market participants increases, providing quantitative evidence consistent with theoretical predictions that coordination becomes increasingly difficult in larger groups.
 
-The prompt heterogeneity coefficient provides additional insights into the mechanisms underlying algorithmic collusion. The P2 prompt specification results in systematically lower prices ($e^{-0.2082} - 1 = -18.8\%$ relative to P1), suggesting that prompt design significantly influences agents' propensity to engage in collusive behavior. Importantly, this effect operates independently of group size, indicating that while prompt specification affects the level of collusion, it does not alter the fundamental relationship between market structure and the sustainability of collusion, thereby confirming the findings of \textcite{fish_algorithmic_2025}.
+The high explanatory power of our models (R-squared values above 0.66) indicates that group size and prompt specification account for the majority of variation in equilibrium pricing behavior. This suggests our specification successfully captures the key determinants of algorithmic collusion in experimental markets and supports the interpretation that the observed patterns reflect fundamental structural relationships rather than random variation.
 
-The experimental controls in Column (2) demonstrate the robustness of our findings across different market conditions. While the $\alpha = 3.2$ condition shows a modest positive effect on prices, the group size coefficient remains virtually unchanged, confirming that our core results are not driven by experimental heterogeneity.
+\subsection{Robustness Analysis and Alternative Explanations}
 
-The high explanatory power of our models (R-squared values above 0.66) indicates that group size and prompt specification account for the majority of variation in equilibrium pricing behavior, suggesting our specification successfully captures the key determinants of algorithmic collusion in these experimental markets.
+This section examines the stability of our core findings across different experimental conditions and specifications, addressing concerns about parameter sensitivity and exploring alternative explanations for observed coordination patterns.
 
-The systematic relationship between market concentration and collusion sustainability demonstrates that algorithmic pricing creates measurable anticompetitive effects that scale predictably with market structure in our controlled setting. The 3.7\% price reduction per additional competitor offers a theoretical benchmark for assessing competitive effects in algorithm-mediated markets.
+\subsubsection*{Prompt Heterogeneity Effects}
+
+The prompt heterogeneity coefficient provides additional insights into the mechanisms underlying algorithmic collusion while testing the robustness of group size effects across different coordination propensities. The P2 prompt specification results in systematically lower prices ($e^{-0.2082} - 1 = -18.8\%$ relative to P1), suggesting that prompt design significantly influences agents' propensity to engage in collusive behavior.
+
+Importantly, this effect operates independently of group size, as evidenced by the virtually identical coefficients across group size specifications. This independence indicates that while prompt specification affects the level of collusion, it does not alter the fundamental relationship between market structure and the sustainability of collusion. This finding confirms the robustness of \emph{Folk Theorem} predictions across different algorithmic coordination propensities and validates the findings of \textcite{fish_algorithmic_2025} regarding prompt sensitivity effects.
+
+The magnitude of the prompt effect also provides perspective on the relative importance of market structure versus algorithmic design factors. While prompt specification has a substantial impact on coordination levels, the systematic group size effects demonstrate that market structure remains a fundamental determinant of coordination sustainability even in competent AI systems.
+
+\subsubsection*{Alternative Functional Forms and Specifications}
+
+To ensure the robustness of our findings, we examine alternative specifications and functional forms (see \ref{app:robust}). Linear specifications without logarithmic transformation yield qualitatively similar results, though with lower explanatory power and less stable coefficient estimates. Alternative aggregation windows (final 25, 75, and 100 periods) produce consistent group size effects, confirming that our results are not sensitive to specific choices about convergence periods.
+
+The experimental controls in Column (2) of \tableref{tab:run_level_results} demonstrate the robustness of our findings across different market conditions and parameter specifications. While the $\alpha = 3.2$ condition shows a modest positive effect on prices, the group size coefficient remains virtually unchanged, confirming that our core results are not driven by experimental heterogeneity or specific parameter choices.
+
+We also test for potential non-linear relationships by including squared terms and interaction effects, finding no evidence of threshold effects or discontinuous coordination breakdown within our experimental range. This suggests that coordination erosion follows a smooth, predictable pattern rather than exhibiting sudden collapse at specific group sizes.
+
+\subsection{Coordination Mechanisms and Agent Reasoning Analysis}
+
+To better understand the mechanisms underlying algorithmic collusion and the observed breakdown patterns, we examine the textual reasoning provided by LLM agents during price-setting decisions. This analysis provides insights into whether observed coordination patterns reflect genuine strategic reasoning or mechanical pattern-matching behavior.
+
+
+\subsubsection*{Alternative Specifications}
+
+% [PLACEHOLDER: Add results from alternative specifications]
+% - Different aggregation windows (last 25, 75, 100 periods)
+% - Alternative functional forms (linear vs. log-linear)
+% - Robustness to outlier exclusion
+% - Sensitivity to different clustering approaches
+
+\subsection{Textual Analysis: Agent Reasoning Mechanisms}
+
+To better understand the mechanisms underlying algorithmic collusion, we analyze the textual reasoning provided by LLM agents during price-setting decisions. 
+
+\subsubsection*{Clustering Analysis of Strategic Language}
+
+
+% [PLACEHOLDER: Include clustering figure]
+
+
+
+\subsubsection*{Strategic Reasoning Patterns}
+
+% [PLACEHOLDER: Add detailed analysis of reasoning patterns]
+% - Examples of typical agent reasoning from each cluster
+% - Evolution of language patterns over experimental periods
+% - Correlation between reasoning type and pricing decisions
+% - Evidence of strategic awareness vs. mechanical responses
+
+\subsubsection*{Validation of Cluster Interpretations}
+
+
+% [PLACEHOLDER: Add validation results]
+% - Inter-rater reliability statistics
+% - Examples of representative sentences from each cluster
+% - Discussion of any discrepancies between human and algorithmic assessments
+
+
+
+% \section{Experiments \& Results}\label{sec:res}
+% 
+% %Synthetic experiments: convergence behavior, comparison to Nash/monopoly
+% %
+% %- We replicated Fish et al. successfully with Mistral
+% %- Smaller models have troubles converging to monopoly prices
+% %- We show that multiform oligpol settings also collude
+% %
+% %
+% %
+% %Real market simulations: price following, margin formation, focal point behavior
+% %
+% %Tables, graphs, timelines
+% %
+% %Interpret results carefully
+% 
+% We begin by demonstrating that our employed LLM agents can determine and converge to the monopoly price level. Based on this ability, we select our agentic model. We then proceed by replicating the \textcite{fish_algorithmic_2025} findings for the duopoly cases. In connection, we then extend their framework beyond simple duopolies to oligopoly settings with two, three, four, five, and eight participants. We also demonstrate that collusion occurs in these settings, albeit with gradations. We continue by providing empirical evidence for \emph{Folk theorem}-style effects in agentic frameworks and conclude by conducting a textual analysis of the LLM outputs to reinforce our findings.
+% 
+% \subsection*{Monopoly Results}
+% 
+% To analyze the convergence of the monopoly setting, we compute the $95th$ and $5th$ percentiles of the observed prices and verify whether they fall within a 5\% margin of the theoretical monopoly price.
+% 
+% The results in \tableref{tab:monopoly_stats} show near-perfect convergence across all runs for both models. Specifically, Mistral Large exhibits no prices outside the convergence band in any experiment, while Mistral Small has only four outlying prices across all runs, considering the final 100 rounds. \textcolor{red}{Although both models demonstrate strong robustness, we choose to proceed with Mistral Large for subsequent analyses due to its larger parameter count, which implies greater representational capacity and decision-making precision}.
+% 
+% \input{latex/tables/monopoly_statistics}
+% 
+% \figureref{fig:monopoly_convergence} visualizes the experiment results using Mistral Large. The model converges within 25 rounds to the monopoly price (indicated by the dashed line), clearly demonstrating its ability to identify and sustain optimal pricing in this economic scenario.
+% 
+% \begin{figure}[H]
+% \centering
+% \includesvg[width=1\linewidth]{latex/imgs/res/monopoly/monopoly_experiment_complete.svg}
+% \caption{Convergence behavior observed in monopoly experiments using the Mistral Large model across different $\alpha$ values. The convergence band represents prices within $\pm 5\%$ of the theoretical monopoly price, computed by solving: $\max_{p_i} \pi = (p_i - c) q_i$.}
+% \label{fig:monopoly_convergence}
+% \end{figure}
+% 
+% \subsection*{Duopoly}
+% 
+% For each of the 21 experiments conducted per prompt prefix, we compute the average price over the last 50 rounds—i.e., after agents have stabilized their pricing strategies. We then compare how closely the prices under P1 align with the Nash equilibrium, and how those under P2 approach the monopoly benchmark. \figureref{fig:duopoly_1} display these results. P1 shows a clear cluster of prices around the orange dotted line, representing the Nash price, while P2 exhibits a sparser distribution that trends upward toward the monopoly price. The separation between the two distributions highlights the distinct pricing behaviors induced by each prompt.
+% 
+% 
+% \figureref{fig:duopoly_2} displays the isoprofit curves for the symmetric duopoly setting. Each black dashed line represents the Bertrand–Nash equilibrium profit for a single firm in a static one-shot game (denoted as $\pi$ Nash). In contrast, the purple dotted line marks the joint profit level attainable under full collusion ($\pi^M$). Agents using P1 tend to consistently achieve profits near the collusive frontier, indicating sustained coordination and alignment with monopoly-like outcomes. In contrast, while agents under P2 also attain positive profits, several observations fall below the Nash isoprofit curve, suggesting suboptimal strategies that yield less than the standard competitive benchmark. Nevertheless, a clear pattern emerges: P1 systematically promotes more collusive behavior, while P2 drives outcomes closer to competitive dynamics. These findings are in line with the results from \cite{fish_algorithmic_2025}.
+% 
+% 
+% \begin{figure}[H]
+%     \centering
+%     \begin{subfigure}[b]{0.475\linewidth}
+%     \includesvg[width=1\linewidth]{latex/imgs/res/duopoly/duopoly_jointplot.svg}
+%     \caption{Duopoly pricing}
+%     \label{fig:duopoly_1}
+%     \end{subfigure}
+%     \hfill
+%     \begin{subfigure}[b]{0.475\linewidth}
+%     \includesvg[width=1\linewidth]{latex/imgs/res/duopoly/duopoly_profit_panel.svg}
+%     \caption{Duopoly profits}
+%     \label{fig:duopoly_2}
+%     \end{subfigure}
+%     \caption{Duopoly experiment}
+%     \label{fig:duopoly}
+% \end{figure}
+% 
+% To formally assess whether the difference in average prices between the two prompt conditions is statistically significant, we conduct a two-sided Welch’s t-test. This approach accounts for the unequal variances observed between P1 and P2 outcomes. The test confirms that the difference in means is highly significant at the 1\% level, reinforcing the interpretation that prompt formulation has a meaningful impact on pricing behavior and strategic interaction.
+% 
+% \subsubsection*{\textit{Tit for Tat} Response - Fixed Effect Regression}
+% %mechanisms that might explain this behavior.
+% 
+% Reciprocal strategies such as \textit{Tit for Tat}, where firms match a competitor's prior action, are central to sustaining cooperation in repeated price-setting environments. Given the experimental design, we expect this behavior to emerge more clearly in P1 than in P2.
+% 
+% However, identifying and interpreting these strategies is inherently challenging. First, price data only captures realized actions, not counterfactual behaviors (i.e., what the agent might have done under different beliefs or plans). Second, LLMs are highly nonlinear \en{black box} systems, meaning their decision-making processes are complex and not directly interpretable—a broader limitation shared across foundation models.
+% 
+% To test whether agents engage in strategic reciprocity, we follow the methodology used by the authors \cite{fish_algorithmic_2025} and estimate the fixed effects panel regression expressed below (cf. \equationref{eq:fish_fe}), examining whether firms adjust their prices in response to their own and their rivals’ lagged prices. This approach allows us to capture strategic interaction patterns consistent with reward-punishment dynamics in repeated games:
+% 
+% \begin{equation}\label{eq:fish_fe}
+%     p_{i,r}^{t} = \alpha_{i,r} + \gamma p_{i,r}^{t-1} + \delta p_{j,r}^{t-1} + \epsilon_{i,r}^t
+% \end{equation}
+% 
+% The dependent variable $p_{i,r}^{t}$ is the price set by agent $i$ at time $t$ in experiment $r$. We include lagged self-price and lagged competitor price as regressors. The fixed effects $\alpha_{i,r}$ capture agent-experiment-level heterogeneity. 
+% 
+% To mitigate the endogeneity concerns---particularly the potential correlation between lagged dependent variables and the error term---we construct the panel using disjoint pairs of periods, ensuring that no two observations share a time index. This design reduces serial correlation in the error term by skipping periods between observations. Additionally, we alternate which agent is designated as \textit{self} across period pairs, breaking firm-specific time dependencies and preventing the formation of continuous time series per firm.
+% 
+% As a result, the panel is defined at the \texttt{experiment\_id}–agent level, yielding 21 units (7 experiments × 3 firms with alternation). Combined with the controlled experimental environment---free of external confounders and driven solely by the manipulation of observable variables---this setup helps isolate each observation’s error term, $\epsilon_{i,r}^t$, from other periods.
+% 
+% Altogether, the use of disjoint periods, firm alternation, and a clean experimental structure effectively breaks the feedback loop that typically generates endogeneity in dynamic panel settings, thereby supporting the validity of our fixed effects regression approach.
+% 
+% However, when replicating this regression, we encountered strong persistence in the price series. Agents tend to converge rapidly to stable pricing strategies, leading to limited price variation and coefficients on lagged prices close to one---suggesting potential non-stationarity. This violates standard assumptions in dynamic panels and raises concerns about the potential for spurious regression.
+% 
+% To address this, we initially considered System GMM \parencite{blundell_initial_1998}, which is well-suited to settings with endogenous regressors and high persistence. However, the rapid convergence in agent behavior meant that additional lags provided little identifying variation, and key diagnostic tests (e.g., Hansen overidentification tests) failed to validate the instruments.
+% 
+% We therefore formally tested for unit roots using the Augmented Dickey-Fuller test and found that most series were indeed non-stationary. To restore stationarity, we applied a logarithmic transformation and first-differenced the series. The following model was then estimated:
+% 
+% \begin{equation}
+%     \Delta \log p_{i,r}^{t} = \gamma \, \Delta \log p_{i,r}^{t-1} + \delta \, \Delta \log p_{j,r}^{t-1} + \Delta \epsilon_{i,r}^t
+% \end{equation}
+% 
+% This differenced specification successfully addresses the persistence issue and reveals meaningful patterns of strategic interaction. As shown in \tableref{tab:fe_duopoly}, firms respond positively and significantly to changes in their competitors’ prices, consistent with \emph{Tit for Tat} or punishment-based coordination. Moreover, the competitor effect is nearly twice as strong in P1 compared to P2, suggesting a more credible or aggressive enforcement of coordination. In contrast, the negative coefficient on the firm’s own lagged price change suggests mild mean reversion, consistent with the observed convergence to stable price levels. 
+% 
+% \begin{table}[htpb!]
+%     \centering
+%     \caption{Tit for Tat Response – Duopoly Setting}
+%     \label{tab:fe_duopoly}
+%     \begin{threeparttable}
+%     {\small
+%     \begin{tabular}{lcc}
+%     \toprule
+%     & \multicolumn{2}{c}{Dependent variable: $\Delta$ log Self Price} \\
+%     \cmidrule(lr){2-3}
+%     & (1) & (2) \\
+%     \midrule
+%     $\Delta$ log Self Price $t-1$         & $-0.3448^{**}$ & $-0.2442^{*}$  \\
+%                              & (0.1566)       & (0.1332)       \\
+%     $\Delta$ log Competitor's Price $t-1$ & $0.4790^{***}$ & $0.2766^{***}$ \\
+%                              & (0.0989)       & (0.1332)       \\
+%     \midrule
+%     Model                    & P1 vs P1       & P2 vs P2       \\          
+%     Group fixed effects      & Yes            & Yes            \\
+%     \midrule
+%     Observations             & 3,150          & 3,150          \\
+%     Number of groups         & 21             & 21             \\
+%     \bottomrule
+%     \end{tabular}
+%     }
+%     \begin{tablenotes}[flushleft]
+%     \footnotesize
+%     \item \textbf{Notes}: Robust standard errors in parentheses. $^{*}$ p$<$0.1, $^{**}$ p$<$0.05, $^{***}$ p$<$0.01. Models (1) and (2) examine P1 and P2's pricing responses, respectively.
+%     \end{tablenotes}
+%     \end{threeparttable}
+% \end{table}
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% \subsubsection*{Towards convergence}
+% 
+% While \textcite[p. 18]{fish_algorithmic_2025} found moderate price stickiness $(\gamma_{P1} \approx 0.48)$ alongside meaningful strategic responsiveness in duopoly settings, our duopoly analysis reveals a fundamental behavioral shift. Although we detect strategic responses when using log-differenced specifications (cf. \tableref{tab:fe_duopoly}), we are unable to reproduce their exact dynamic patterns for the last 200 periods when replicating their methodology (cf. \tableref{tab:fe_fish}). In our case, agents exhibit near-unit root persistence $(\gamma_{P1} \approx 0.993)$ with minimal period-to-period strategic interaction. This suggests our agents follow \emph{converge-and-persist coordination}---initially finding focal price levels, then maintaining them with minimal deviation---rather than active reward-punishment schemes with period-by-period adjustments. \figureref{fig:ts_prices_comb} shows this persistence across runs and especially in later rounds where virtually no price deviations occur anymore. As visible in the figure, this observation is also consistent in the following oligopoly settings.
+% 
+% This behavioral pattern has important methodological implications. Since price dynamics are dominated by persistence rather than strategic interaction, standard dynamic panel approaches become uninformative for testing predictions of the \emph{Folk theorem}. Instead, we focus on two complementary analyses: (1) run-level equilibrium differences that capture the \emph{Folk theorem}'s core predictions about group size effects on collusion sustainability, and (2) convergence behavior in early periods where coordination occurs.
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% \subsection*{Oligopoly}
+% 
+% The oligopolistic scenario constitutes our main innovation as we extend the \textcite{fish_algorithmic_2025} framework by multi-firm scenarios. \figureref{fig:oligopols} visually summarizes our findings across all runs.
+% 
+% \begin{figure}[H]
+%     \centering
+%     \includesvg[width=1\linewidth]{latex/imgs/res/convergence_prices_by_num_agents.svg}
+%     \caption{Oligopolistic data distribution, 42--168 data points ($\bullet$) per supergroup (3 alphas $\times$ 7 runs $\times$ number of firms; average of last 50 rounds), triangles ($\blacktriangle$) represent subgroup averages, dashed lines ($\text{- -}$) represent Nash prices following \equationref{eq:nash} and Monopoly prices according to \equationref{eq:monop} per supergroup.}
+%     \label{fig:oligopols}
+% \end{figure}
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% \subsection{Run-Level Equilibrium Analysis}\label{sec:run_level}
+% 
+% Having established that our LLM agents can successfully engage in tacit collusion in duopoly settings, we now turn to our central research question: Does algorithmic collusion break down as market concentration decreases, consistent with the predictions of the Folk Theorem? To address this question rigorously, we employ a run-level equilibrium analysis that focuses on the final pricing outcomes after agents have had sufficient time to converge to stable strategies.
+% 
+% \subsubsection{Results}
+% 
+% Table~\ref{tab:run_level_results} presents our main empirical findings from estimating equations~\eqref{eq:baseline} and~\eqref{eq:controls}. Both specifications yield statistically identical group size coefficients, confirming the robustness of our core findings across different experimental conditions.
+% 
+% \begin{table}[htbp!]
+%     \centering
+%     \caption{Run-Level Equilibrium Analysis: Group Size Effects on Algorithmic Collusion}
+%     \label{tab:run_level_results}
+%     \begin{threeparttable}
+%     \begin{tabular}{lcc}
+%     \toprule
+%      & \multicolumn{2}{c}{Dependent Variable: $\ln(\text{Price})$} \\
+%     \cmidrule(lr){2-3}
+%      & (1) Equation~\eqref{eq:baseline} & (2) Equation~\eqref{eq:controls} \\
+%     \midrule
+%     Group Size & $-0.0373^{***}$ & $-0.0373^{***}$ \\
+%      & $(0.0055)$ & $(0.0054)$ \\
+%     \\
+%     P2 Prompt & $-0.2082^{***}$ & $-0.2082^{***}$ \\
+%      & $(0.0125)$ & $(0.0125)$ \\
+%     \\
+%     $\alpha = 3.2$ &  & $0.0303^{**}$ \\
+%      &  & $(0.0140)$ \\
+%     \\
+%     $\alpha = 10.0$ &  & $0.0166$ \\
+%      &  & $(0.0157)$ \\
+%     \\
+%     Constant & $0.6573^{***}$ & $0.6417^{***}$ \\
+%      & $(0.0203)$ & $(0.0218)$ \\
+%     \midrule
+%     Observations & 168 & 168 \\
+%     R-squared & 0.666 & 0.675 \\
+%     \bottomrule
+%     \end{tabular}
+%     \begin{tablenotes}[flushleft]
+%     \footnotesize
+%     \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average log price for one experimental run over the final 50 periods (rounds 251-300). Group Size ranges from 2 to 5 agents. P2 Prompt is a dummy variable for the alternative prompt specification. Alpha controls represent different demand intensity parameters.
+%     \end{tablenotes}
+%     \end{threeparttable}
+% \end{table}
+% 
+% The results provide strong empirical support for the Folk Theorem's predictions regarding the sustainability of collusion. The group size coefficient of $-0.0373$ is highly statistically significant ($p < 0.001$) and economically meaningful. Interpreted as a percentage effect, each additional competitor reduces equilibrium prices by approximately 3.7\%, representing a substantial erosion of collusive power as market concentration decreases.
+% 
+% To illustrate the economic magnitude of this effect, consider the progression from duopoly to five-agent competition. Moving from $n=2$ to $n=5$ represents a cumulative effect of $(e^{-0.0373 \times 3} - 1) \times 100\% = -10.6\%$, demonstrating that algorithmic collusion faces substantial constraints as the number of market participants increases, consistent with the theoretical prediction that coordination becomes increasingly difficult in larger groups.
+% 
+% The prompt heterogeneity coefficient provides additional insights into the mechanisms underlying algorithmic collusion. The P2 prompt specification results in systematically lower prices ($e^{-0.2082} - 1 = -18.8\%$ relative to P1), suggesting that prompt design significantly influences agents' propensity to engage in collusive behavior. Importantly, this effect operates independently of group size, indicating that while prompt specification affects the level of collusion, it does not alter the fundamental relationship between market structure and the sustainability of collusion, thereby confirming the findings of \textcite{fish_algorithmic_2025}.
+% 
+% The experimental controls in Column (2) demonstrate the robustness of our findings across different market conditions. While the $\alpha = 3.2$ condition shows a modest positive effect on prices, the group size coefficient remains virtually unchanged, confirming that our core results are not driven by experimental heterogeneity.
+% 
+% The high explanatory power of our models (R-squared values above 0.66) indicates that group size and prompt specification account for the majority of variation in equilibrium pricing behavior, suggesting our specification successfully captures the key determinants of algorithmic collusion in these experimental markets.
+% 
+% The systematic relationship between market concentration and collusion sustainability demonstrates that algorithmic pricing creates measurable anticompetitive effects that scale predictably with market structure in our controlled setting. The 3.7\% price reduction per additional competitor offers a theoretical benchmark for assessing competitive effects in algorithm-mediated markets.
