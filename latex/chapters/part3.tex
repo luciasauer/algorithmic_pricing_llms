@@ -109,7 +109,7 @@ Our empirical analysis relies on three key theoretical benchmarks derived from t
 
 The competitive baseline assumes firms maximize individual profits, taking competitors' prices as given. For firm $i$, the Nash equilibrium price solves:
 
-\begin{equation}
+\begin{equation}\label{eq:nash}
     p_i^{N} = \arg\max_{p_i} \pi_i = (p_i - c_i) \cdot q_i(p_i, \mathbf{p}_{-i}^N)
 \end{equation}
 
@@ -119,7 +119,7 @@ where $q_i$ follows the logit demand function specified in \equationref{eq:calva
 
 The collusive upper bound represents joint profit maximization across all firms, solving:
 
-\begin{equation}
+\begin{equation}\label{eq:monop}
     \mathbf{p}^M = \arg\max_{p_1,...,p_n} \sum_{i=1}^n \pi_i = \sum_{i=1}^n (p_i - c_i) \cdot q_i(\mathbf{p})
 \end{equation}
 

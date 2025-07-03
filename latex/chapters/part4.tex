@@ -60,12 +60,14 @@ For each of the 21 experiments conducted per prompt prefix, we compute the avera
 
 To formally assess whether the difference in average prices between the two prompt conditions is statistically significant, we conduct a two-sided Welch’s t-test. This approach accounts for the unequal variances observed between P1 and P2 outcomes. The test confirms that the difference in means is highly significant at the 1\% level, reinforcing the interpretation that prompt formulation has a meaningful impact on pricing behavior and strategic interaction.
 
-\subsubsection*{Tit for Tat Response - Fixed Effect Regression}
+\subsubsection*{\textit{Tit for Tat}Response - Fixed Effect Regression}
 %mechanisms that might explain this behavior.
 
-Reciprocal strategies such as Tit for Tat, where firms match a competitor's prior action, are central to sustaining cooperation in repeated price-setting environments. Given the experimental design, we expect this behavior to emerge more clearly in P1 than in P2.
+Reciprocal strategies such as \textit{Tit for Tat}, where firms match a competitor's prior action, are central to sustaining cooperation in repeated price-setting environments. Given the experimental design, we expect this behavior to emerge more clearly in P1 than in P2.
 
-To test this, we follow the methodology used by the authors \cite{fish_algorithmic_2025} and estimate the fixed effects panel regression expressed below (cf. \equationref{eq:fish_fe}), examining whether firms adjust their prices in response to their own and their rivals’ lagged prices. This approach allows us to capture strategic interaction patterns consistent with reward-punishment dynamics in repeated games:
+However, identifying and interpreting these strategies is inherently challenging. First, price data only captures realized actions, not counterfactual behaviors (i.e., what the agent might have done under different beliefs or plans). Second, LLMs are highly nonlinear \en{black box} systems, meaning their decision-making processes are complex and not directly interpretable—a broader limitation shared across foundation models.
+
+To test whether agents engage in strategic reciprocity, we follow the methodology used by the authors \cite{fish_algorithmic_2025} and estimate the fixed effects panel regression expressed below (cf. \equationref{eq:fish_fe}), examining whether firms adjust their prices in response to their own and their rivals’ lagged prices. This approach allows us to capture strategic interaction patterns consistent with reward-punishment dynamics in repeated games:
 
 \begin{equation}\label{eq:fish_fe}
     p_{i,r}^{t} = \alpha_{i,r} + \gamma p_{i,r}^{t-1} + \delta p_{j,r}^{t-1} + \epsilon_{i,r}^t
@@ -122,6 +124,17 @@ This differenced specification successfully addresses the persistence issue and 
     \end{minipage}
 \end{table}
 
+\subsection*{Oligopoly}
+
+
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=1\linewidth]{latex/imgs/res/convergence_prices_by_num_agents.svg}
+    \caption{Oligopolistic data distribution, 21 data points ($\bullet$) per supergroup (3 alphas $\times$ 7 runs $\times$ number of firms), triangles ($\blacktriangle$) represent subgroup averages, dashed lines ($\text{- -}$) represent: Nash prices following \equationref{eq:nash} and Monopoly prices according to \equationref{eq:monop} per supergroup.}
+    \label{fig:oligopols}
+\end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -130,12 +143,3 @@ This differenced specification successfully addresses the persistence issue and 
 While \textcite[p. 18]{fish_algorithmic_2025} found moderate price stickiness $(\gamma_{P1} \approx 0.48)$ alongside meaningful strategic responsiveness in duopoly settings, our duopoly analysis reveals a fundamental behavioral shift when employing the same methodology: LLM agents exhibit near-unit root persistence $(\gamma_{P1} \approx 0.997)$ with virtually no period-to-period strategic interaction. Although we detect strategic responses when using log-differenced specifications (cf. \tableref{tab:fe_duopoly}), we cannot reproduce their exact dynamic patterns for the last 200 periods. This suggests our agents follow \emph{converge-and-persist coordination}---initially finding focal price levels, then maintaining them with minimal deviation---rather than active reward-punishment schemes with period-by-period adjustments.
 
 This behavioral pattern has important methodological implications. Since price dynamics are dominated by persistence rather than strategic interaction, standard dynamic panel approaches become uninformative for testing predictions of the \emph{Folk theorem}. Instead, we focus on two complementary analyses: (1) run-level equilibrium differences that capture the \emph{Folk theorem}'s core predictions about group size effects on collusion sustainability, and (2) convergence behavior in early periods where coordination occurs.
-
-\subsection*{Oligopoly}
-
-\begin{figure}[H]
-    \centering
-    \includesvg[width=1\linewidth]{latex/imgs/res/convergence_prices_by_num_agents.svg}
-    \caption{Oligopolistic data distribution}
-    \label{fig:oligopols}
-\end{figure}
