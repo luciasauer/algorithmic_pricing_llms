@@ -101,6 +101,7 @@ name = "algorithmic-pricing-llms"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "deepmultilingualpunctuation" },
     { name = "dotenv" },
     { name = "hdbscan" },
     { name = "instructor" },
@@ -129,11 +130,13 @@ dependencies = [
     { name = "seaborn" },
     { name = "sentence-transformers" },
     { name = "statsmodels" },
+    { name = "syntok" },
     { name = "wordcloud" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "deepmultilingualpunctuation", specifier = ">=1.0.1" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "hdbscan", specifier = ">=0.8.40" },
     { name = "instructor", specifier = ">=1.9.0" },
@@ -162,6 +165,7 @@ requires-dist = [
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "sentence-transformers", specifier = ">=5.0.0" },
     { name = "statsmodels", specifier = ">=0.14.4" },
+    { name = "syntok", specifier = ">=1.4.4" },
     { name = "wordcloud", specifier = ">=1.9.4" },
 ]
 
@@ -597,6 +601,19 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/43/fa/6d96a0978d19e17b68d634497769987b16c8f4cd0a7a05048bec693caa6b/decorator-5.2.1.tar.gz", hash = "sha256:65f266143752f734b0a7cc83c46f4618af75b8c5911b00ccb61d0ac9b6da0360", size = 56711, upload-time = "2025-02-24T04:41:34.073Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4e/8c/f3147f5c4b73e7550fe5f9352eaa956ae838d5c51eb58e7a25b9f3e2643b/decorator-5.2.1-py3-none-any.whl", hash = "sha256:d316bb415a2d9e2d2b3abcc4084c6502fc09240e292cd76a76afc106a1c8e04a", size = 9190, upload-time = "2025-02-24T04:41:32.565Z" },
+]
+
+[[package]]
+name = "deepmultilingualpunctuation"
+version = "1.0.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "torch" },
+    { name = "transformers" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/63/d6/96fb37bc6bb3e647d68a2003e63b99458f9ac3535eab1e4fc95dbe95455b/deepmultilingualpunctuation-1.0.1.tar.gz", hash = "sha256:aaf3c0ca56dfef7d6f27d9e675850595c586d62f1fda46a687e0c1b004a76c11", size = 4223, upload-time = "2022-02-11T13:15:10.14Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/dc/a7/505f531c23aa2c381b597c9e59a62c20d9e6294f32ad7d06e4eaa2f3d438/deepmultilingualpunctuation-1.0.1-py3-none-any.whl", hash = "sha256:f346378adbecdcef84c63a61467f755d75385559d0260f60bef4315b5fb3a54f", size = 5366, upload-time = "2022-02-11T13:15:06.836Z" },
 ]
 
 [[package]]
@@ -3491,6 +3508,17 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/83/d3/803453b36afefb7c2bb238361cd4ae6125a569b4db67cd9e79846ba2d68c/sympy-1.14.0.tar.gz", hash = "sha256:d3d3fe8df1e5a0b42f0e7bdf50541697dbe7d23746e894990c030e2b05e72517", size = 7793921, upload-time = "2025-04-27T18:05:01.611Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a2/09/77d55d46fd61b4a135c444fc97158ef34a095e5681d0a6c10b75bf356191/sympy-1.14.0-py3-none-any.whl", hash = "sha256:e091cc3e99d2141a0ba2847328f5479b05d94a6635cb96148ccb3f34671bd8f5", size = 6299353, upload-time = "2025-04-27T18:04:59.103Z" },
+]
+
+[[package]]
+name = "syntok"
+version = "1.4.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "regex" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/47/0d/e9700408c99275692c57ac786edfbede03cf2a9818bd3ecbc4cbf21a4448/syntok-1.4.4-py3-none-any.whl", hash = "sha256:263546bea559cb693bc23dc436307a44e17a242bb9f2a8c5e39eb86906aaf831", size = 24548, upload-time = "2022-03-12T18:06:11.254Z" },
 ]
 
 [[package]]

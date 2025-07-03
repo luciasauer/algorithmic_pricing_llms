@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "deepmultilingualpunctuation>=1.0.1",
     "dotenv>=0.9.9",
     "hdbscan>=0.8.40",
     "instructor>=1.9.0",
@@ -33,5 +34,6 @@ dependencies = [
     "seaborn>=0.13.2",
     "sentence-transformers>=5.0.0",
     "statsmodels>=0.14.4",
+    "syntok>=1.4.4",
     "wordcloud>=1.9.4",
 ]
