@@ -52,7 +52,7 @@ Our analysis of duopoly interactions replicates key findings from \textcite{fish
 
 \figureref{fig:duopoly_2} displays the isoprofit curves for the symmetric duopoly setting. Each black dashed line represents the Bertrand-Nash equilibrium profit for a single firm in a static one-shot game (denoted as $\pi$ Nash). In contrast, the purple dotted line marks the joint profit level attainable under full collusion ($\pi^M$). Agents using P1 tend to consistently achieve profits near the collusive frontier, indicating sustained coordination and alignment with monopoly-like outcomes. In contrast, while agents under P2 also attain positive profits, several observations fall below the Nash isoprofit curve, suggesting suboptimal strategies that yield less than the standard competitive benchmark. Nevertheless, a clear pattern emerges: P1 systematically promotes more collusive behavior, while P2 drives outcomes closer to competitive dynamics. These findings align with the results from \textcite{fish_algorithmic_2025}.
 
-To formally assess whether the difference in average prices between the two prompt conditions is statistically significant, we conduct a two-sided Welch's t-test. This approach accounts for the unequal variances observed between P1 and P2 outcomes. The test confirms that the difference in means is highly significant at the 1\% level, reinforcing the interpretation that prompt formulation has a meaningful impact on pricing behavior and strategic interaction.
+To formally assess whether the difference in average prices between the two prompt conditions is statistically significant, we conduct a two-sided Welch's t-test (see Appendix Table~\ref{tab:welch_by_market_size}). This approach accounts for the unequal variances observed between P1 and P2 outcomes. The test confirms that the difference in means is highly significant at the 1\% level, reinforcing the interpretation that prompt formulation has a meaningful impact on pricing behavior and strategic interaction.
 
 \subsubsection*{Discovery of Converge-and-Persist Coordination}
 
@@ -61,8 +61,8 @@ Our analysis of period-by-period price dynamics reveals that LLM agents follow a
 Agents rapidly identify focal price levels within the first 25-50 periods, then maintain these prices with minimal subsequent variation. This pattern contrasts sharply with the ongoing strategic adjustment cycles typically observed in human or Q-learning algorithmic coordination, where agents continuously respond to competitor actions through reward-punishment mechanisms.
 
 When attempting to replicate the dynamic panel analysis of \textcite{fish_algorithmic_2025} using their specification (see \ref{eq:dynamic_panel}), we encounter several concerning patterns that reveal the fundamental difference in LLM coordination mechanisms:
-
-\begin{enumerate}
+\setlist{nolistsep}
+\begin{enumerate}[noitemsep]
     \item \textbf{Extreme price persistence}: Coefficients on lagged own prices approach unity ($\beta_1 \approx 0.993$), suggesting potential unit root behavior
     \item \textbf{Limited strategic interaction}: While statistically significant, coefficients on competitor prices are economically small ($\beta_2 \approx 0.003$)
     \item \textbf{Rapid convergence}: Agents quickly settle into stable pricing patterns with minimal subsequent variation
@@ -129,7 +129,7 @@ Having established that LLM agents can engage in tacit collusion and identified 
 \begin{figure}[htpb!]
     \centering
     \includesvg[width=1\linewidth]{latex/imgs/res/convergence_prices_by_num_agents.svg}
-    \caption{Oligopolistic data distribution, 42--168 data points ($\bullet$) per supergroup (3 alphas $\times$ 7 runs $\times$ number of firms; average of last 50 rounds), triangles ($\blacktriangle$) represent subgroup averages, dashed lines ($\text{- -}$) represent Nash prices following \equationref{eq:nash} and Monopoly prices according to \equationref{eq:monop} per supergroup.}
+    \caption{Oligopolistic data distribution, 42--168 data points ($\bullet$) per supergroup (3 $\alpha$s $\times$ 7 runs $\times$ number of firms; average of last 50 rounds), triangles ($\blacktriangle$) represent subgroup averages, dashed lines ($\text{- -}$) represent Nash prices following \equationref{eq:nash} and Monopoly prices according to \equationref{eq:monop} per supergroup.}
     \label{fig:oligopols}
 \end{figure}
 
@@ -139,7 +139,7 @@ The triangular markers representing subgroup averages show a smooth progression 
 
 \subsubsection*{Run-Level Equilibrium Analysis}
 
-\tableref{tab:run_level_results} presents our main empirical findings from the run-level equilibrium analysis specified in equations \ref{eq:baseline} and \ref{eq:controls}. Both baseline and controlled specifications yield nearly identical group size coefficients, confirming the robustness of our core findings across different experimental conditions and strengthening confidence in our causal interpretation.
+\tableref{tab:run_level_results} presents our main empirical findings from the run-level equilibrium analysis specified in equations \ref{eq:baseline} and \ref{eq:controls}. Both baseline and controlled specifications yield nearly identical group size coefficients, confirming the robustness of our core findings across different experimental conditions and strengthening confidence in our causal interpretation. Also, recall that since LLM agents are stateless and independent across experimental runs without institutional memory, firm-level regressions would incorrectly assume persistent heterogeneity that does not exist. Run-level analysis appropriately treats each simulation as an independent observation where agent behavior is determined solely by the market structure parameters of that specific run.
 
 \begin{table}[htbp!]
     \centering
@@ -173,12 +173,12 @@ The triangular markers representing subgroup averages show a smooth progression 
     \end{tabular}
     \begin{tablenotes}[flushleft]
     \footnotesize
-    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average log price for one experimental run over the final 50 periods. Group Size ranges from 2 to 5 agents. P2 Prompt is a dummy variable for the alternative prompt specification.
+    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average log price for one experimental run over the final 50 periods. Group Size ranges from 2 to 5 agents. P2 Prompt is a dummy variable for the alternative prompt specification. Observations = 168 since 4 different group sizes $\times$ 3 $\alpha$s $\times$ 7 runs $\times$ 2 prompt types.
     \end{tablenotes}
     \end{threeparttable}
 \end{table}
 
-The results provide strong empirical support for \emph{Folk Theorem} predictions regarding the relationship between market structure and collusion sustainability. The group size coefficient of $-0.0373$ is highly statistically significant ($p < 0.001$) and economically meaningful. Interpreted as a percentage effect, each additional competitor reduces equilibrium prices by approximately 3.7\%, representing substantial erosion of collusive power as market concentration decreases and suggesting that prices move systematically closer to competitive levels as group size increases.
+The results provide empirical support for \emph{Folk Theorem} predictions regarding the relationship between market structure and collusion sustainability. The group size coefficient of $-0.0373$ is highly statistically significant ($p < 0.001$) and economically meaningful. Interpreted as a percentage effect, each additional competitor reduces equilibrium prices by approximately 3.7\%, representing substantial erosion of collusive power as market concentration decreases and suggesting that prices move systematically closer to competitive levels as group size increases. 
 
 To illustrate the cumulative economic magnitude of this effect, consider the progression from duopoly to five-agent competition. Moving from $n=2$ to $n=5$ represents a total price reduction of $(e^{-0.0373 \times 3} - 1) \times 100\% = -10.6\%$. This demonstrates that algorithmic collusion faces substantial constraints as the number of market participants increases, providing quantitative evidence consistent with theoretical predictions that coordination becomes increasingly difficult in larger groups.
 
@@ -221,9 +221,18 @@ To better understand the mechanisms underlying algorithmic collusion and the obs
 
 To better understand the mechanisms underlying algorithmic collusion, we analyze the textual reasoning provided by LLM agents during price-setting decisions. 
 
+Plans -> sentences -> embeddings using [] -> reduction dimensionality PCA -> clustering Kmeans -> top 10 central sentences -> Mistral to get interpreteations -> relative appearance between different prompts
+
 \subsubsection*{Clustering Analysis of Strategic Language}
 
+\begin{figure}[htpb!]
+    \centering
+    \includesvg[width=1\linewidth]{latex/imgs/res/text_analysis_relative_prevalence_cluster.svg}
+    \caption{Hellooooo}
+    \label{fig:relative_prevalence_clusters}
+\end{figure}
 
+SentenceTransformer('all-mpnet-base-v2')
 % [PLACEHOLDER: Include clustering figure]
 
 
