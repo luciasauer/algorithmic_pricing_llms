@@ -11,9 +11,11 @@
 <div align="center">
 
 ## 🎓 Master's Thesis: Algorithmic Collusion in Multi-Agent Markets: Testing Folk Theorem Predictions
+<div align="center">
+  <img src="./latex/imgs/BSE%20Barcelona%20Graduate%20School%20of%20Economics.svg" width="20%" />
+</div>
 
-![BSE Logo](./latex/imgs/BSE%20Barcelona%20Graduate%20School%20of%20Economics.svg)
----
+
 
 **Authors**: Julian Romero, Lucia Sauer, Moritz Peist
 
