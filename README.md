@@ -75,7 +75,7 @@ The following flowchart illustrates the complete data flow and module interactio
 ```mermaid
 ---
 config:
-  theme: mc
+  theme: dark
   layout: elk
 ---
 flowchart TD
@@ -210,72 +210,6 @@ flowchart TD
     H5 --> J3
     I5 --> J4
     J5 --> K1
-     A:::configStyle
-     A1:::configStyle
-     A2:::configStyle
-     A3:::configStyle
-     A4:::configStyle
-     B:::llmStyle
-     B1:::llmStyle
-     B2:::llmStyle
-     B3:::llmStyle
-     B4:::llmStyle
-     C:::llmStyle
-     C1:::llmStyle
-     C2:::llmStyle
-     C3:::llmStyle
-     C4:::llmStyle
-     C5:::llmStyle
-     D:::simStyle
-     D1:::simStyle
-     D2:::simStyle
-     D3:::simStyle
-     D4:::simStyle
-     E:::simStyle
-     E1:::simStyle
-     E2:::simStyle
-     E3:::simStyle
-     E4:::simStyle
-     F:::simStyle
-     F1:::simStyle
-     F2:::simStyle
-     F3:::simStyle
-     F4:::simStyle
-     G:::dataStyle
-     G1:::dataStyle
-     G2:::dataStyle
-     G3:::dataStyle
-     G4:::dataStyle
-     G5:::dataStyle
-     H:::analysisStyle
-     H1:::analysisStyle
-     H2:::analysisStyle
-     H3:::analysisStyle
-     H4:::analysisStyle
-     H5:::analysisStyle
-     I:::analysisStyle
-     I1:::analysisStyle
-     I2:::analysisStyle
-     I3:::analysisStyle
-     I4:::analysisStyle
-     I5:::analysisStyle
-     J:::outputStyle
-     J1:::outputStyle
-     J2:::outputStyle
-     J3:::outputStyle
-     J4:::outputStyle
-     J5:::outputStyle
-     K:::outputStyle
-     K1:::outputStyle
-     K2:::outputStyle
-     K3:::outputStyle
-     K4:::outputStyle
-    classDef configStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef llmStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef simStyle fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
-    classDef dataStyle fill:#fff8e1,stroke:#f57f17,stroke-width:2px
-    classDef analysisStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    classDef outputStyle fill:#fce4ec,stroke:#880e4f,stroke-width:2px
 ```
 
 ---
