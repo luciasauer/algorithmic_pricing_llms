@@ -97,7 +97,7 @@ This section presents supplementary statistical analyses that support our findin
 
 This section presents the main empirical results, demonstrating a systematic breakdown of collusion as market concentration decreases. The analysis covers markets with 2 to 5 competing agents across different prompt specifications, providing evidence for Folk Theorem-style predictions in algorithmic settings.
 
-Results visually demonstrate a systematic price decline with increasing market participants, consistent with the patterns consistent with Folk Theorem logic regarding the sustainability of collusion. Across both prompt specifications (P1, P2), average prices exhibit a monotonic decrease as $n$ increases from 2 to 5 agents, with minimal overlap in 95\% confidence intervals between different market structures. The pronounced price dispersion during initial rounds converges to distinct equilibrium levels, with duopoly markets ($n=2$) sustaining significantly higher prices than markets with four or five competitors. This pattern supports the theoretical prediction that tacit coordination becomes increasingly complex as the required discount factor $\delta \geq \frac{\pi^D - \pi^C}{\pi^D}$ approaches unity with larger $n$, ultimately rendering collusive equilibria unsustainable in less concentrated markets.
+Results visually demonstrate a systematic price decline with increasing market participants, consistent with the patterns consistent with Folk Theorem logic regarding the sustainability of collusion. Across both prompt specifications (P1, P2), average prices exhibit a monotonic decrease as $n$ increases from 2 to 5 agents, with minimal overlap in 95\% confidence intervals between different market structures. The pronounced price dispersion during initial rounds converges to distinct equilibrium levels, with duopoly markets ($n=2$) sustaining significantly higher prices than markets with four or five competitors. This pattern supports the theoretical rationale that tacit coordination becomes increasingly complex as the required discount factor $\delta \geq \frac{\pi^D - \pi^C}{\pi^D}$ approaches unity with larger $n$, potentially rendering collusive equilibria unsustainable in less concentrated markets.
 
 % Plot of all runs
 \begin{figure}[H]
@@ -391,3 +391,18 @@ This are the text examples used to construct the vectors \textit{Competitive} an
     \item Consider slight adjustments based on Firm B's pricing to maximize profit without entering a price war.
     \item Additionally, test a price at 10.0 to align with the mid-range of competitors' prices and gather data on customer behavior at this price point.
 \end{itemize}
+
+
+
+\subsection*{GitHub}
+
+All code, data, and supplementary materials for this thesis are publicly available in this \href{https://github.com/luciasauer/algorithmic_pricing_llms}{GitHub repository}.\footnote{If URL needs to be copied manually: \url{https://github.com/luciasauer/algorithmic_pricing_llms}} The repository includes:
+
+\begin{itemize}
+    \item Experimental simulation code for multi-agent setup and analysis
+    \item Data processing and analysis scripts
+    \item Combined experimental results as a Parquet file 
+    \item Replication instructions and environment setup
+\end{itemize}
+
+This ensures full reproducibility of the research findings presented in this thesis.

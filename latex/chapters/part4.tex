@@ -8,7 +8,8 @@ We begin by verifying that our selected LLM agents possess the capability to ide
 
 \subsubsection*{Monopoly Convergence Results}
 
-To analyze convergence behavior, we compute the 95th and 5th percentiles of observed prices and verify whether they fall within a 5\% margin of the theoretical monopoly price. \tableref{tab:monopoly_stats} presents convergence statistics for both Mistral models across all experimental conditions.
+To analyze convergence behavior, we calculate the 90th and 10th percentiles of observed last 100 prices and check whether they lie within $\pm5\%$ of the theoretical monopoly price. \tableref{tab:monopoly_stats} reports the convergence results for both Mistral models across all experimental conditions.
+
 
 \input{latex/tables/monopoly_statistics}
 
@@ -27,7 +28,7 @@ These validation results establish that our selected LLM agent possesses the fun
 
 \subsection{Duopoly Coordination Patterns and Mechanisms}
 
-Our analysis of duopoly interactions replicates key findings from \textcite{fish_algorithmic_2025} while revealing distinctive coordination patterns that differ from traditional reward-punishment mechanisms documented in the algorithmic collusion literature. These discoveries have important implications for our analytical approach and interpretation of oligopoly results.
+Our analysis of duopoly interactions replicates key findings from \textcite{fish_algorithmic_2025} while revealing distinctive coordination patterns that differ from those previously documented in the algorithmic collusion literature, identifying reward-punishment mechanisms. These discoveries have important implications for our analytical approach and interpretation of oligopoly results.
 
 \subsubsection*{Duopoly Coordination Results}
 
@@ -191,7 +192,7 @@ This section examines the stability of our core findings across different experi
 
 \subsubsection*{Prompt Heterogeneity Effects}
 
-The prompt heterogeneity coefficient provides additional insights into the mechanisms underlying algorithmic collusion while testing the robustness of group size effects across different coordination propensities. The P2 prompt specification results in systematically lower prices ($e^{-0.2082} - 1 = -18.8\%$ relative to P1), suggesting that prompt design significantly influences agents' propensity to engage in collusive behavior.
+The prompt heterogeneity coefficient offers additional insights into the mechanisms underlying algorithmic collusion, while also testing the robustness of group size effects across different coordination propensities. The P2 prompt specification results in systematically lower prices ($e^{-0.2082} - 1 = -18.8\%$ relative to P1), suggesting that prompt design significantly influences agents' propensity to engage in collusive behavior.
 
 Importantly, this effect operates independently of group size, as evidenced by the virtually identical coefficients across group size specifications. This independence indicates that while prompt specification affects the level of collusion, it does not alter the fundamental relationship between market structure and the sustainability of collusion. This finding confirms the robustness of \emph{Folk Theorem} logic across different algorithmic coordination propensities and validates the findings of \textcite{fish_algorithmic_2025} regarding prompt sensitivity effects.
 
@@ -199,7 +200,7 @@ The magnitude of the prompt effect also provides perspective on the relative imp
 
 \subsubsection*{Alternative Functional Forms and Specifications}
 
-To ensure the robustness of our findings, we examine alternative specifications and functional forms (see \ref{app:robust}). Linear specifications without logarithmic transformation yield qualitatively similar results, though with lower explanatory power and less stable coefficient estimates. Alternative aggregation windows (final 25, 75, and 100 periods) produce consistent group size effects, confirming that our results are not sensitive to specific choices about convergence periods.
+To ensure the robustness of our findings, we examine alternative specifications and functional forms (see Appendix \ref{app:robust}). Linear specifications without logarithmic transformation yield qualitatively similar results, though with lower explanatory power and less stable coefficient estimates. Alternative aggregation windows (final 25, 75, and 100 periods) produce consistent group size effects, confirming that our results are not sensitive to specific choices about convergence periods.
 
 The experimental controls in Column (2) of \tableref{tab:run_level_results} demonstrate the robustness of our findings across different market conditions and parameter specifications. While the $\alpha = 3.2$ condition shows a modest positive effect on prices, the group size coefficient remains virtually unchanged, confirming that our core results are not driven by experimental heterogeneity or specific parameter choices.
 
@@ -210,7 +211,7 @@ We also test for potential non-linear relationships by including squared terms a
 To better understand the mechanisms underlying algorithmic collusion and the observed breakdown patterns, we examine the textual reasoning provided by LLM agents during price-setting decisions. This analysis provides insights into whether observed coordination patterns reflect genuine strategic reasoning or mechanical pattern-matching behavior.
 
 \subsubsection*{Clustering Analysis of Strategic Language}
-\autoref{fig:relative_prevalence_clusters} shows the relative prevalence of clustered sentences by prompt prefix. Agents with the Profit Maximization prompt (P1) are more concerned to competitor price monitoring, incremental price increases, and price ceiling experimentation. In contrast, the agents with Prompt 2 exhibit sentence clusters that focus on aggressive undercutting, price boundary testing, and capturing market share.
+\autoref{fig:relative_prevalence_clusters} shows the relative prevalence of clustered sentences by prompt prefix. Agents with the Profit Maximization Prompt Prefix (P1) are more concerned to competitor price monitoring, incremental price increases, and price ceiling experimentation. In contrast, the agents with Prompt 2 exhibit sentence clusters that focus on aggressive undercutting, price boundary testing, and capturing market share.
 
 \begin{figure}[htpb!]
     \centering
@@ -229,7 +230,7 @@ Figure~\ref{fig:plans_competition_score} shows clear differences in tone across 
     \caption{Evolution of the Competition Score across experimental rounds for different market designs and prompt prefixes. The horizontal line at zero indicates the baseline where there is no semantic difference between competitive and collusive tone in the plans generated by the agents. Each series represents the average tone of the plans generated by the agents across all experimental runs, tracked over time for a given market configuration, with their CI.} \label{fig:plans_competition_score}
 \end{figure}
 
-These visual insights are consistent with the regression results from equation~\eqref{eq:comp_score}. As shown in \tableref{tab:ols_contrastive_score}, the competition score increases in oligopoly settings with 3 and 4 firms compared to a duopoly, with the largest increase observed in markets with 5 firms. Additionally, as agents progress beyond the initial rounds, competition decreases, reflecting the emergence of a \textit{converge-and-persist} pattern. Prompt Prefix 1 also has a significant negative effect on competition, consistent with more collusive plan design relative to P2. Finally, competition significantly increases under the high price scale condition ($\alpha = 10$), suggesting that higher stakes amplify competitive pressures.
+These visual insights are consistent with the regression results from equation~\eqref{eq:comp_score}. As shown in \tableref{tab:ols_contrastive_score}, the \textit{Competition Score} increases in oligopoly settings with 3 and 4 firms compared to a duopoly, with the largest increase observed in markets with five firms. Additionally, as agents progress beyond the initial rounds, competition decreases, reflecting the emergence of the \textit{converge-and-persist} pattern. Prompt Prefix 1 also has a significant negative effect on competition, consistent with a more collusive plan design relative to P2. Finally, competition significantly increases under the high price scale condition ($\alpha = 10$), suggesting that higher stakes amplify competitive pressures.
 
 \begin{table}[H]
     \centering
@@ -269,4 +270,4 @@ These visual insights are consistent with the regression results from equation~\
 \end{table}
 
 
-The analysis confirms that the semantic tone of agent-generated plans closely mirrors pricing behavior and responds systematically to changes in prompts, market size, and demand conditions. This alignment underscores the potential of LLMs to function as coherent and strategically consistent decision-makers in complex economic environments—offering a powerful tool for studying emergent behavior under controlled manipulations. Importantly, the results reveal that the language of collusion remains pronounced under smaller market sizes and weakens as the number of firms increases, aligning with predictions from the folk theorem and supporting our central hypothesis. However, it is crucial to recognize that LLMs are fundamentally probabilistic next-token predictors rather than genuine reasoning machines, generating outputs based on statistical patterns learned from data rather than explicit economic rationality or intentionality. Thus, while the plans produced may sound plausible and structured, they reflect learned linguistic correlations more than true strategic thinking. This distinction highlights both the promise and the limitations of using LLMs to explore economic behavior and reinforces the need for careful interpretation when inferring motivations from model-generated language.
+The analysis confirms that the semantic tone of agent-generated plans closely mirrors pricing behavior and responds systematically to changes in prompts, market size, and demand conditions. This alignment underscores the potential of LLMs to function as coherent and strategically consistent decision-makers in complex economic environments—offering a powerful tool for studying emergent behavior under controlled manipulations. Importantly, the results reveal that the language of collusion remains pronounced under smaller market sizes and weakens as the number of firms increases, aligning with predictions from the folk theorem and supporting our central hypothesis. However, it is crucial to recognize that LLMs are fundamentally probabilistic next-token predictors rather than genuine reasoning machines, generating outputs based on statistical patterns learned from data rather than explicit economic rationality or intentionality. Thus, while the plans produced may sound plausible and structured for the human eye, they reflect learned linguistic correlations more than true strategic thinking. This distinction highlights both the promise and the limitations of using LLMs to explore economic behavior and reinforces the need for careful interpretation when inferring motivations from model-generated language.
