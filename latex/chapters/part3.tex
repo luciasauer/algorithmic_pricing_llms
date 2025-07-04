@@ -3,11 +3,11 @@
 We build on the synthetic market environment developed by \textcite{fish_algorithmic_2025}, replicating their setup as a foundation for our analysis. While preserving the core structure of their environment, we introduce two key modifications that enable us to investigate a central implication of the \emph{Folk Theorem} in repeated games:
 \setlist{nolistsep}
 \begin{enumerate}[noitemsep]
-    \item We replace the proprietary LLMs used in the original study with open-source alternatives.\footnote{\noindent\textcite{fish_algorithmic_2025} determined their model selection through monopoly-price convergence testing, which we also conducted on the open-source models to inform our model selection (cf. \chapterref{sec:res}).} 
+    \item We replace the proprietary LLMs used in the original study with openly accessible alternatives.\footnote{\noindent\textcite{fish_algorithmic_2025} determined their model selection through monopoly-price convergence testing, which we also conducted on the open-source models to inform our model selection (cf. \chapterref{sec:res}).} 
     \item We extend the analysis from duopoly to oligopoly settings, enabling us to study how LLMs behave as pricing agents in markets with more than two competitors. 
 \end{enumerate}
 
-These extensions enable us to investigate how sustaining collusion becomes more difficult as the number of firms increases, as the per-firm share of collusive profits diminishes, making deviation more attractive. To maintain cooperation, firms must place greater weight on future payoffs—reflected in a discount factor $\delta$ approaching one—which implies a high degree of patience required for coordination sustainability.
+These extensions enable us to investigate how sustaining collusion becomes more difficult as the number of firms increases, as the per-firm share of collusive profits diminishes, making deviation more attractive.
 
 \subsection{Experimental Framework}
 
@@ -15,7 +15,7 @@ The following subsections detail our experimental setup by describing the experi
 
 \subsubsection*{Experiment Design}
 
-We build directly on the framework introduced by \textcite{fish_algorithmic_2025}, running a series of pricing game experiments in which agents represent firms competing in a Bertrand oligopoly setting. These agents repeatedly set prices over 300 periods without explicitly communicating with each other. Based on the prices submitted in each round, the environment determines each firm's demand and profit, which serve as the agent's reward signal. A schematic representation can be found in \figureref{fig:experimental_design}.
+We follow the framework introduced by \textcite{fish_algorithmic_2025}, running a series of pricing game experiments in which agents represent firms competing in a Bertrand oligopoly setting. These agents repeatedly set prices over 300 periods without explicitly communicating with each other. Based on the prices submitted in each round, the environment determines each firm's demand and profit, which serve as the agent's reward signal. A schematic representation can be found in \figureref{fig:experimental_design}.
 
 \begin{figure}[htpb!]
   \centering
@@ -33,10 +33,10 @@ The reward structure depends on the demand function, which is defined following 
 where:
 \setlist{nolistsep}
 \begin{itemize}[noitemsep]
-    \item $\mu > 0$ captures the degree of horizontal product differentiation between firms
-    \item $a_i$ represents firm-specific brand effects or vertical differentiation parameters
-    \item $a_0$ captures aggregate demand and serves as the utility of the outside option
-    \item $\alpha$ and $\beta$ are scaling parameters that do not affect the economic analysis
+    \item $\mu > 0$ captures the degree of horizontal product differentiation between firms;
+    \item $a_i$ represents firm-specific brand effects or vertical differentiation parameters;
+    \item $a_0$ captures aggregate demand and serves as the utility of the outside option; and
+    \item $\alpha$ and $\beta$ are prices and market scaling parameters respectively, that do not affect the economic analysis.
 \end{itemize}
 
 Under this demand function, firms with lower prices gain a greater market share, but the market is not a winner-takes-all scenario due to product differentiation. The firm profits at time $t$ are computed as: 
@@ -48,7 +48,7 @@ where $c_i^t$ is the marginal cost of firm $i$ at period $t$. This setup enables
 
 \subsubsection*{Pricing Agents}
 
-Due to budget constraints, we focus exclusively on open-source LLMs: DeepSeek, Llama, and Mistral (both Small and Large variants). However, DeepSeek and Llama require local deployment, have relatively few parameters, and lack the capacity needed for our task. In contrast, Mistral is the only provider offering a free API for large, high-performance models, enabling us to run experiments at scale with more model capabilities. Therefore, while we initially tested all models, we proceeded exclusively with Mistral models\footnote{Specifically, \texttt{mistral-large-2411} and \texttt{mistral-small-2406}.} for both practical and performance reasons.
+Due to budget constraints, we focus exclusively on openly available LLMs: DeepSeek, Llama, and MistralAI (both Small and Large variants). However, since DeepSeek and Llama do not offer free API access, we are required to deploy them locally. Consequently, we are limited to smaller models with fewer parameters, which may lack the necessary capacity for our task. In contrast, Mistral is the only provider offering a free API for large, high-performance models, enabling us to run experiments at scale with more model capabilities. Therefore, while we initially tested all models, we proceeded exclusively with Mistral models\footnote{Particularly, \texttt{mistral-large-2411} and \texttt{mistral-small-2406}.} for both practical and performance reasons.
 
 Each agent sets prices by generating responses to a structured prompt that is updated every round. The prompt includes:
 \setlist{nolistsep}
@@ -56,7 +56,7 @@ Each agent sets prices by generating responses to a structured prompt that is up
     \item \textbf{Prompt prefix:} An instruction that sets the agent's strategic objective (e.g., maximizing profit over time).
     \item \textbf{Cost information:} The current marginal cost $c_i^t$.
     \item \textbf{Market history:} Prices charged by all firms in the previous 100 rounds.
-    \item \textbf{Planning context:} A memory proxy that recalls the agent's prior strategy or intent from period $t-1$ to provide \emph{continuity of thought} between periods. Since LLMs are stateless, the agent writes down its plans at the end of each period to include in the next prompt.
+    \item \textbf{Planning context:} A memory proxy that recalls the agent's prior strategy or intent from period $t-1$ to provide \emph{continuity of thought} between periods. As in this experimental setup the LLMs are stateless\footnote{A LLM is considered stateless when it does not retain memory of previous interactions or outputs between individual calls; each response is generated independently based solely on the current input, without awareness of prior context beyond what is explicitly provided.}, the agent writes down its plans and insights at the end of each period to include in the next prompt.
     \item \textbf{Output instructions:} A directive to return only a numerical price.
 \end{enumerate}
 
@@ -95,7 +95,7 @@ Next, we turn to investigate the behavior of LLM-based pricing agents in a duopo
 \end{tcolorbox}
 \end{center}
 
-\emph{Collusive} prefix encourages stable pricing and long-term profitability, while \emph{Competitive} prefix promotes short-term profit-seeking with allowance for exploratory undercutting strategies. Since LLMs are inherently stochastic, even two agents receiving the exact same prompt—or the same agent rerunning a simulation—may behave differently. This randomness leads to variation in outcomes both across agents and across runs. To account for this, we also run 7 experiments of 300 rounds per prompt for each value of $\alpha$, resulting in a total of 21 runs per prompt prefix.
+\emph{Collusive} prefix (P1) encourages stable pricing and long-term profitability, while \emph{Competitive} prefix (P2) promotes short-term profit-seeking with allowance for exploratory undercutting strategies. Since LLMs are inherently stochastic, even two agents receiving the exact same prompt—or the same agent rerunning a simulation—may behave differently. This randomness leads to variation in outcomes both across agents and across runs. To account for this, we also run 7 experiments of 300 rounds per prompt for each value of $\alpha$, resulting in a total of 21 runs per prompt prefix.
 
 Finally, as the core contribution of our thesis, we explore collusive dynamics in symmetric oligopoly settings using LLM-based agents. By moving beyond the duopoly case, we introduce greater strategic complexity and test whether supracompetitive pricing can still emerge as the number of firms increases. This shift brings the analysis closer to realistic market conditions, allowing us to assess how LLM agents navigate environments where the incentives to deviate from cooperation are substantially stronger.
 
@@ -158,10 +158,10 @@ As $n$ grows, $\pi^C$ falls, and the threshold $\delta^*$ approaches one, meanin
 This theoretical framework enables us to investigate the central research question of whether and how LLM agent coordination varies with market participation. By comparing observed pricing patterns against these benchmarks across different market structures ($n = 2, 3, 4, 5$), we can assess:
 \setlist{nolistsep}
 \begin{itemize}[noitemsep]
-    \item \textbf{Coordination sustainability:} Whether agents maintain supracompetitive pricing above Nash levels as market participation increases
-    \item \textbf{Breakdown patterns:} How pricing dynamics evolve when coordination becomes unsustainable, including the timing and completeness of any transitions toward competitive outcomes  
-    \item \textbf{Theoretical alignment:} Whether observed breakdown thresholds align with \emph{Folk Theorem} logic or suggest alternative coordination mechanisms specific to LLM agents
-    \item \textbf{Behavioral mechanisms:} What strategic patterns emerge in agent decision-making as coordination complexity increases
+    \item \textbf{Coordination sustainability:} Whether agents maintain supracompetitive pricing above Nash levels as market participation increases.
+    \item \textbf{Breakdown patterns:} How pricing dynamics evolve when coordination becomes unsustainable, including the timing and completeness of any transitions toward competitive outcomes.
+    \item \textbf{Theoretical alignment:} Whether observed breakdown thresholds align with \emph{Folk Theorem} logic or suggest alternative coordination mechanisms specific to LLM agents.
+    \item \textbf{Behavioral mechanisms:} What strategic patterns emerge in agent decision-making as coordination complexity increases.
 \end{itemize}
 
 The experimental design enables us to determine whether LLM agents adhere to traditional \emph{Folk Theorem} patterns, exhibit enhanced coordination capabilities that surpass theoretical predictions, or encounter distinct limitations that result in different breakdown dynamics. This empirical approach provides crucial evidence for understanding the boundaries of algorithmic coordination in strategic environments.
@@ -184,7 +184,7 @@ Hence, we estimate the following econometric models:
     \ln(\bar{p}_r) = \beta_0 + \beta_1 \cdot \text{GroupSize}_r + \beta_2 \cdot \text{P2Prompt}_r + \sum_{j \in \{3.2, 10\}} \gamma_j \cdot \mathbb{I}[\alpha_r = \alpha_j] + \varepsilon_r
 \end{equation}
 
-where equation~\eqref{eq:baseline} represents our baseline specification and equation~\eqref{eq:controls} includes demand parameter controls $\gamma_j$. Moreover $\ln(\bar{p}_r)$ represents the logarithm of the average normalized price\footnote{Prices are normalized by dividing by the demand parameter $\alpha$ to ensure comparability across experimental conditions with different demand intensities.} for run $r$, $\text{GroupSize}_r \in \{2,3,4,5\}$ is the number of competing agents, and $\text{P2Prompt}_r$ is a dummy variable for the alternative prompt specification.
+where equation~\eqref{eq:baseline} represents our baseline specification and equation~\eqref{eq:controls} includes demand parameter controls $\gamma_j$. Moreover $\ln(\bar{p}_r)$ represents the logarithm of the average normalized price\footnote{Prices are normalized by dividing by the demand parameter $\alpha$ to ensure comparability across experimental conditions at different price levels.} for run $r$, $\text{GroupSize}_r \in \{2,3,4,5\}$ is the number of competing agents, and $\text{P2Prompt}_r$ is a dummy variable for the alternative prompt specification.
 
 The logarithmic transformation serves multiple purposes: it stabilizes the variance of price data, allows for straightforward interpretation of coefficients as percentage effects, and addresses potential concerns about heteroskedasticity. The coefficient $\beta_1$ captures the marginal impact of market concentration on collusive pricing, with the \emph{Folk Theorem} predicting $\beta_1 < 0$ (i.e., larger groups sustain lower prices).
 
@@ -196,7 +196,7 @@ To complement our primary run-level analysis and test for strategic interaction 
     p_{i,r}^t = \alpha_{i,r} + \beta_1 p_{i,r}^{t-1} + \beta_2 p_{j,r}^{t-1} + \varepsilon_{i,r}^t
 \end{equation}
 
-where $p_{i,r}^t$ denotes firm $i$'s price in round $r$ at time $t$, $\alpha_{i,r}$ captures firm-experiment specific effects, and $\beta_1, \beta_2$ measure own and competitor price persistence respectively.
+where $p_{i,r}^t$ denotes firm $i$'s price in run $r$ at time $t$, $\alpha_{i,r}$ captures firm-experiment specific effects, and $\beta_1, \beta_2$ measure own and competitor price persistence respectively.
 
 However, our empirical findings reveal extreme price persistence requiring alternative specifications. When standard approaches prove inadequate due to non-stationarity concerns, we employ differenced specifications:
 
@@ -222,17 +222,17 @@ These limitations are acknowledged, recognizing that they represent inherent cha
 
 \subsection{Textual Analysis}
 
-To better understand the relationship between the \en{reasoning} of LLM pricing agents and the plans they generate, particularly in connection with the prices they set, we conduct a two-pronged textual analysis of the generated plans.
+To better understand the relationship between the \en{reasoning} of LLM pricing agents and the plans they generate---particularly in connection with the prices they set---we conduct a two-pronged textual analysis of the generated plans.
 
-In the first approach, the agent-generated plans were split at the sentence level and embedded using a Sentence-Transformers model\footnote{\texttt{all-mpnet-base-v2}}\footnote{Prices and firms names were masked to avoid attention to price levels and market setting but rather in sentence content}. This embedding represents the semantic meaning of each sentence in a 768-dimensional vector space. To facilitate interpretation and clustering, dimensionality reduction was applied using Principal Component Analysis (PCA), retaining 50\% of the total variance. This process resulted in a reduced 9-dimensional representation of each sentence. Subsequently, the K-means clustering algorithm was applied to group the sentences into nine distinct clusters based on their semantic content. To interpret these clusters and assign them names, the 10 most representative sentences from each cluster were manually analyzed\footnote{See Appendix~\ref{app:text_examples} for detailed examples.}. Finally, the relative prevalence of each cluster was computed for different prompt prefixes (P1 and P2), based on the proportion of sentences from each cluster associated with each prefix. The prevalence is just the ratio between the proportion of sentences of P1, divided by the proportion of sentences of P2 that appear in that particular cluster, centered at zero. Positive values indicates a higher share of sentences of that cluster corresponding to P1 and viceversa.
+In the first approach, the agent-generated text plans are split at the sentence level and embedded using a Sentence-Transformers model\footnote{\texttt{all-mpnet-base-v2}}.\footnote{Prices and firms' names are masked to avoid attention to price levels and market setting, but rather in sentence content} This embedding represents the semantic meaning of each sentence in a 768-dimensional vector space. To facilitate interpretation and clustering, dimensionality reduction is applied using Principal Component Analysis (PCA), retaining 50\% of the total variance. This process results in a reduced 9-dimensional representation of each sentence. Subsequently, the K-means clustering algorithm is applied to group the sentences into nine distinct clusters based on their semantic content. To interpret and name the clusters, we manually analyze the 10 most representative sentences from each cluster to assign a label.\footnote{See Appendix~\ref{app:text_examples} for detailed examples.} Next, we calculate the relative prevalence of each cluster for the two prompt prefixes (P1 and P2). This is done by comparing the proportion of sentences in each cluster that come from P1 versus P2. Specifically, we compute the ratio of P1’s proportion to P2’s proportion within the cluster, centered at zero. Positive values mean the cluster contains more sentences from P1, while negative values mean more sentences come from P2.
 
-The second approach examined the complete plan as a whole, with the primary objective of evaluating its competitiveness. Specifically, we aimed to explore the relationship between plan competitiveness and the number of agents interacting within the same environment. To quantify competitiveness, we constructed reference vectors representing \textit{Competitive} and \textit{NonCompetitive} plans using the same Sentence-Transformers model as above\footnote{See Appendix~\ref{app:text_examples_comp_score} for detailed examples.}. For each generated plan, we computed the cosine similarity between its embedded representation and the two reference vectors. The competition score was then defined as the difference:
+The second approach is to examine the generated plan as a whole, with the primary objective of evaluating its competitiveness tone. Specifically, we aim to explore the relationship between plan competitiveness and the number of agents interacting within the same environment. To quantify competitiveness, we construct reference vectors representing \textit{Competitive} and \textit{NonCompetitive} plans using the same Sentence-Transformers model mentioned before\footnote{See Appendix~\ref{app:text_examples_comp_score} for detailed examples.}. For each generated plan, we compute the cosine similarity between its embedded representation and the two reference vectors. The competition score is then computed as the difference:
 
 \begin{equation}
     \text{Competition Score}_{i,r}^{t} = \text{Competitive}_{i,r}^{t} - \text{NonCompetitive}_{i,r}^{t}
 \end{equation}
 
-A positive competition score indicates that the plan generated by agent $i$ at period $t$ in experimental run $r$ is more semantically aligned with competitive examples, while a negative score suggests greater similarity to non-competitive (i.e., collusive) examples.
+A positive competition score indicates that the plan generated by agent $i$ at period $t$ in experimental run $r$ is more semantically aligned with competitive examples. In contrast, a negative score suggests greater similarity to non-competitive (i.e., collusive) examples.
 
 To examine how plan tone varies across experimental conditions, we estimate the following linear specification:
 
@@ -249,5 +249,5 @@ To examine how plan tone varies across experimental conditions, we estimate the 
 
 %In Equation~\eqref{eq:comp_score}, the dependent variable is the \textit{Competition Score} for each agent $i$, in experiment $r$, at period $t$. The explanatory variables include an indicator for whether the prompt type is \textit{P1}, the price level of the experiment $\alpha$ with categories $3.2$ and $10$, the round of the experiment binned into intervals of 60 consecutive periods, denoted by $\tau$ and the market setting considered is captured by the number of agents variable. The omitted categories for interpretation are \textit{P2} for the prompt, $\alpha = 1.0$ for the price level, the duopoly setting and the first bin of rounds (periods 1 to 60).
 
-The dependent variable is the \textit{Competition Score} of the plan generated by agent $i$ in experimental run $r$ at time period $t$. The explanatory variables include a dummy for the prompt type (\textit{P1Prompt}), indicators for the price scale parameter $\alpha \in \{3.2, 10\}$, time period bin fixed effects ($\tau_r$), and market size (number of competing agents). The omitted (reference) categories are: prompt P2, baseline demand level $\alpha = 1.0$, duopoly ($\text{Agents}_r = 2$), and the first time period bin (periods 1–60).
+The dependent variable is the constructed \textit{Competition Score}, based on the plan generated by agent $i$ in experimental run $r$ at time period $t$. The explanatory variables include a dummy for the prompt prefix type (\textit{P1Prompt}), indicators for the price scale parameter $\alpha \in \{3.2, 10\}$, time period bin effects ($\tau_r$), and market size (number of competing agents). The omitted (reference) categories are: prompt P2, baseline demand level $\alpha = 1.0$, duopoly ($\text{Agents}_r = 2$), and the first time period bin (periods 1–60).
 
