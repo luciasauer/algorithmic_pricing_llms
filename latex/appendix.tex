@@ -95,15 +95,15 @@ This section presents supplementary statistical analyses that support our findin
 
 \subsection*{Oligopolies}
 
-This section presents the main empirical results, demonstrating a systematic breakdown of collusion as market concentration decreases. The analysis covers markets with 2 to 5 competing agents across different prompt specifications, providing direct evidence for Folk Theorem predictions in algorithmic settings.
+This section presents the main empirical results, demonstrating a systematic breakdown of collusion as market concentration decreases. The analysis covers markets with 2 to 5 competing agents across different prompt specifications, providing evidence for Folk Theorem-style predictions in algorithmic settings.
 
-Results visually demonstrate a systematic price decline with increasing market participants, consistent with the Folk Theorem predictions regarding the sustainability of collusion. Across both prompt specifications (P1, P2), average prices exhibit a monotonic decrease as $n$ increases from 2 to 5 agents, with minimal overlap in 95\% confidence intervals between different market structures. The pronounced price dispersion during initial rounds converges to distinct equilibrium levels, with duopoly markets ($n=2$) sustaining significantly higher prices than markets with four or five competitors. This pattern supports the theoretical prediction that tacit coordination becomes increasingly complex as the required discount factor $\delta \geq \frac{\pi^D - \pi^C}{\pi^D}$ approaches unity with larger $n$, ultimately rendering collusive equilibria unsustainable in less concentrated markets.
+Results visually demonstrate a systematic price decline with increasing market participants, consistent with the patterns consistent with Folk Theorem logic regarding the sustainability of collusion. Across both prompt specifications (P1, P2), average prices exhibit a monotonic decrease as $n$ increases from 2 to 5 agents, with minimal overlap in 95\% confidence intervals between different market structures. The pronounced price dispersion during initial rounds converges to distinct equilibrium levels, with duopoly markets ($n=2$) sustaining significantly higher prices than markets with four or five competitors. This pattern supports the theoretical prediction that tacit coordination becomes increasingly complex as the required discount factor $\delta \geq \frac{\pi^D - \pi^C}{\pi^D}$ approaches unity with larger $n$, ultimately rendering collusive equilibria unsustainable in less concentrated markets.
 
 % Plot of all runs
 \begin{figure}[H]
     \centering
     \includesvg[width=1\linewidth]{latex/imgs/res/price_over_time_by_prompt_prefix_combined.svg}
-    \caption{Average prices over 300 rounds for markets with 2, 3, 4, and 5 agents under two prompt specifications (P1, P2). Shaded areas represent 95\% confidence intervals across 21 experimental runs per condition (7 runs × 3 $\alpha$-parameters). Prices systematically decline as the number of competing agents increases, consistent with Folk Theorem predictions on collusion sustainability.}
+    \caption{Average prices over 300 rounds for markets with 2, 3, 4, and 5 agents under two prompt specifications (P1, P2). Shaded areas represent 95\% confidence intervals across 21 experimental runs per condition (7 runs × 3 $\alpha$-parameters). Prices systematically decline as the number of competing agents increases, consistent with Folk Theorem logic on collusion sustainability.}
     \label{fig:ts_prices_comb}
 \end{figure}
 
@@ -183,7 +183,7 @@ We conduct extensive robustness tests to validate our core Folk Theorem findings
     \end{tabular}
     \begin{tablenotes}[flushleft]
     \footnotesize
-    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average price for one experimental run over the final 50 periods. The left column uses log-transformed prices (normalized by $\alpha$), while the right column uses price levels (normalized by $\alpha$). Group Size ranges from 2 to 5 agents. Results confirm Folk Theorem predictions are robust to functional form specification.
+    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average price for one experimental run over the final 50 periods. The left column uses log-transformed prices (normalized by $\alpha$), while the right column uses price levels (normalized by $\alpha$). Group Size ranges from 2 to 5 agents. Results consistent with the Folk Theorem logic are robust to variations in functional form specification.
     \end{tablenotes}
     \end{threeparttable}
 \end{table}
@@ -227,7 +227,7 @@ We conduct extensive robustness tests to validate our core Folk Theorem findings
     \end{tabular}
     \begin{tablenotes}[flushleft]
     \footnotesize
-    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average log price for one experimental run over the final 50 periods. Left column tests for non-linear Folk Theorem effects via squared terms. The right column tests for differential group size effects across prompt types. Neither squared terms nor interaction effects are statistically significant, confirming linear Folk Theorem predictions.
+    \item \textbf{Notes:} Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the average log price for one experimental run over the final 50 periods. Left column tests for non-linear Folk Theorem effects via squared terms. The right column tests for differential group size effects across prompt types. Neither squared terms nor interaction effects are statistically significant, confirming linear patterns consistent with Folk Theorem logic.
     \end{tablenotes}
     \end{threeparttable}
 \end{table}
@@ -349,7 +349,7 @@ The following are examples of the most representative sentences of each cluster:
 
 
 \subsection*{Competitive and Non Competitive Text Examples}\label{app:text_examples_comp_score}
-This are the text examples used to construct the vectors \textit{Competitive} and \textit{NonCompetitive}.
+This are the text examples used to construct the vectors \textit{Competitive} and \textit{NonCompetitive}, to compute the \textit{Competitive Score}.
 
 \textbf{Competitive References}
 \begin{itemize}
