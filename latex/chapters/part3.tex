@@ -48,7 +48,7 @@ where $c_i^t$ is the marginal cost of firm $i$ at period $t$. This setup enables
 
 \subsubsection*{Pricing Agents}
 
-Due to budget constraints, we focus exclusively on open-source LLMs: DeepSeek, Llama, and Mistral (both Small and Large variants). However, DeepSeek and Llama require local deployment, have relatively few parameters, and lack the capacity needed for our task. In contrast, Mistral is the only provider offering a free API for large, high-performance models, enabling us to run experiments at scale with more model capabilities. Therefore, while we initially tested all models, we proceeded exclusively with Mistral models\footnote{Specifically, the \texttt{mistral-large-2411} and \texttt{mistral-small-2406}.} for both practical and performance reasons.
+Due to budget constraints, we focus exclusively on open-source LLMs: DeepSeek, Llama, and Mistral (both Small and Large variants). However, DeepSeek and Llama require local deployment, have relatively few parameters, and lack the capacity needed for our task. In contrast, Mistral is the only provider offering a free API for large, high-performance models, enabling us to run experiments at scale with more model capabilities. Therefore, while we initially tested all models, we proceeded exclusively with Mistral models\footnote{Specifically, \texttt{mistral-large-2411} and \texttt{mistral-small-2406}.} for both practical and performance reasons.
 
 Each agent sets prices by generating responses to a structured prompt that is updated every round. The prompt includes:
 \setlist{nolistsep}
@@ -193,10 +193,10 @@ The logarithmic transformation serves multiple purposes: it stabilizes the varia
 To complement our primary run-level analysis and test for strategic interaction mechanisms, we also examine period-by-period dynamics. As detailed in Section \ref{sec:res}, our empirical discoveries necessitate adaptive approaches to capture the unique coordination patterns exhibited by LLM agents. The initial planned approach followed \textcite{fish_algorithmic_2025} using dynamic panel specification:
 
 \begin{equation}\label{eq:dynamic_panel}
-    p_{i,r}^t = \alpha_i + \beta_1 p_{i,r}^{t-1} + \beta_2 p_{j,r}^{t-1} + \varepsilon_{i,r}^t
+    p_{i,r}^t = \alpha_{i,r} + \beta_1 p_{i,r}^{t-1} + \beta_2 p_{j,r}^{t-1} + \varepsilon_{i,r}^t
 \end{equation}
 
-where $p_{i,r}^t$ denotes firm $i$'s price in round $r$ at time $t$, $\alpha_i$ captures firm-specific effects, and $\beta_1, \beta_2$ measure own and competitor price persistence respectively.
+where $p_{i,r}^t$ denotes firm $i$'s price in round $r$ at time $t$, $\alpha_{i,r}$ captures firm-experiment specific effects, and $\beta_1, \beta_2$ measure own and competitor price persistence respectively.
 
 However, our empirical findings reveal extreme price persistence requiring alternative specifications. When standard approaches prove inadequate due to non-stationarity concerns, we employ differenced specifications:
 
@@ -219,6 +219,33 @@ The controlled experimental environment eliminates many threats to causal infere
 However, several limitations remain. First, LLMs are stochastic systems, making strategy identification inherently challenging. Price data captures realized actions but not counterfactual behaviors or underlying decision processes. Second, LLMs represent complex "black box" systems whose decision-making processes are not directly interpretable—a limitation shared across foundation models. Third, the prompt specifications represent somewhat arbitrary choices that affect the reproducibility and generalizability of the results. Finally, external validity to real-world scenarios requires careful consideration, as our synthetic environment abstracts away many market complexities that could fundamentally alter coordination dynamics.
 
 These limitations are acknowledged, recognizing that they represent inherent challenges in studying the behavior of AI systems, rather than flaws in our experimental design. Our controlled approach provides the cleanest possible test of \emph{Folk Theorem} predictions in algorithmic settings, thereby establishing a foundation for future research that addresses these broader challenges.
+
+\subsection{Textual Analysis}
+
+To better understand the relationship between the \en{reasoning} of LLM pricing agents and the plans they generate, particularly in connection with the prices they set, we conduct a two-pronged textual analysis of the generated plans.
+
+In the first approach, the agent-generated plans were split at the sentence level and embedded using a Sentence-Transformers model\footnote{\texttt{all-mpnet-base-v2}}\footnote{Prices and firms names were masked to avoid attention to price levels and market setting but rather in sentence content}. This embedding represents the semantic meaning of each sentence in a 768-dimensional vector space. To facilitate interpretation and clustering, dimensionality reduction was applied using Principal Component Analysis (PCA), retaining 50\% of the total variance. This process resulted in a reduced 9-dimensional representation of each sentence. Subsequently, the K-means clustering algorithm was applied to group the sentences into nine distinct clusters based on their semantic content. To interpret these clusters and assign them names, the 10 most representative sentences from each cluster were manually analyzed\footnote{See Appendix~\ref{app:text_examples} for detailed examples.}. Finally, the relative prevalence of each cluster was computed for different prompt prefixes (P1 and P2), based on the proportion of sentences from each cluster associated with each prefix. The prevalence is just the ratio between the proportion of sentences of P1, divided by the proportion of sentences of P2 that appear in that particular cluster, centered at zero. Positive values indicates a higher share of sentences of that cluster corresponding to P1 and viceversa.
+
+The second approach examined the complete plan as a whole, with the primary objective of evaluating its competitiveness. Specifically, we aimed to explore the relationship between plan competitiveness and the number of agents interacting within the same environment. To quantify competitiveness, we constructed reference vectors representing \textit{Competitive} and \textit{NonCompetitive} plans using the same Sentence-Transformers model as above\footnote{See Appendix~\ref{app:text_examples_comp_score} for detailed examples.}. For each generated plan, we computed the cosine similarity between its embedded representation and the two reference vectors. The competition score was then defined as the difference:
+
+\begin{equation}
+    \text{Competition Score}_{i,r}^{t} = \text{Competitive}_{i,r}^{t} - \text{NonCompetitive}_{i,r}^{t}
+\end{equation}
+
+A positive competition score indicates that the plan generated by agent $i$ at period $t$ in the experiment run $r$ is more aligned with competitive examples, while a negative score suggests a greater resemblance to non-competitive examples. To further investigate how plan competitiveness varies with experimental conditions, the following linear regression was estimated:
+
+\begin{equation}\label{eq:comp_score}
+\begin{aligned}
+    \text{Comp Score}^t_{i,r} &= \beta_0 + \beta_1 \cdot \text{P1Prompt}_{i,r} 
+    + \sum_{j \in \{3.2, 10\}} \gamma_j \cdot \mathbb{I}[\alpha_r = \alpha_j] \\
+    &\quad + \sum_{b \in \{2, 3, 4, 5\}} \lambda_b \cdot \mathbb{I}[\tau_r = \tau_b] 
+    + \sum_{k \in \{3, 4, 5\}} \delta_k \cdot \mathbb{I}[\text{Agents}_r = k] 
+    + \epsilon_{i,r}^t
+\end{aligned}
+\end{equation}
+
+In Equation~\eqref{eq:comp_score}, the dependent variable is the \textit{Competition Score} for each agent $i$, in experiment $r$, at period $t$. The explanatory variables include an indicator for whether the prompt type is \textit{P1}, the price level of the experiment $\alpha$ with categories $3.2$ and $10$, the round of the experiment binned into intervals of 60 consecutive periods, denoted by $\tau$ and the market setting considered is captured by the number of agents variable. The omitted categories for interpretation are \textit{P2} for the prompt, $\alpha = 1.0$ for the price level, the duopoly setting and the first bin of rounds (periods 1 to 60).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -269,7 +296,7 @@ These limitations are acknowledged, recognizing that they represent inherent cha
 %
 %\subsubsection*{Pricing Agents}
 %
-%Due to budget constraints, we focus exclusively on open-source LLMs: DeepSeek, Llama, and Mistral (both Small and Large variants). However, DeepSeek and Llama require local deployment, have relatively few parameters, and lack the capacity needed for our task. In contrast, Mistral is the only provider offering a free API for large, high-performance models, enabling us to run experiments at scale with more model capabilities. Therefore, while we initially tested all models, we proceeded exclusively with Mistral models\footnote{Specifically, the \texttt{mistral-large-2411} and \texttt{mistral-small-2406}.} for both practical and performance reasons.
+%Due to budget constraints, we focus exclusively on open-source LLMs: DeepSeek, Llama, and Mistral (both Small and Large variants). However, DeepSeek and Llama require local deployment, have relatively few parameters, and lack the capacity needed for our task. In contrast, Mistral is the only provider offering a free API for large, high-performance models, enabling us to run experiments at scale with more model capabilities. Therefore, while we initially tested all models, we proceeded exclusively with Mistral models\footnote{Specifically, \texttt{mistral-large-2411} and \texttt{mistral-small-2406}.} for both practical and performance reasons.
 %
 %Each agent sets prices by generating responses to a structured prompt that is updated every round. The prompt includes:
 %

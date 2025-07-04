@@ -72,7 +72,7 @@ These findings (see \tableref{tab:fe_fish}) indicate that LLM agents coordinate 
 
 \subsubsection*{Addressing Non-Stationarity and Strategic Interaction}
 
-Given the extreme price persistence observed in our data, we formally test for unit roots using the Augmented Dickey-Fuller test. The results (see Appendix Table~\ref{tab:adf_comparison}) confirm that most price series are indeed non-stationary, violating the fundamental assumptions of standard dynamic panel models and raising concerns about spurious regression.
+Given the extreme price persistence observed in our data (see \figureref{fig:ts_prices_comb}), we formally test for unit roots using the Augmented Dickey-Fuller test. The results (see Appendix Table~\ref{tab:adf_comparison}) confirm that most price series are indeed non-stationary, violating the fundamental assumptions of standard dynamic panel models and raising concerns about spurious regression.
 
 To address these issues and test for strategic interaction during transition periods, we apply a logarithmic transformation and first-difference the series using the equation in \eqref{eq:differenced_fe}. This differenced specification successfully addresses the persistence issue and enables the identification of strategic interaction patterns. \tableref{tab:fe_duopoly} presents results from this analysis, revealing evidence of strategic reciprocity mechanisms operating during transition periods.
 
@@ -142,14 +142,14 @@ The triangular markers representing subgroup averages show a smooth progression 
 
 \tableref{tab:run_level_results} presents our main empirical findings from the run-level equilibrium analysis specified in equations \ref{eq:baseline} and \ref{eq:controls}. Both baseline and controlled specifications yield nearly identical group size coefficients, confirming the robustness of our core findings across different experimental conditions and strengthening confidence in our causal interpretation. Also, recall that since LLM agents are stateless and independent across experimental runs without institutional memory, firm-level regressions would incorrectly assume persistent heterogeneity that does not exist. Run-level analysis appropriately treats each simulation as an independent observation where agent behavior is determined solely by the market structure parameters of that specific run.
 
-\begin{table}[htbp!]
+\begin{table}[htpb!]
     \centering
     \caption{Run-Level Equilibrium Analysis: Group Size Effects on Algorithmic Collusion}
     \label{tab:run_level_results}
     \begin{threeparttable}
     \begin{tabular}{lcc}
     \toprule
-     & \multicolumn{2}{c}{Dependent Variable: $\ln(\text{Price})$} \\
+     & \multicolumn{2}{c}{Dependent Variable: $\ln(\overline{\text{Price}})$} \\
     \cmidrule(lr){2-3}
      & (1) Baseline -- \equationref{eq:baseline} & (2) With Controls -- \equationref{eq:controls} \\
     \midrule
@@ -209,56 +209,62 @@ We also test for potential non-linear relationships by including squared terms a
 
 To better understand the mechanisms underlying algorithmic collusion and the observed breakdown patterns, we examine the textual reasoning provided by LLM agents during price-setting decisions. This analysis provides insights into whether observed coordination patterns reflect genuine strategic reasoning or mechanical pattern-matching behavior.
 
-
-\subsubsection*{Alternative Specifications}
-
-% [PLACEHOLDER: Add results from alternative specifications]
-% - Different aggregation windows (last 25, 75, 100 periods)
-% - Alternative functional forms (linear vs. log-linear)
-% - Robustness to outlier exclusion
-% - Sensitivity to different clustering approaches
-
-\subsection{Textual Analysis: Agent Reasoning Mechanisms}
-
-To better understand the mechanisms underlying algorithmic collusion, we analyze the textual reasoning provided by LLM agents during price-setting decisions. 
-
-Plans -> sentences -> embeddings using [] -> reduction dimensionality PCA -> clustering Kmeans -> top 10 central sentences -> Mistral to get interpreteations -> relative appearance between different prompts
-
 \subsubsection*{Clustering Analysis of Strategic Language}
+\autoref{fig:relative_prevalence_clusters} shows the relative prevalence of clustered sentences by prompt prefix. Agents with the Profit Maximization prompt (P1) are more concerned to competitor price monitoring, incremental price increases, and price ceiling experimentation. In contrast, the agents with Prompt 2 exhibit sentence clusters that focus on aggressive undercutting, price boundary testing, and market share capture.
 
 \begin{figure}[htpb!]
     \centering
     \includesvg[width=1\linewidth]{latex/imgs/res/text_analysis_relative_prevalence_cluster.svg}
-    \caption{Hellooooo}\label{fig:relative_prevalence_clusters}
+    \caption{Relative prevalence of clusters by prefix type. Values close to zero indicate clusters that are equally present across both types of agents' plan sentences, while larger positive or negative values reflect clusters that are more strongly associated with a particular prefix type. }\label{fig:relative_prevalence_clusters}
 \end{figure}
 
+In conclusion, the linguistic patterns captured in \autoref{fig:relative_prevalence_clusters} are consistent with the price-setting behaviors observed in the experiments. The agents' language reflects their strategic orientation: P1 agents align with a profit-driven, incremental approach, while P2 agents adopt a more aggressive, competitive stance. This correspondence between expressed intentions and pricing actions highlights the role of prompt design in shaping not only agent behavior but also their underlying decision-making process.
 
-% [PLACEHOLDER: Include clustering figure]
+\subsubsection*{Strategic Reasoning Patterns}
 
 \begin{figure}[htpb!]
     \centering
     \includesvg[width=1\linewidth]{latex/imgs/res/competition_score_analysis_by_prefix_type.svg}
-    \caption{asdads}\label{fig:asdasd}
+    \caption{Competition Score evolution over the round of the experiments. The horizontal line in zero means no contrast plan's semantic between competitve and collusive tone, while series above zero found more competitve tone in the plans generate by the agents for the different market experiment design and }\label{fig:plans_competition_score}
 \end{figure}
 
 
 
-\subsubsection*{Strategic Reasoning Patterns}
-
-% [PLACEHOLDER: Add detailed analysis of reasoning patterns]
-% - Examples of typical agent reasoning from each cluster
-% - Evolution of language patterns over experimental periods
-% - Correlation between reasoning type and pricing decisions
-% - Evidence of strategic awareness vs. mechanical responses
-
-\subsubsection*{Validation of Cluster Interpretations}
-
-
-% [PLACEHOLDER: Add validation results]
-% - Inter-rater reliability statistics
-% - Examples of representative sentences from each cluster
-% - Discussion of any discrepancies between human and algorithmic assessments
-
+\begin{table}[H]
+    \centering
+    \caption{Competition Score Regression}
+    \label{tab:ols_contrastive_score}
+    \begin{threeparttable}
+    {\small
+    \begin{tabular}{l@{\hspace{2cm}}rr}
+    \toprule
+    & \multicolumn{2}{c}{Dependent variable: Contrastive Score Normalized} \\
+    \cmidrule(lr){2-3}
+    & Coefficient & Std. Error \\
+    \midrule
+    Intercept                            & $-0.0726^{***}$ & (0.009) \\
+    Agents = 3                           & $0.2475^{***}$  & (0.008) \\
+    Agents = 4                           & $0.2423^{***}$  & (0.008) \\
+    Agents = 5                           & $0.3784^{***}$  & (0.007) \\
+    Round (60,120]                       & $-0.0609^{***}$ & (0.007) \\
+    Round (120,180]                      & $-0.0709^{***}$ & (0.007) \\
+    Round (180,240]                      & $-0.1034^{***}$ & (0.007) \\
+    Round (240,300]                      & $-0.1084^{***}$ & (0.007) \\
+    $\alpha= 3.2$                        & $-0.0820^{***}$ & (0.006) \\
+    $\alpha= 10$                         & $0.2480^{***}$  & (0.006) \\
+    P1 Prompt                            & $-0.3420^{***}$ & (0.005) \\
+    \midrule
+    Observations                             & \multicolumn{2}{c}{175,812} \\
+    R-squared                               & \multicolumn{2}{c}{0.065} \\
+    \bottomrule
+    \end{tabular}
+    }
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item \textbf{Notes}: Robust standard errors (HC3) in parentheses. $^{*}$ $p<0.1$, $^{**}$ $p<0.05$, $^{***}$ $p<0.01$. Each observation represents the for one experimental run . X regressors. Observations = 175,812 since 4 different group sizes $\times$ 3 $\alpha$s $\times$ 7 runs $\times$ 2 prompt types.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{table}
 
 
 % \section{Experiments \& Results}\label{sec:res}
