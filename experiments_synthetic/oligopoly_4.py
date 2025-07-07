@@ -97,7 +97,7 @@ if __name__ == "__main__":
                 main(
                     prompt_prefix=P1,
                     alpha=alpha,
-                    experiment_name=f"oligopoly_setting_4_firms_P1",
+                    experiment_name="oligopoly_setting_4_firms_P1",
                 )
             )
             print(f"Experiment with alpha={alpha} completed.\n")
