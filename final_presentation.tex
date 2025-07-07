@@ -247,11 +247,11 @@ How can we better understand the \textbf{strategies} of LLM-based pricing agents
 
 
 \begin{itemize}
-    \item Analyze pricing data for features associated with reward - punishment scheme:
+    \item Analyze \textbf{pricing data} for features associated with reward - punishment scheme:
     \begin{itemize}
         \item How responsive is an agent to its competitor's price?
     \end{itemize}
-    \item Analyze LLM's chain-of-thought outputs to measure how its stated plans relate to its pricing behavior:
+    \item Analyze \textbf{LLM's chain-of-thought} outputs to measure how its stated plans relate to its pricing behavior:
     \begin{itemize}
         \item Does the LLM's chain-of-thought substantially affect its pricing behavior?
         \item Are certain text outputs more strongly associated with certain prompts?
@@ -264,8 +264,6 @@ How can we better understand the \textbf{strategies} of LLM-based pricing agents
 \begin{frame}{Converge \& Persist Strategy}
 \begin{center}
 \begin{tcolorbox}[colback=myorange!10, colframe=myorange, width=0.6\textwidth]
-
- %\begin{tcolorbox}[colback=gray!10, colframe=black, width=0.6\textwidth]
 $$\Delta \log p_{i,r}^{t} = \gamma \, \Delta \log p_{i,r}^{t-1} + \delta \, \Delta \log p_{j,r}^{t-1} + \Delta \epsilon_{i,r}^t$$
 \end{tcolorbox}   
 \end{center}
@@ -341,6 +339,10 @@ Attach eq and table with results
 
 \begin{columns}
     \begin{column}{0.5\textwidth}
+    \begin{itemize}
+        \item Analyze the entire PLANS
+        \item Competitiveness 
+    \end{itemize}
     
         
     \end{column}
@@ -353,7 +355,7 @@ Attach eq and table with results
         \end{figure}
         
     \scalebox{0.8}{%
-        $\color{#1f77b4}\mathrm{Competition\ Score}^t_{i,r} = \color{#4daf4a}\mathrm{Competitive}^t_{i,r} - \color{#e41a1c}\mathrm{NonCompetitive}^t_{i,r}$
+        $\color{CompBlue}\mathrm{Competition\ Score}^t_{i,r} = \color{CompGreen}\mathrm{Competitive}^t_{i,r} - \color{CompRed}\mathrm{NonCompetitive}^t_{i,r}$
         }
     \end{column}
 \end{columns}
@@ -369,10 +371,13 @@ Attach eq and table with results
 
 \begin{frame}[fragile]{Textual analysis: competition score (cont.)}
 \scriptsize
+\begin{tcolorbox}[colback=myorange!10, colframe=myorange, width=\textwidth]
+\begin{center}
 \begin{equation*}
         Comp Score^t_{i,r} = \beta_0 + \beta_1 \cdot P1Prompt_{i,r} + \sum_{j \in \{3.2, 10\}} \gamma_j \cdot \mathbb{I}[\alpha_r = \alpha_j] \quad + \sum_{b \in \{2, 3, 4, 5\}} \lambda_b \cdot \mathbb{I}[\tau_r = \tau_b] + \sum_{k \in \{3, 4, 5\}} \delta_k \cdot \mathbb{I}[\text{Agents}_r = k] + \epsilon_{i,r}^t
 \end{equation*}
-\normalsize
+\end{center}
+\end{tcolorbox}
 
 % TABLE WITH RESULTS
 
