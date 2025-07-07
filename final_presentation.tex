@@ -71,7 +71,7 @@
 
 % \date{\today}
 \date{}
-\author{Lucia Sauer, Julian Romero \& Moritz Peist }
+\author{Lucia Sauer, Julián Romero \& Moritz Peist}
 \institute{Barcelona School of Economics}
 %\logo{\includesvg[width=0.2\linewidth]{latex/imgs/BSE Barcelona Graduate School of Economics.svg}}
 % \titlegraphic{\hfill\includegraphics[height=1.5cm]{logo.pdf}}
@@ -142,13 +142,14 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{Monopoly Experiment}
+\begin{frame}{Monopoly Experiment}\label{}
 \begin{figure}[htpb!]
     \centering
     \includesvg[width=0.7\linewidth]{latex/imgs/res/monopoly/monopoly_experiment_complete.svg}
     \caption{Convergence behavior observed in monopoly experiments using the \textbf{Mistral Large} model across different $\alpha$ values.}
     \label{fig:monopoly_convergence}
 \end{figure}
+\hfill\hyperlink{app:calvano}{\beamergotobutton{See Demand Function}}
 \end{frame}
 
 \begin{frame}{Duopoly Experiment}
@@ -212,15 +213,15 @@
     \begin{figure}[htpb!]
       \centering
       \includegraphics[width=1\linewidth]{latex/imgs/illustration_diagram_experiment.pdf}
-        \caption{Illustration of Experimental Design adapted from \textcite[p. 9]{fish_algorithmic_2025}: Each agent sends a prompt to the LLM with its own plans and market insights. They can't communicate directly—only through prices. All they see is the market history and their own outcomes.\\
-        \hfill\hyperlink{app:prompts}{\beamergotobutton{See prompts}}}
+        \caption{Illustration of Experimental Design adapted from \textcite[p. 9]{fish_algorithmic_2025}: Each agent sends a prompt to the LLM with its own plans and market insights. They can't communicate directly—only through prices. All they see is the market history and their own outcomes.}
         \label{fig:experimental_design}
     \end{figure}
+    \hfill\hyperlink{app:prompts}{\beamergotobutton{See Prompts}}
 \end{frame}
 
 
 % %Comment this to increase performance 
-\begin{frame}{How does it look in reality?}
+\begin{frame}{How does this look in action?}
     \begin{figure}
         \centering
         \animategraphics[controls, 
@@ -237,8 +238,6 @@
 
 \section{Results}
 
-
-
 \begin{frame}{Oligopoly Experiment}
     \begin{figure}[htpb!]
         \centering
@@ -247,6 +246,8 @@
         \label{fig:ts_prices_comb}
     \end{figure}
 \end{frame}
+
+\subsection{Numerical analysis}
 
 \begin{frame}{Analyzing Strategic Behavior}
 
@@ -312,8 +313,6 @@ R-squared                             & 0.1409        & 0.0124      \\
 
 \end{frame}
 
-
-
 \begin{frame}{Oligopoly Experiments}
     \begin{figure}[htpb!]
         \centering
@@ -361,12 +360,11 @@ R-squared     & 0.666         & 0.675           \\
 
 \end{frame}
 
-\section{Textual analysis}
-
+\subsection{Textual analysis}
 
 \begin{frame}[fragile]{Textual analysis: clustering approach}\label{slide:cluster_approach}
     \begin{enumerate}
-        \item Split PLANS into sentences, and mask \texttt{<PRICE>} and \texttt{<COMPETITOR>}; \hyperlink{app:plan_examples}{\beamergotobutton{See Appendix}}
+        \item Split PLANS into sentences, and mask \texttt{<PRICE>} and \texttt{<COMPETITOR>};
         \item Embedded using SentenceTranformer\footnote{all-mpnet-base-v2};
         \item PCA from 768 → 9 dimensions (50\% variance);
         \item K-means to cluster sentences meaning-wise and extract centroids;
@@ -424,7 +422,7 @@ R-squared     & 0.666         & 0.675           \\
 
 \end{frame}
 
-\begin{frame}[fragile]{Textual analysis: competition score (cont.)}
+\begin{frame}[fragile]{Textual Analysis: Competition Score (cont.)}
 \scriptsize
 \begin{tcolorbox}[colback=myorange!10, colframe=myorange, width=\textwidth]
 \begin{center}
@@ -434,20 +432,74 @@ R-squared     & 0.666         & 0.675           \\
 \end{center}
 \end{tcolorbox}
 
-% TABLE WITH RESULTS
-
-
+    \begin{table}[h]
+        \centering
+        \begin{tabular}{l@{\hspace{0.6cm}}r@{\hspace{0.4cm}}r}
+        \toprule
+        & Coefficient & Std. Error \\
+        \midrule
+        Intercept                     & $-0.0726^{***}$ & (0.009) \\
+        Agents = 3                    & $0.2475^{***}$  & (0.008) \\
+        Agents = 4                    & $0.2423^{***}$  & (0.008) \\
+        Agents = 5                    & $0.3784^{***}$  & (0.007) \\
+        Round (60,120]                & $-0.0609^{***}$ & (0.007) \\
+        Round (120,180]               & $-0.0709^{***}$ & (0.007) \\
+        Round (180,240]               & $-0.1034^{***}$ & (0.007) \\
+        Round (240,300]               & $-0.1084^{***}$ & (0.007) \\
+        $\alpha = 3.2$                & $-0.0820^{***}$ & (0.006) \\
+        $\alpha = 10$                 & $0.2480^{***}$  & (0.006) \\
+        P1 Prompt                     & $-0.3420^{***}$ & (0.005) \\
+        \midrule
+        Observations                  & \multicolumn{2}{c}{175,812} \\
+        R-squared                     & \multicolumn{2}{c}{0.065} \\
+        \bottomrule
+        \end{tabular}
+    \end{table}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
 
 \begin{frame}{Findings}
-    
+    \begin{itemize}
+        \item \textcite{fish_algorithmic_2025} replication partially successful---also more accessible LLMs collude
+        \item They are also prone to subtle prompt changes, resulting in vastly different outcomes
+        \item LLM-based pricing agents autonomously collude in oligopoly settings.
+        \item $3.7\%$ price reduction per additional competitor with cumulative effects reaching $10.6\%$ from duopoly to five-agent markets, consistent with \textit{Folk Theorem} and \textcite{calvano_artificial_2020}. 
+        \end{itemize}
 \end{frame}
 
 \begin{frame}{Limitations}
+    \begin{itemize}
+    \item \textbf{Resource and Access Constraints}
+    \begin{itemize}
+        \item Small sample sizes due to computational costs/API limits
+        \item Limited to open-source models (missed state-of-the-art systems)
+        \item Short experimental horizon (300 periods)
+    \end{itemize}
     
+    \item \textbf{Experimental Scope Limitations}
+    \begin{itemize}
+        \item Single demand structure (Calvano function only)
+        \item Symmetric agents (no firm heterogeneity)
+        \item Limited parameter space ($\alpha \in \{1, 3.2, 10\}$)
+        \item No learning across multiple markets
+    \end{itemize}
+    
+    \item \textbf{Causal Identification Challenges}
+    \begin{itemize}
+        \item Cannot distinguish Folk Theorem from computational constraints
+        \item Prompt sensitivity vs. strategic reasoning unclear
+        \item Pattern matching vs. genuine coordination ambiguous
+    \end{itemize}
+    
+    \item \textbf{Temporal and Technological Constraints}
+    \begin{itemize}
+        \item Results tied to specific model versions/time period
+        \item No cross-architecture robustness testing
+        \item Rapid AI development may render findings obsolete
+    \end{itemize}
+    \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -548,22 +600,44 @@ R-squared     & 0.666         & 0.675           \\
     \end{columns}
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}{Appendix: Plans Examples}\label{app:plans_examples}
+\begin{frame}{Appendix: Calvano Demand Function}\label{app:calvano}
+    \begin{itemize}
+        \item \textbf{Demand specification:}
+        $$q_i^t = \beta \times \frac{e^{\frac{a_i - p_i^t/\alpha}{\mu}}}{\sum_{j=1}^{n} e^{\frac{a_j - p_j^t/\alpha}{\mu}} + e^{\frac{a_0}{\mu}}}$$
+        
+        \item \textbf{Parameter definitions:}
+        \begin{itemize}
+            \item $\mu > 0$: Degree of horizontal product differentiation between firms
+            \item $a_i$: Firm-specific brand effects/vertical differentiation parameters
+            \item $a_0$: Aggregate demand parameter (utility of outside option)
+            \item $\alpha, \beta$: Price and market scaling parameters (no economic impact)
+        \end{itemize}
+        
+        \item \textbf{Experimental parameterization:}
+        \begin{itemize}
+            \item $a_i = 2$ for all firms (symmetric vertical differentiation)
+            \item $a_0 = 0$ (normalized outside option)
+            \item $\mu = 0.25$ (moderate product differentiation)
+            \item $\beta = 100$ (quantity scaling)
+            \item $\alpha \in \{1, 3.2, 10\}$ (price scaling, varied randomly)
+            \item $c_i = 1$ (marginal cost for all firms) \hfill\Acrobatmenu{GoBack}{\beamerreturnbutton{Back}}
+        \end{itemize}
+    \end{itemize}
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{Appendix: Cluster Examples}\label{app:cluster_examples}
 \begin{enumerate}
-    \item \textbf{Price Boundary Exploration}: I plan to test a price of < PRICE > to further explore the upper boundary of customer sensitivity and gather more data on how slight adjustments affect sales and profits.
-    \item \textbf{Confirm Competitive Price Point}:Specifically, retest \$\textt{<PRICE>} and \$\textt{<PRICE>} to confirm their stability.
-    \item \textbf{Competitor Price Monitoring}:Monitor \textt{<COMPETITOR>}'s pricing closely and be prepared to adjust our price to maintain or increase market share.
-    \item \textbf{Adaptive Pricing for Advantage}:If profits improve, continue to fine tune the price in smaller increments.
-    \item \textbf{Explore Price Elasticity}:Additionally , explore the impact of a price of \textt{<PRICE>} to understand the elasticity of demand better.
-    \item \textbf{Profit Push Through Price Tweaks}: Test prices at \$ \textt< PRICE > and $ < PRICE > to see if these incremental changes affect profit significantly.
-    \item \textbf{}:
-    \item \textbf{}:
-    \item \textbf{}:
+    \item \textbf{Price Boundary Exploration}: [...] to further explore the upper boundary[...].
+    \item \textbf{Confirm Competitive Price Point}: Retest \$\texttt{<PRICE>} [...] to confirm their stability.
+    \item \textbf{Competitor Price Monitoring}: Monitor \texttt{<COMPETITOR>}'s pricing closely and be prepared to adjust our price to maintain or increase market share.
+    \item \textbf{Adaptive Pricing for Advantage}: If profits improve, continue to fine tune the price in smaller increments.
+    \item \textbf{Explore Price Elasticity}: [...] explore [...] to understand the elasticity of demand better.
+    \item \textbf{Profit Push Through Price Tweaks}: Test prices at \$ \texttt{<PRICE>} and \$ \texttt{<PRICE>} to see if these incremental changes affect profit significantly.
+    \item \textbf{Test Price Ceiling}: Test the price of \texttt{<PRICE>} to gather more data on the upper bound.
+    \item \textbf{Position Price for Next Move}: Set the price to \$ \texttt{<PRICE>} for the next round to gather more data and assess market response.
+    \item \textbf{Exploit Competitor Price Gaps}: [...] testing a price of \texttt{<PRICE>} to capture more market share.\hfill\hyperlink{slide:cluster_approach}{\beamergotobutton{Back to slide}}
 \end{enumerate}
 \end{frame}
 
@@ -581,7 +655,7 @@ R-squared     & 0.666         & 0.675           \\
     \item Consider testing prices that are 2 cents above Firm A to see if we can increase prices.
     \item Monitor the competitor's pricing strategy to avoid a price war.
     \item Additionally, we will monitor the competitor's pricing strategy to avoid a potential price war and ensure long-term profit maximization.
-    \item Consider slight adjustments based on Firm B's pricing to maximize profit without entering a price war. \hyperlink{slide:comp_score}{\beamergotobutton{Back to slide}}
+    \item Consider slight adjustments based on Firm B's pricing to maximize profit without entering a price war.\hfill\hyperlink{slide:comp_score}{\beamergotobutton{Back to slide}}
 \end{enumerate}
 
 \end{frame}
