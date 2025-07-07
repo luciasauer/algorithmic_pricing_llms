@@ -12,6 +12,10 @@
 **Academic Year**: 2024-2025  
 **Supervisor**: Christopher Rauh
 
+<div align="center">
+  <img src="./latex/imgs/BSE%20Barcelona%20Graduate%20School%20of%20Economics.svg" width="20%" />
+</div>
+
 ---
 
 ## Table of Contents
