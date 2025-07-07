@@ -20,6 +20,11 @@
 \usepackage{threeparttable}
 \usepackage{csquotes}
 \usepackage{multicol}
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{CompBlue}{HTML}{1f77b4}
+\definecolor{CompGreen}{HTML}{4daf4a}
+\definecolor{CompRed}{HTML}{e41a1c}
 
 \usepackage[
     backend=biber, 
@@ -30,6 +35,8 @@
 
 \definecolor{lightgray}{gray}{0.95}
 
+%%% COLOR FOR EQUATIONS
+\definecolor{myorange}{HTML}{FF7F0E}
 \newtcblisting{promptblock}{
   colback=lightgray,
   colframe=,
@@ -78,7 +85,12 @@
             \tableofcontents
         \end{column}
         \begin{column}{0.45\textwidth}
-            
+            \begin{figure}
+                \centering
+                \includegraphics[width=1\linewidth]{latex/slides_pricing_collusion/imgs/folk_around_find_out_static.pdf}
+                \caption{Will we find out?}
+                \label{fig:fafo}
+            \end{figure}
         \end{column}
     \end{columns}
 \end{frame}
@@ -144,19 +156,21 @@
 \begin{frame}{Research question}
     \textbf{Group Size Effect} --- \textcite[]{calvano_artificial_2020} find: 
     
+    \vspace{0.5cm}
+    
     \begin{quote}
         \enquote{\emph{The degree of collusion decreases as the number of competitors rises. However,   substantial collusion continues to prevail when firms are three or four in number.}}
     \end{quote}
     \vfill
     \begin{center}
-        \fbox{\begin{minipage}{0.9\textwidth}
+        \begin{tcolorbox}[colback=gray!10, colframe=black, width=0.9\textwidth]
         \centering
         \textbf{Research Gap:} Fish et al. focus on duopoly settings. How does LLM collusion scale with market size?
         
         \vspace{0.5cm}
         
         \textbf{Folk Theorem Implication:} Collusion sustainability requires $\delta \geq \frac{\pi^D - \pi^C}{\pi^D}$ where $\pi^C = \frac{\pi^M}{n}$. As $n$ increases, the critical discount factor approaches unity, making collusion sustainable only under conditions of extreme patience (see \ref{app:ft}).
-        \end{minipage}}
+        \end{tcolorbox}
     \end{center}
 \end{frame}
 
@@ -174,7 +188,7 @@
 \end{frame}
 
 
-% Uncomment this to increase performance 
+% Comment this to increase performance 
 %\begin{frame}{How does it look in reality?}
 %    \begin{figure}
 %        \centering
@@ -216,6 +230,15 @@
 \end{minipage}
 \end{frame}
 
+\begin{frame}{Oligopoly Experiment}
+    \begin{figure}[htpb!]
+        \centering
+        \includesvg[width=1\linewidth]{latex/imgs/res/price_over_time_by_prompt_prefix_combined.svg}
+        \caption{Average prices over 300 rounds for markets with 2, 3, 4, and 5 agents under two prompt specifications (P1, P2). Shaded areas represent 95\% confidence intervals across 21 experimental runs per condition (7 runs × 3 $\alpha$-parameters). Prices systematically decline as the number of competing agents increases, consistent with Folk Theorem logic on collusion sustainability.}
+        \label{fig:ts_prices_comb}
+    \end{figure}
+\end{frame}
+
 \begin{frame}{Analyzing Strategic Behavior}
 \begin{center}
 \begin{tcolorbox}[colback=gray!10, colframe=black, width=0.9\textwidth]
@@ -240,7 +263,9 @@ How can we better understand the \textbf{strategies} of LLM-based pricing agents
 
 \begin{frame}{Converge \& Persist Strategy}
 \begin{center}
- \begin{tcolorbox}[colback=gray!10, colframe=black, width=0.6\textwidth]
+\begin{tcolorbox}[colback=myorange!10, colframe=myorange, width=0.6\textwidth]
+
+ %\begin{tcolorbox}[colback=gray!10, colframe=black, width=0.6\textwidth]
 $$\Delta \log p_{i,r}^{t} = \gamma \, \Delta \log p_{i,r}^{t-1} + \delta \, \Delta \log p_{j,r}^{t-1} + \Delta \epsilon_{i,r}^t$$
 \end{tcolorbox}   
 \end{center}
@@ -327,9 +352,9 @@ Attach eq and table with results
             %\label{fig:enter-label}
         \end{figure}
         
-    \begin{equation*}
-        \text{\textcolor{#1f77b4}{Competition Score}}^t_{i,r}  = \text{\textcolor{#4daf4a}{Competitive}}^t_{i,r} - \text{\textcolor{#e41a1c}{NonCompetitive}}^t_{i,r}
-    \end{equation*}
+    \scalebox{0.8}{%
+        $\color{#1f77b4}\mathrm{Competition\ Score}^t_{i,r} = \color{#4daf4a}\mathrm{Competitive}^t_{i,r} - \color{#e41a1c}\mathrm{NonCompetitive}^t_{i,r}$
+        }
     \end{column}
 \end{columns}
 
