@@ -73,7 +73,14 @@
 \maketitle
 
 \begin{frame}{Outline}
-    \tableofcontents
+    \begin{columns}[c]
+        \begin{column}{0.45\textwidth}
+            \tableofcontents
+        \end{column}
+        \begin{column}{0.45\textwidth}
+            
+        \end{column}
+    \end{columns}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -267,13 +274,12 @@ R-squared                & 0.1409         & 0.0124         \\
 
 
 \begin{frame}{Oligopoly Experiments}
-\begin{figure}[htpb!]
-    \centering
-    \includesvg[width=0.7\linewidth]{latex/imgs/res/convergence_prices_by_num_agents.svg}
-    \caption{}
-    \label{fig:monopoly_convergence}
-\end{figure}
-
+    \begin{figure}[htpb!]
+        \centering
+        \includesvg[width=.65\linewidth]{latex/imgs/res/convergence_prices_by_num_agents.svg}
+        \caption{Oligopolistic data distribution, 42--168 data points ($\bullet$) per supergroup (3 $\alpha$s $\times$ 7 runs $\times$ number of firms; average of last 50 rounds), triangles ($\blacktriangle$) represent subgroup averages, dashed lines ($\text{- -}$) represent Nash prices and Monopoly prices per supergroup.}
+        \label{fig:oligopols}
+    \end{figure}
 \end{frame}
 
 \begin{frame}{Oligopoly Results: Folk Theorem-style effects?}
@@ -286,25 +292,20 @@ Attach eq and table with results
 
 
 \begin{frame}[fragile]{Textual analysis: clustering approach}
-
-\begin{enumerate}
-    \item Split PLANS into stenentces;
-    \item Embedded using SentenceTranformer\footnote{all-mpnet-base-v2};
-    \item PCA from 768 → 9 dimensions (50\% variance);
-    \item K-means to cluster sentences meaning-wise;
-    \item Assign labels to clusters;
-    \item Compared proportion of sentences for each cluster between P1 vs. P2 (relative prevalence);
-    $$
-    \text{Relative Prevalence} = \frac{\text{P1 Proportion}}{\text{P2 Proportion}} - 1
-    $$
-\end{enumerate}
-
-\begin{itemize}
-    
-
-\end{itemize}
-
+    \begin{enumerate}
+        \item Split PLANS into sentences;
+        \item Embedded using SentenceTranformer\footnote{all-mpnet-base-v2};
+        \item PCA from 768 → 9 dimensions (50\% variance);
+        \item K-means to cluster sentences meaning-wise;
+        \item Assign labels to clusters;
+        \item Compared proportion of sentences for each cluster between P1 vs. P2 (relative prevalence);
+        $$
+        \text{Relative Prevalence} = \frac{\text{P1 Proportion}}{\text{P2 Proportion}} - 1
+        $$
+    \end{enumerate}
 \end{frame}
+
+
 \begin{frame}[fragile]{Textual analysis: clustering approach (cont.)}
 
 \includesvg[width=0.9\linewidth]{latex/imgs/res/text_analysis_relative_prevalence_cluster.svg}
@@ -354,6 +355,16 @@ Attach eq and table with results
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion}
+
+\begin{frame}{Findings}
+    
+\end{frame}
+
+\begin{frame}{Limitations}
+    
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{References}
 \begin{frame}[allowframebreaks]{References}
@@ -401,32 +412,23 @@ Attach eq and table with results
     \begin{column}{0.55\textwidth}
         \centering
         % Include your corrected plot here
-        \includegraphics[width=\textwidth]{ft_plot.pdf}
+        \includegraphics[width=\textwidth]{latex/slides_pricing_collusion/imgs/ft_plot.pdf}
     \end{column}
     
     % --- RIGHT COLUMN: EXPLANATION ---
     \begin{column}{0.45\textwidth}
         \small
         \begin{itemize}
-            \item \textbf{The Visualization Explained:}
-            \begin{itemize}
                 \item[\textcolor{gray!60}{\rule{0.3cm}{0.3cm}}] \textbf{Feasible Set:} All possible average payoffs from mixing pure strategy outcomes
                 \item[\textbf{- -}] \textbf{Individual Rationality:} Minmax payoffs $(1,1)$ - players won't accept less than Nash equilibrium
                 \item[\textcolor{orange}{\rule{0.3cm}{0.3cm}}] \textbf{Folk Theorem Set:} Sustainable equilibria when $\delta$ is sufficiently high
-            \end{itemize}
-            \item \textbf{Key Features:}
-            \begin{itemize}
-                \item Any point in blue region can be sustained as equilibrium
-                \item Requires appropriate punishment strategies
+                \item Any point in orange can be sustained as equilibrium
+                \item Requires approp. punishment strategies
                 \item Players must be patient enough ($\delta$ high)
                 \item Cooperation $(3,3)$ is feasible but not automatic
-            \end{itemize}
-            \item \textbf{Connection to Our Study:}
-            \begin{itemize}
                 \item We test if LLM agents actually achieve points in this set
                 \item Focus on $(3,3)$-type outcomes in our market simulations
                 \item Examine breakdown as theoretical conditions become harder to meet
-            \end{itemize}
         \end{itemize}
     \end{column}
     \end{columns}
