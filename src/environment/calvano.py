@@ -1,18 +1,4 @@
 # src/environment/environment.py
-"""
-Calvano demand environment implementation.
-
-This module implements the market environment based on the demand specification
-from Calvano et al. (2020). The environment manages market parameters, computes
-quantities and profits using nested logit demand, and provides benchmarks for
-monopoly and Nash equilibrium pricing.
-
-References:
-    Calvano, E., Calzolari, G., Denicolò, V., & Pastorello, S. (2020).
-    "Artificial intelligence, algorithmic pricing, and collusion."
-    American Economic Review, 110(10), 3267-3297.
-"""
-
 import logging
 import numpy as np
 from src.environment.pricing_market_logic_multiproduct import (
@@ -24,40 +10,7 @@ from src.environment.pricing_market_logic_multiproduct import (
 
 
 class CalvanoDemandEnvironment:
-    """
-    Market environment implementing Calvano et al. (2020) demand specification.
-
-    This class manages the economic environment for the pricing simulation,
-    including market parameters, demand calculations, and profit computations.
-    It supports both static and time-varying cost structures.
-
-    Attributes:
-        name: Descriptive name for this environment instance
-        description: Detailed description of the environment configuration
-        logger: Logger instance for debugging and monitoring
-        a_0: Outside option demand intercept (baseline utility)
-        a: Array of demand intercepts for each product
-        mu: Price sensitivity parameter (higher = more price sensitive)
-        alpha: Array of quality/markup parameters for each product
-        beta: Parameter for demand specification (if used)
-        sigma: Within-group correlation parameter for nested logit
-        c: Array of marginal costs (fallback for static costs)
-        group_idxs: Array indicating which group each product belongs to
-        c_series: Time series of costs for dynamic cost scenarios
-        round: Current round number (1-indexed)
-        monopoly_prices: Precomputed monopoly benchmark prices
-        nash_prices: Precomputed Nash equilibrium benchmark prices
-    """
-
     def __init__(self, name: str, description: str, logger: logging.Logger = None):
-        """
-        Initialize the Calvano demand environment.
-
-        Args:
-            name: Descriptive name for this environment instance
-            description: Detailed description of the environment configuration
-            logger: Logger instance for debugging and monitoring (optional)
-        """
         self.name = name
         self.description = description
         self.logger = logger or logging.getLogger("experiment_logger")

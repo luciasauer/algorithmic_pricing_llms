@@ -1,17 +1,4 @@
 # src/experiment/experiment.py
-"""
-Experiment orchestration and execution framework.
-
-This module contains the core experiment infrastructure for running multi-agent
-pricing simulations. It handles agent coordination, rate limiting, data collection,
-and experiment management across multiple runs and configurations.
-
-The main components are:
-- RateLimiter: Manages API rate limiting to prevent quota exhaustion
-- RateLimitedAgentWrapper: Wraps agents with rate limiting and retry logic
-- Experiment: Main orchestrator for multi-round pricing games
-"""
-
 import asyncio
 import datetime
 import logging
@@ -29,26 +16,9 @@ from src.utils.logger import setup_logger
 
 
 class RateLimiter:
-    """
-    Thread-safe rate limiter for managing API request frequency.
-
-    Ensures that API requests (particularly to LLM services) are spaced
-    appropriately to avoid hitting rate limits or quota restrictions.
-    Uses asyncio locks to coordinate between concurrent requests.
-
-    Attributes:
-        rate_limit_seconds: Minimum time between requests in seconds
-        last_request_time: Timestamp of the last request
-        lock: Async lock for thread-safe coordination
-    """
+    """Thread-safe rate limiter that ensures requests are spaced appropriately."""
 
     def __init__(self, rate_limit_seconds: float = 1.0):
-        """
-        Initialize the rate limiter.
-
-        Args:
-            rate_limit_seconds: Minimum time between requests in seconds (default: 1.0)
-        """
         self.rate_limit_seconds = rate_limit_seconds
         self.last_request_time = 0
         self.lock = asyncio.Lock()

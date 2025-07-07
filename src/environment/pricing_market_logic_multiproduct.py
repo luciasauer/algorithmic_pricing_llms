@@ -1,36 +1,3 @@
-"""
-Multi-product pricing market logic implementation.
-
-This module implements the economic models for pricing, demand, and profit calculations
-in multi-product markets with differentiated goods. The implementation follows the
-nested logit demand model as described in economic literature.
-
-The core functionality includes:
-- Quantity calculations using nested logit demand
-- Profit maximization for monopoly pricing
-- Nash equilibrium computation using best response dynamics
-- Best response calculations for individual agents
-
-Mathematical Model:
-The demand system follows a nested logit specification where consumers first
-choose a product group g, then choose a specific product j within that group.
-
-The choice probabilities are:
-- Group selection: s_g = D_g^(1-σ) / Σ_k D_k^(1-σ)
-- Product selection within group: s_{j|g} = exp(δ_j/(1-σ)) / D_g
-
-Where:
-- δ_j = (a_j - p_j/α_j) / μ is the mean utility
-- D_g = Σ_{j∈g} exp(δ_j/(1-σ)) is the group inclusive value
-- σ is the within-group correlation parameter
-- μ is the price sensitivity parameter
-- α_j is the quality/markup parameter for product j
-
-References:
-- Miller, Nathan H. "Nested Logit Notes" (nathanhmiller.org/nlnotes.pdf)
-- Calvano et al. (2020) "Artificial Intelligence, Algorithmic Pricing, and Collusion"
-"""
-
 import math
 from math import exp, isclose
 import random
@@ -62,33 +29,6 @@ def get_quantities(
     sigma: float,
     group_idxs: tuple[int],
 ) -> list:
-    """
-    Calculate demand quantities using nested logit model.
-
-    Computes the market demand quantities for each product based on the nested logit
-    demand specification. Consumers first choose a product group, then choose a
-    specific product within that group.
-
-    Args:
-        p: Tuple of prices for each product
-        a0: Outside option demand intercept (baseline utility)
-        a: Tuple of demand intercepts for each product (product quality)
-        mu: Price sensitivity parameter (higher = more price sensitive)
-        alpha: Tuple of quality/markup parameters for each product
-        multiplier: Market size multiplier (total potential demand)
-        sigma: Within-group correlation parameter (0 < sigma < 1)
-        group_idxs: Tuple indicating which group each product belongs to (1-indexed)
-
-    Returns:
-        List of demand quantities for each product
-
-    Note:
-        The implementation follows Miller's nested logit notes where:
-        - δ_j = (a_j - p_j/α_j) / μ is the mean utility for product j
-        - Group choice probabilities: s_g = D_g^(1-σ) / Σ_k D_k^(1-σ)
-        - Within-group choice probabilities: s_{j|g} = exp(δ_j/(1-σ)) / D_g
-        - Final quantities: q_j = multiplier × s_g × s_{j|g}
-    """
     # Following these notes: https://www.nathanhmiller.org/nlnotes.pdf
     assert len(a) == len(alpha) == len(p) == len(group_idxs)
     assert min(group_idxs) == 1
@@ -165,31 +105,6 @@ def get_profits(
     sigma: float,
     group_idxs: tuple[int],
 ) -> list:
-    """
-    Calculate profits for each firm given prices and market parameters.
-
-    Computes the profit for each firm using the formula:
-    profit_i = quantity_i × (price_i/alpha_i - marginal_cost_i)
-
-    Args:
-        p: Tuple of prices for each product
-        c: Tuple of marginal costs for each product
-        a0: Outside option demand intercept
-        a: Tuple of demand intercepts for each product
-        mu: Price sensitivity parameter
-        alpha: Tuple of quality/markup parameters for each product
-        multiplier: Market size multiplier
-        sigma: Within-group correlation parameter
-        group_idxs: Tuple indicating which group each product belongs to
-
-    Returns:
-        List of profits for each firm
-
-    Note:
-        Profits are calculated as (p_i/α_i - c_i) × q_i where q_i comes from
-        the nested logit demand model. The α_i parameter allows for quality
-        differentiation in the profit calculation.
-    """
     q = get_quantities(
         p=p,
         a0=a0,
@@ -217,29 +132,7 @@ def get_monopoly_prices(
     group_idxs: tuple[int],
 ) -> list[float]:
     """
-    Calculate optimal monopoly prices that maximize total industry profits.
-
-    Finds the price vector that a single monopolist controlling all products
-    would set to maximize total profits across all products. Uses numerical
-    optimization with trust-constrained methods.
-
-    Args:
-        a0: Outside option demand intercept
-        a: Tuple of demand intercepts for each product
-        mu: Price sensitivity parameter
-        alpha: Tuple of quality/markup parameters for each product
-        c: Tuple of marginal costs for each product
-        multiplier: Market size multiplier
-        sigma: Within-group correlation parameter
-        group_idxs: Tuple indicating which group each product belongs to
-
-    Returns:
-        List of optimal monopoly prices for each product
-
-    Note:
-        The optimization maximizes Σ_i profit_i subject to p_i ≥ c_i × α_i
-        (prices must cover marginal costs). Uses the initial guess p_i = c_i × α_i
-        and the trust-constrained optimization method for numerical stability.
+    Find a vector of prices that monopolist would set for each of the different goods.
     """
 
     def inv_profit(
