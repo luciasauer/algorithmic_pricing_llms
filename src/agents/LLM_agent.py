@@ -1,12 +1,4 @@
 # src/agents/LLM_agent.py
-"""
-Large Language Model (LLM) based market agent implementation.
-
-This module implements an agent that uses Mistral AI's LLM to make pricing decisions
-in the market simulation. The agent maintains memory of recent market history and
-uses structured prompts to elicit pricing decisions from the language model.
-"""
-
 import json
 import logging
 import asyncio
@@ -22,21 +14,6 @@ RETRY_DELAY_SECONDS = 1
 
 
 class LLMAgent(Agent):
-    """
-    Agent that uses Large Language Models for pricing decisions.
-
-    This agent communicates with Mistral AI's API to make strategic pricing decisions
-    based on market history and context. It maintains a rolling memory window of
-    past market outcomes and uses structured prompts to ensure consistent responses.
-
-    Attributes:
-        api_key: Mistral AI API key for authentication
-        model_name: Name of the Mistral model to use (e.g., "mistral-large-2411")
-        response_model: Pydantic model defining expected response structure
-        memory_length: Number of past rounds to include in agent memory
-        client: Mistral API client instance
-    """
-
     def __init__(
         self,
         name: str,
@@ -49,25 +26,6 @@ class LLMAgent(Agent):
         env_params: dict = None,
         logger: logging.Logger = None,
     ):
-        """
-        Initialize an LLM-based agent.
-
-        Args:
-            name: Unique identifier for the agent (e.g., "Firm A")
-            prefix: Prompt prefix to use (e.g., "P1", "P2") - affects coordination propensity
-            api_key: Mistral AI API key for authentication
-            model_name: Name of the Mistral model (e.g., "mistral-large-2411")
-            response_model: Pydantic model defining the expected JSON response structure
-            prompt_template: Base prompt template string (optional)
-            memory_length: Number of past rounds to include in memory (default: 100)
-            env_params: Dictionary of economic parameters (a, alpha, c)
-            logger: Logger instance for debugging
-
-        Note:
-            The prefix parameter is crucial for the experimental design. Different
-            prefixes (P1 vs P2) test different coordination propensities in the
-            Folk Theorem experiment.
-        """
         super().__init__(
             name=name,
             prefix=prefix,
