@@ -37,6 +37,7 @@
 
 %%% COLOR FOR EQUATIONS
 \definecolor{myorange}{HTML}{FF7F0E}
+\definecolor{myblue}{HTML}{984EA3}
 \newtcblisting{promptblock}{
   colback=lightgray,
   colframe=,
@@ -87,7 +88,13 @@
         \begin{column}{0.45\textwidth}
             \begin{figure}
                 \centering
-                \includegraphics[width=1\linewidth]{latex/slides_pricing_collusion/imgs/folk_around_find_out_static.pdf}
+                \animategraphics[controls, 
+                    autoplay, % Starts playing immediately
+                    autoresume, % Resumes after page focus returns
+                    autopause, % Pauses when page loses focus
+                    poster=last, % picture to display when not playing
+                    loop, % Loop through animation endlessly
+                    width=0.7\linewidth]{20}{latex/slides_pricing_collusion/imgs/fafo/frame_}{00}{98}
                 \caption{Will we find out?}
                 \label{fig:fafo}
             \end{figure}
@@ -135,82 +142,11 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{Empirical Evidence: Real-World Validation}
-    \begin{center}
-    \begin{block}{\textbf{\textcite{assad_algorithmic_2024}: German Retail Gasoline Market}}
-    \begin{itemize}
-        \item \textbf{Setting:} Natural experiment from algorithmic pricing software adoption in 2017
-        \item \textbf{Method:} Structural break analysis around software deployment
-        \item \textbf{Key Finding:} Algorithmic pricing increased margins by:
-        \begin{itemize}
-            \item \textbf{15\%} in competitive markets
-            \item \textbf{36\%} in concentrated markets
-        \end{itemize}
-        \item \textbf{Critical Condition:} Effects only emerged when all competitors used algorithms
-        \item \textbf{Implication:} Algorithmic collusion is not merely theoretical---it occurs in practice with measurable consumer harm
-    \end{itemize}
-    \end{block}
-    \end{center}
-\end{frame}
-
-\begin{frame}{Research question}
-    \textbf{Group Size Effect} --- \textcite[]{calvano_artificial_2020} find: 
-    
-    \vspace{0.5cm}
-    
-    \begin{quote}
-        \enquote{\emph{The degree of collusion decreases as the number of competitors rises. However,   substantial collusion continues to prevail when firms are three or four in number.}}
-    \end{quote}
-    \vfill
-    \begin{center}
-        \begin{tcolorbox}[colback=gray!10, colframe=black, width=0.9\textwidth]
-        \centering
-        \textbf{Research Gap:} Fish et al. focus on duopoly settings. How does LLM collusion scale with market size?
-        
-        \vspace{0.5cm}
-        
-        \textbf{Folk Theorem Implication:} Collusion sustainability requires $\delta \geq \frac{\pi^D - \pi^C}{\pi^D}$ where $\pi^C = \frac{\pi^M}{n}$. As $n$ increases, the critical discount factor approaches unity, making collusion sustainable only under conditions of extreme patience (see \ref{app:ft}).
-        \end{tcolorbox}
-    \end{center}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Experiment}
-
-\begin{frame}[fragile]{Our Implementation}
-    \begin{figure}[htpb!]
-      \centering
-      \includegraphics[width=1\linewidth]{latex/imgs/illustration_diagram_experiment.pdf}
-        \caption{Illustration of Experimental Design adapted from \textcite[p. 9]{fish_algorithmic_2025}: Each agent sends a prompt to the LLM with its own plans and market insights. They can't communicate directly—only through prices. All they see is the market history and their own outcomes.}
-        \label{fig:experimental_design}
-    \end{figure}
-\end{frame}
-
-
-% Comment this to increase performance 
-%\begin{frame}{How does it look in reality?}
-%    \begin{figure}
-%        \centering
-%        \animategraphics[controls, 
-%            autoplay, % Starts playing immediately
-%            autoresume, % Resumes after page focus returns
-%            autopause, % Pauses when page loses focus
-%            width=0.7\linewidth]{10}{latex/slides_pricing_collusion/imgs/beamer_frames/frame_}{000}{299}
-%        \caption{300 period run---P1, 5 firms }
-%        \label{fig:run}
-%    \end{figure}
-%\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Results}
-
 \begin{frame}{Monopoly Experiment}
 \begin{figure}[htpb!]
     \centering
     \includesvg[width=0.7\linewidth]{latex/imgs/res/monopoly/monopoly_experiment_complete.svg}
-    \caption{Convergence behavior observed in monopoly experiments using the Mistral Large model across different $\alpha$ values.}
+    \caption{Convergence behavior observed in monopoly experiments using the \textbf{Mistral Large} model across different $\alpha$ values.}
     \label{fig:monopoly_convergence}
 \end{figure}
 \end{frame}
@@ -230,6 +166,79 @@
 \end{minipage}
 \end{frame}
 
+\begin{frame}{Empirical Evidence: Real-World Validation}
+    \begin{center}
+    \begin{block}{\textbf{\textcite{assad_algorithmic_2024}: German Retail Gasoline Market}}
+    \begin{itemize}
+        \item \textbf{Setting:} Natural experiment from algorithmic pricing software adoption in 2017
+        \item \textbf{Method:} Structural break analysis around software deployment
+        \item \textbf{Key Finding:} Algorithmic pricing increased margins by:
+        \begin{itemize}
+            \item \textbf{15\%} in competitive markets
+            \item \textbf{36\%} in concentrated markets
+        \end{itemize}
+        \item \textbf{Critical Condition:} Effects only emerged when all competitors used algorithms
+        \item \textbf{Implication:} Algorithmic collusion is not merely theoretical---it occurs in practice with measurable consumer harm
+    \end{itemize}
+    \end{block}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Research question}\label{app:researchquestion}
+    \textbf{Group Size Effect} --- \textcite[p. 3268]{calvano_artificial_2020} find for Q-algorithms: 
+    
+    \vspace{0.5cm}
+    \begin{quote}
+        \enquote{\emph{The degree of collusion decreases as the number of competitors rises. However, substantial collusion continues to prevail when the active firms are three or four in number. The algorithms display a stubborn propensity to collude even when they are asymmetric, and when they operate in stochastic environments.}}
+    \end{quote}
+    \vfill
+    \begin{center}
+        \begin{tcolorbox}[colback=myblue!10, colframe=myblue, width=0.9\textwidth]
+        \centering
+        \textbf{Research Gap:} Fish et al. focus on duopoly settings. How does LLM collusion scale with market size?
+        
+        \vspace{0.5cm}
+        
+        \textbf{Folk Theorem Implication:} Collusion sustainability requires $\delta \geq \frac{\pi^D - \pi^C}{\pi^D}$ where $\pi^C = \frac{\pi^M}{n}$. As $n$ increases, the critical discount factor approaches unity, making collusion sustainable only under conditions of extreme patience \hyperlink{app:ft}{\hyperlink{app:ft}{\beamergotobutton{See Appendix 2}}}
+        \end{tcolorbox}
+    \end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Experiment}
+
+\begin{frame}[fragile]{Our Implementation}\label{experiment}
+    \begin{figure}[htpb!]
+      \centering
+      \includegraphics[width=1\linewidth]{latex/imgs/illustration_diagram_experiment.pdf}
+        \caption{Illustration of Experimental Design adapted from \textcite[p. 9]{fish_algorithmic_2025}: Each agent sends a prompt to the LLM with its own plans and market insights. They can't communicate directly—only through prices. All they see is the market history and their own outcomes.\\
+        \hfill\hyperlink{app:prompts}{\beamergotobutton{See prompts}}}
+        \label{fig:experimental_design}
+    \end{figure}
+\end{frame}
+
+
+% %Comment this to increase performance 
+\begin{frame}{How does it look in reality?}
+    \begin{figure}
+        \centering
+        \animategraphics[controls, 
+            autoplay, % Starts playing immediately
+            autoresume, % Resumes after page focus returns
+            autopause, % Pauses when page loses focus
+            width=0.7\linewidth]{10}{latex/slides_pricing_collusion/imgs/beamer_frames/frame_}{000}{299}
+        \caption{300 period run---P1, 5 firms}
+        \label{fig:run}
+    \end{figure}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Results}
+
+
+
 \begin{frame}{Oligopoly Experiment}
     \begin{figure}[htpb!]
         \centering
@@ -240,60 +249,69 @@
 \end{frame}
 
 \begin{frame}{Analyzing Strategic Behavior}
+
 \begin{center}
 \begin{tcolorbox}[colback=gray!10, colframe=black, width=0.9\textwidth]
-How can we better understand the \textbf{strategies} of LLM-based pricing agents? 
+How can we better understand the \textbf{strategies} of LLM-based pricing agents?
 \end{tcolorbox}
+\end{center}
 
+\textbf{Two sources of evidence:}
 
+\vspace{0.5em}
+\textbf{1. Pricing Data — Strategic Patterns in Behavior}
 \begin{itemize}
-    \item Analyze \textbf{pricing data} for features associated with reward - punishment scheme:
-    \begin{itemize}
-        \item How responsive is an agent to its competitor's price?
-    \end{itemize}
-    \item Analyze \textbf{LLM's chain-of-thought} outputs to measure how its stated plans relate to its pricing behavior:
-    \begin{itemize}
-        \item Does the LLM's chain-of-thought substantially affect its pricing behavior?
-        \item Are certain text outputs more strongly associated with certain prompts?
-    \end{itemize}
+    \item How sensitive is an agent to competitor pricing?
+    \item Does collusion weaken as market concentration falls (consistent with the Folk Theorem)?
 \end{itemize}
 
-\end{center}
+\vspace{0.5em}
+\textbf{2. Chain-of-Thought Text — Stated Plans and Intentions}
+\begin{itemize}
+    \item Do verbalized plans influence actual pricing behavior?
+    \item Are certain strategic patterns tied to specific prompt formulations?
+\end{itemize}
+
 \end{frame}
 
+
 \begin{frame}{Converge \& Persist Strategy}
+
+\scriptsize  % Use \tiny if needed
+
 \begin{center}
-\begin{tcolorbox}[colback=myorange!10, colframe=myorange, width=0.6\textwidth]
-$$\Delta \log p_{i,r}^{t} = \gamma \, \Delta \log p_{i,r}^{t-1} + \delta \, \Delta \log p_{j,r}^{t-1} + \Delta \epsilon_{i,r}^t$$
-\end{tcolorbox}   
+\begin{tcolorbox}[colback=myorange!10, colframe=myorange, width=0.85\textwidth]
+$$
+\Delta \log p_{i,r}^{t} = \gamma \, \Delta \log p_{i,r}^{t-1} + 
+\delta \, \Delta \log p_{j,r}^{t-1} + \Delta \epsilon_{i,r}^t
+$$
+\end{tcolorbox}
 \end{center}
 
-
+\vspace{-1em}
 
 \centering
-\scriptsize % You can also try \tiny if still too large
 \begin{threeparttable}
-\caption{\emph{Tit for Tat} Response -- Duopoly Setting}
+\caption{\textit{Tit for Tat} Response – Duopoly Setting}
 \begin{tabular}{lcc}
 \toprule
-& \multicolumn{2}{c}{Dependent variable: $\Delta$ log Self Price} \\
-\cmidrule(lr){2-3}
-& (1) & (2) \\
+& (1) P1 vs P1 & (2) P2 vs P2 \\
 \midrule
 $\Delta$ log Self Price $t-1$         & $-0.3434^{*}$ & $-0.0908$  \\
-                             & (0.1863)       & (0.1343)       \\
-$\Delta$ log Competitor's Price $t-1$ & $0.5093^{***}$ & $0.1954^{***}$ \\
-                             & (0.1203)       & (0.0669)       \\
+                                      & (0.1863)      & (0.1343)   \\
+$\Delta$ log Competitor Price $t-1$   & $0.5093^{***}$ & $0.1954^{***}$ \\
+                                      & (0.1203)       & (0.0669)       \\
 \midrule
-Model                    & P1 vs P1       & P2 vs P2       \\          
-Group fixed effects      & Yes            & Yes            \\
-Observations             & 3,150          & 3,150          \\
-Number of groups         & 21             & 21             \\
-R-squared                & 0.1409         & 0.0124         \\
+Group Fixed Effects                   & Yes           & Yes         \\
+Observations                          & 3,150         & 3,150       \\
+Number of Groups                      & 21            & 21          \\
+R-squared                             & 0.1409        & 0.0124      \\
 \bottomrule
 \end{tabular}
 \end{threeparttable}
+
 \end{frame}
+
 
 
 \begin{frame}{Oligopoly Experiments}
@@ -307,20 +325,52 @@ R-squared                & 0.1409         & 0.0124         \\
 
 \begin{frame}{Oligopoly Results: Folk Theorem-style effects?}
 
-Attach eq and table with results
-    
+\scriptsize % Try \tiny if needed
+\begin{tcolorbox}[colback=myorange!10, colframe=myorange, width=\textwidth]
+$$
+\ln(\bar{p}_r) = \beta_0 + \beta_1 \cdot \text{GroupSize}_r + \beta_2 \cdot \text{P2Prompt}_r + 
+\sum_{j \in \{3.2, 10\}} \gamma_j \cdot \mathbb{I}[\alpha_r = \alpha_j] + \varepsilon_r
+$$
+\end{tcolorbox}
+
+\vspace{-1em}
+
+\centering
+\begin{threeparttable}
+\caption{Run-Level Regression: Group Size and Prompt Effects on Log Price}
+\begin{tabular}{lcc}
+\toprule
+& (1) Baseline & (2) With Controls \\
+\midrule
+Group Size & $-0.0373^{***}$ & $-0.0373^{***}$ \\
+          & $(0.0055)$       & $(0.0054)$       \\
+P2 Prompt & $-0.2082^{***}$  & $-0.2082^{***}$  \\
+          & $(0.0125)$       & $(0.0125)$       \\
+$\alpha = 3.2$ &             & $0.0303^{**}$    \\
+              &             & $(0.0140)$       \\
+$\alpha = 10.0$&             & $0.0166$         \\
+              &             & $(0.0157)$       \\
+Constant      & $0.6573^{***}$ & $0.6417^{***}$ \\
+              & $(0.0203)$     & $(0.0218)$     \\
+\midrule
+Observations  & 168           & 168             \\
+R-squared     & 0.666         & 0.675           \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+
 \end{frame}
 
 \section{Textual analysis}
 
 
-\begin{frame}[fragile]{Textual analysis: clustering approach}
+\begin{frame}[fragile]{Textual analysis: clustering approach}\label{slide:cluster_approach}
     \begin{enumerate}
-        \item Split PLANS into sentences;
+        \item Split PLANS into sentences, and mask \texttt{<PRICE>} and \texttt{<COMPETITOR>}; \hyperlink{app:plan_examples}{\beamergotobutton{See Appendix}}
         \item Embedded using SentenceTranformer\footnote{all-mpnet-base-v2};
         \item PCA from 768 → 9 dimensions (50\% variance);
-        \item K-means to cluster sentences meaning-wise;
-        \item Assign labels to clusters;
+        \item K-means to cluster sentences meaning-wise and extract centroids;
+        \item Assign labels to clusters; \hyperlink{app:cluster_examples}{\beamergotobutton{See Appendix}}
         \item Compared proportion of sentences for each cluster between P1 vs. P2 (relative prevalence);
         $$
         \text{Relative Prevalence} = \frac{\text{P1 Proportion}}{\text{P2 Proportion}} - 1
@@ -335,31 +385,36 @@ Attach eq and table with results
 
 \end{frame}
 
-\begin{frame}[fragile]{Textual analysis: competition score}
+\begin{frame}[fragile]{Textual analysis: competition score}\label{slide:comp_score}
 
 \begin{columns}
     \begin{column}{0.5\textwidth}
-    \begin{itemize}
-        \item Analyze the entire PLANS
-        \item Competitiveness 
-    \end{itemize}
+    \begin{enumerate}
+        \item Construct reference vectors using SentenceTransformer;
+        \hyperlink{app:textual_comp_score}{\beamergotobutton{See Appendix}}
+        \item Embed the entire PLANS;
+        \item Computed cosine similarity between the vectorized plan and the reference vectors, $\color{CompGreen}\mathrm{Competitive}^t_{i,r}$ and $\color{CompRed}\mathrm{NonCompetitive}^t_{i,r}$;
+        \item Calculate contrastive score $\color{CompBlue}\mathrm{Competition\ Score}^t_{i,r}$.
+    \end{enumerate}
     
+    \vspace{1cm}
+    
+    \scalebox{0.8}{%
+    $\color{CompBlue}\mathrm{Competition\ Score}^t_{i,r} = \color{CompGreen}\mathrm{Competitive}^t_{i,r} - \color{CompRed}\mathrm{NonCompetitive}^t_{i,r}$
+    }
         
     \end{column}
     \begin{column}{0.5\textwidth}
         \begin{figure}
             \centering
             \includegraphics[width=0.9\linewidth]{latex//slides_pricing_collusion/textual_analysis_vector_illustration.png}
-            %\caption{Enter Caption}
+            \caption{Embeddings space.}
             %\label{fig:enter-label}
         \end{figure}
         
-    \scalebox{0.8}{%
-        $\color{CompBlue}\mathrm{Competition\ Score}^t_{i,r} = \color{CompGreen}\mathrm{Competitive}^t_{i,r} - \color{CompRed}\mathrm{NonCompetitive}^t_{i,r}$
-        }
+
     \end{column}
 \end{columns}
-
 
 \end{frame}
 
@@ -430,14 +485,12 @@ Attach eq and table with results
         \end{itemize}
     \end{multicols}
     \textbf{Key Insight:}
-    Folk Theorem provides clear directional prediction: $\frac{\partial \delta^{required}}{\partial n} > 0$
-
+    Folk Theorem provides clear directional prediction: $\frac{\partial \delta^{required}}{\partial n} > 0$ \hfill\hyperlink{app:researchquestion}{\beamergotobutton{Back to Main}}
 \end{frame}
 
 % Appendix Slide 2: Visualization
 \begin{frame}{Appendix: Visualizing the Folk Theorem}\label{app:ft}
     \begin{columns}[T]
-    
     % --- LEFT COLUMN: PLOT ---
     \begin{column}{0.55\textwidth}
         \centering
@@ -463,6 +516,79 @@ Attach eq and table with results
     \end{column}
     \end{columns}
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Appendix: Prompts---P0 + P1 vs. P2}\label{app:prompts}
+    \begin{tcolorbox}[colback=gray!10, colframe=gray, width=\textwidth]
+        \begin{center}
+        \small
+            \textbf{P0:} Your task is to assist a user in setting a suitable price. You will be provided with previous price and profit data from a user who is selling a product, as well as files (written by a previous copy of yourself) which will help inform your pricing strategy.
+            Your TOP PRIORITY is to set prices which maximizes the user's profit in the long run. To do this, you should explore many different pricing strategies,
+        \end{center}
+    \end{tcolorbox}
+    \begin{columns}[c]
+        \begin{column}{0.45\linewidth}
+            \begin{tcolorbox}[colback=myorange!10, colframe=myorange, width=\textwidth]
+                \begin{center}
+                \small
+                    \textbf{P1:} keeping in mind your primary goal of maximizing profit --- thus, you should not take actions which undermine profitability.
+                \end{center}
+            \end{tcolorbox}
+            \hyperlink{experiment}{\beamergotobutton{Back to Experiment}}
+        \end{column}
+        \begin{column}{0.45\linewidth}
+            \begin{tcolorbox}[colback=myblue!10, colframe=myblue, width=\textwidth]
+                \begin{center}
+                \small
+                    \textbf{P2:} including possibly risky or aggressive options for data-gathering purposes, keeping in mind that pricing lower than your competitor will typically lead to more product sold. Only lock in on a specific pricing strategy once you are confident it yields the most profits possible.
+                \end{center}
+            \end{tcolorbox}            
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Appendix: Plans Examples}\label{app:plans_examples}
+\end{frame}
+
+\begin{frame}{Appendix: Cluster Examples}\label{app:cluster_examples}
+\begin{enumerate}
+    \item \textbf{Price Boundary Exploration}: I plan to test a price of < PRICE > to further explore the upper boundary of customer sensitivity and gather more data on how slight adjustments affect sales and profits.
+    \item \textbf{Confirm Competitive Price Point}:Specifically, retest \$\textt{<PRICE>} and \$\textt{<PRICE>} to confirm their stability.
+    \item \textbf{Competitor Price Monitoring}:Monitor \textt{<COMPETITOR>}'s pricing closely and be prepared to adjust our price to maintain or increase market share.
+    \item \textbf{Adaptive Pricing for Advantage}:If profits improve, continue to fine tune the price in smaller increments.
+    \item \textbf{Explore Price Elasticity}:Additionally , explore the impact of a price of \textt{<PRICE>} to understand the elasticity of demand better.
+    \item \textbf{Profit Push Through Price Tweaks}: Test prices at \$ \textt< PRICE > and $ < PRICE > to see if these incremental changes affect profit significantly.
+    \item \textbf{}:
+    \item \textbf{}:
+    \item \textbf{}:
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Appendix: Textual Analysis Vector References}\label{app:textual_comp_score}
+\textbf{Competitive References}
+\begin{enumerate}
+    \item Maintaining lower prices will lead to higher profits.
+    \item Further price reductions might be necessary to compete effectively.
+    \item Consider testing 1.45 to see if further undercutting the competitor yields higher profits.
+    \item We need to test prices that are below Firm B's consistently. Since we are testing aggressively low prices.
+\end{enumerate}
+
+\textbf{Non-Competitive References}
+\begin{enumerate}
+    \item Consider testing prices that are 2 cents above Firm A to see if we can increase prices.
+    \item Monitor the competitor's pricing strategy to avoid a price war.
+    \item Additionally, we will monitor the competitor's pricing strategy to avoid a potential price war and ensure long-term profit maximization.
+    \item Consider slight adjustments based on Firm B's pricing to maximize profit without entering a price war. \hyperlink{slide:comp_score}{\beamergotobutton{Back to slide}}
+\end{enumerate}
+
+\end{frame}
+
+
+
+% Appendix Textual Analysis
 
 
 \end{document}
