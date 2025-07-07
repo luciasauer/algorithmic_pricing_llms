@@ -15,6 +15,14 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{amsmath}
+\usepackage{animate}
+
+\usepackage[
+    backend=biber, 
+    style=apa,
+    hyperref=true
+    ]{biblatex}
+\addbibresource{latex/references.bib}
 
 \definecolor{lightgray}{gray}{0.95}
 
@@ -133,7 +141,7 @@ Current marginal cost: c_t^i = 3.45
 
 \begin{frame}[fragile]{Demand function}
 \begin{itemize}
-    \item Calvano (2020) Demand Function
+    \item \textcite{calvano_artificial_2020} Demand Function
     $$
 q_i = \beta \cdot \frac{e^{\frac{a_i - p_i/\alpha}{\mu}}}{\sum_{j=1}^{n} e^{\frac{a_j - p_j/\alpha}{\mu}} + e^{\frac{a_0}{\mu}}}
 $$
@@ -155,10 +163,8 @@ $$
 
 
 
-\begin{frame}{}
-
-
-    
+\begin{frame}{What's going on?}
+    \animategraphics[loop,controls,width=\textwidth]{10}{latex/imgs/beamer_frames/frame_}{000}{299}    
 \end{frame}
 %\appendix
 
