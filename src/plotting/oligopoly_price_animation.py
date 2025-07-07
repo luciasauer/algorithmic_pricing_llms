@@ -344,7 +344,7 @@ def generate_beamer_frames(output_dir="latex/imgs/beamer_frames", frame_interval
         plt.tight_layout()
 
         # Save frame
-        frame_filename = f"{output_dir}/frame_{frame_count:03d}_period_{period:03d}.png"
+        frame_filename = f"{output_dir}/frame_{frame_count:03d}.png"
         plt.savefig(frame_filename, dpi=300, bbox_inches="tight")
         plt.close()
 
@@ -370,8 +370,8 @@ if __name__ == "__main__":
 
     # Create animated GIF
     try:
-        anim = save_animation_gif()
-        print("Static plot, Beamer frames, and animated GIF created successfully!")
+        # anim = save_animation_gif()
+        print("Beamer frames created successfully!")
     except Exception as e:
         print(f"Could not create animation: {e}")
         print("Static plot and Beamer frames created successfully!")
