@@ -1,9 +1,30 @@
-# src/agents/base_agent.py
+"""
+Base Agent Interface for Market Simulation
+
+This module defines the abstract base class for all market agents,
+providing common functionality for pricing decisions and market interaction.
+"""
+
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 
 
 class Agent(ABC):
+    """
+    Abstract base class for market agents in oligopoly experiments.
+
+    Defines the interface for agents that make pricing decisions based on
+    market context and strategic parameters.
+
+    Args:
+        name: Unique identifier for the agent
+        prefix: Strategic context prefix for decision-making
+        prompt_template: Template for formatting decision prompts
+        env_index: Agent's index in the market environment
+        env_params: Market environment parameters (a, alpha, c)
+        logger: Logger instance for experiment tracking
+    """
+
     def __init__(
         self,
         name: str,
@@ -35,14 +56,25 @@ class Agent(ABC):
 
     @property
     def requires_prompt(self) -> bool:
+        """Whether agent requires prompt for decision-making."""
         return True  # default for LLM-based agents
 
     @property
     def type(self) -> str:
+        """Return agent type identifier."""
         return None
 
     @abstractmethod
     async def act(self, prompt: str) -> Dict[str, Any]:
+        """
+        Execute pricing decision based on market context.
+
+        Args:
+            prompt: Market context and decision prompt
+
+        Returns:
+            Dict containing agent response and metadata
+        """
         pass
 
     def get_marginal_cost(self, round_num: int) -> float:

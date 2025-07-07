@@ -1,3 +1,10 @@
+"""
+Utility Functions for Market Analysis
+
+This module provides helper functions for analyzing price convergence,
+statistical validation, and experiment metrics.
+"""
+
 import numpy as np
 
 

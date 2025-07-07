@@ -1,3 +1,10 @@
+"""
+Visualization Utilities for Market Experiment Analysis
+
+This module provides plotting functions for visualizing pricing dynamics,
+quantities, and profits in multi-agent market experiments.
+"""
+
 import numpy as np
 import polars as pl
 from pathlib import Path
@@ -12,6 +19,20 @@ def plot_experiment_svg(
     show_profits: bool = False,
     plot_references: bool = True,
 ):
+    """
+    Create comprehensive experiment visualization with price dynamics.
+
+    Generates time series plots showing price evolution, with optional
+    quantity and profit panels. Includes theoretical benchmarks.
+
+    Args:
+        df: Experiment data containing agent prices and market outcomes
+        metadata: Experiment metadata with environment parameters
+        save_path: Path to save the generated SVG plot
+        show_quantities: Whether to include quantity panel
+        show_profits: Whether to include profit panel
+        plot_references: Whether to show monopoly/Nash benchmarks
+    """
     env_params = metadata.get("environment").get("environment_params")
     p_m = env_params.get("monopoly_prices")
     q_m = env_params.get("monopoly_quantities")

@@ -1,4 +1,10 @@
-# src/experiment/experiment.py
+"""
+Experiment Orchestration for Multi-Agent Pricing Games
+
+This module coordinates repeated pricing games between LLM agents,
+managing rate limiting, data collection, and experiment lifecycle.
+"""
+
 import asyncio
 import datetime
 import logging

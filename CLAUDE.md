@@ -67,6 +67,11 @@ This is an academic research project investigating algorithmic collusion among L
 - Focus on final 50 periods (251-300) for equilibrium analysis
 - Bootstrap validation and robustness testing
 
+**`/src/plotting/`** - Visualization Tools
+- `final_figures.py` generates publication-ready statistical plots
+- `plotting.py` contains core visualization utilities
+- `run_animation.py` creates animated visualizations of price dynamics
+
 ### Data Flow
 
 1. **Configuration** → Market parameters (α, β, μ, costs) and agent setup

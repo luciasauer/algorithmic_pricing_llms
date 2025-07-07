@@ -1,10 +1,30 @@
-# src/utils/logger.py
+"""
+Logging Configuration for Experiment Tracking
+
+This module provides standardized logging setup for experiment monitoring,
+with both console and file output capabilities.
+"""
+
 import sys
 import logging
 from pathlib import Path
 
 
 def setup_logger(name="experiment_logger", log_file: Path = None, level=logging.INFO):
+    """
+    Configure logging for experiment tracking.
+
+    Sets up console and optional file logging with standardized formatting
+    for experiment monitoring and debugging.
+
+    Args:
+        name: Logger name identifier
+        log_file: Optional path for file logging
+        level: Logging level (default: INFO)
+
+    Returns:
+        Configured logger instance
+    """
     logger = logging.getLogger(name)
     logger.setLevel(level)
     logger.propagate = False

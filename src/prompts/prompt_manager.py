@@ -1,4 +1,10 @@
-# src/prompts/prompt_manager.py
+"""
+Prompt Management for LLM Agent Decision-Making
+
+This module handles dynamic prompt generation with context injection,
+memory management, and market history formatting for LLM agents.
+"""
+
 import string
 import logging
 from typing import Type, List
@@ -7,10 +13,34 @@ from src.agents.base_agent import Agent
 
 
 class PromptManager:
+    """
+    Manages dynamic prompt generation and context injection for LLM agents.
+
+    Handles memory window management, market history formatting, and
+    strategic context injection for agent decision-making.
+
+    Args:
+        logger: Logger instance for experiment tracking
+    """
+
     def __init__(self, logger: logging.Logger = None):
         self.logger = logger or logging.getLogger("experiment_logger")
 
     def generate_prompt(self, agent: Type[Agent], history: dict, round_num: int) -> str:
+        """
+        Generate contextualized prompt for agent decision-making.
+
+        Creates prompt by injecting market history, benchmarks, and strategic
+        context into the agent's prompt template.
+
+        Args:
+            agent: Agent instance requiring prompt
+            history: Market history data
+            round_num: Current round number
+
+        Returns:
+            Formatted prompt string with injected context
+        """
         if not getattr(agent, "requires_prompt", True):  # for fake agents
             return ""
         prompt_body = agent.prompt_template

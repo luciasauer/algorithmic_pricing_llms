@@ -1,3 +1,10 @@
+"""
+Statistical Analysis for Folk Theorem Testing
+
+This module provides core regression models and statistical analysis
+for testing Folk Theorem predictions in multi-agent pricing experiments.
+"""
+
 import warnings
 
 import matplotlib.pyplot as plt
@@ -12,6 +19,18 @@ warnings.filterwarnings("ignore")
 
 
 class CollusionAnalysis:
+    """
+    Statistical analysis framework for testing Folk Theorem predictions.
+
+    Provides regression models, robustness tests, and visualization tools
+    for analyzing pricing coordination breakdown as group size increases.
+
+    Args:
+        df: Polars DataFrame with experimental data
+            Required columns: run_id, period, agent_id, group_size,
+            prompt_type, price, alpha, monopoly_prices, nash_prices
+    """
+
     def __init__(self, df: pl.DataFrame):
         """
         Initialize with a Polars DataFrame containing experimental data
