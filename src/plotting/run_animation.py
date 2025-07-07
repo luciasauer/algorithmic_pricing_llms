@@ -8,14 +8,61 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 import polars as pl
-import seaborn as sns
 
-# Set up style
-plt.style.use("seaborn-v0_8-darkgrid")
-sns.set_palette("husl")
+# Define golden ratio for height
+golden_ratio = (5**0.5 - 1) / 2  # ≈ 0.618
+FIG_WIDTH_IN = 170 / 25.4  # matches typical \linewidth in 12pt LaTeX article
+FIG_HEIGHT_IN = FIG_WIDTH_IN * golden_ratio  # aesthetically pleasing height
+SUPTITLE_FONTSIZE = 12
 
-# Agent colors - different colors for each firm
-AGENT_COLORS = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]
+# Set up consistent styling to match other plots
+plt.rcParams.update(
+    {
+        # === Font settings ===
+        # 'text.usetex': True,
+        "font.family": "serif",
+        "font.size": 8,  # Base font size
+        "axes.labelsize": 8,  # Axis label font
+        "axes.titlesize": 12,  # Title font size
+        "xtick.labelsize": 8,  # X tick labels
+        "ytick.labelsize": 8,  # Y tick labels
+        "legend.fontsize": 8,  # Legend text size
+        # === Figure settings ===
+        "figure.figsize": (FIG_WIDTH_IN, FIG_HEIGHT_IN),  # Size in inches
+        "figure.dpi": 300,  # High-res for export
+        # === Line/Marker settings ===
+        "lines.linewidth": 1.5,
+        "lines.markersize": 4,
+        # === Grid and style ===
+        "axes.grid": True,
+        "grid.alpha": 0.4,
+        "grid.linestyle": "--",
+        # === Legend settings ===
+        "legend.edgecolor": "none",  # No edge line (just in case)
+        # === Save options ===
+        "savefig.format": "svg",
+        "savefig.bbox": "tight",  # Avoid extra whitespace
+        "savefig.dpi": 300,  # High-res for export
+    }
+)
+
+# Set consistent color palette
+plt.rcParams["axes.prop_cycle"] = plt.cycler(
+    color=[
+        "#984ea3",
+        "#ff7f0e",
+        "#1f77b4",
+        "#e41a1c",
+        "#4daf4a",
+        "#ffff3e",
+        "#f781bf",
+        "#999999",
+    ]
+)
+
+# Agent colors - using the consistent color palette
+colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+AGENT_COLORS = colors[:5]  # Use first 5 colors from the palette
 AGENT_NAMES = ["Firm A", "Firm B", "Firm C", "Firm D", "Firm E"]
 
 
@@ -71,8 +118,8 @@ def create_animation():
     # Load data
     price_data, nash_price, monopoly_price = load_and_process_data()
 
-    # Set up the figure and axis
-    fig, ax = plt.subplots(figsize=(8, 5))
+    # Set up the figure and axis with consistent styling
+    fig, ax = plt.subplots(figsize=(FIG_WIDTH_IN, FIG_HEIGHT_IN))
     ax.set_xlim(0, 300)
 
     # Determine y-axis limits
@@ -84,22 +131,22 @@ def create_animation():
     y_max = max(max(all_prices), nash_price, monopoly_price) * 1.1
     ax.set_ylim(y_min, y_max)
 
-    # Set labels and title
-    ax.set_xlabel("Period", fontsize=14)
-    ax.set_ylabel("Normalized Price (P/α)", fontsize=14)
+    # Set labels and title with consistent font sizes
+    ax.set_xlabel("Period", fontsize=8)
+    ax.set_ylabel("Normalized Price (P/α)", fontsize=8)
     ax.set_title(
         "5-Agent Oligopoly: Normalized Price Evolution by Firm & Prompt Type",
-        fontsize=16,
+        fontsize=12,
         fontweight="bold",
     )
 
-    # Add reference lines
+    # Add reference lines with consistent styling
     ax.axhline(
         y=nash_price,
         color="gray",
         linestyle="--",
         alpha=0.8,
-        linewidth=2,
+        linewidth=1.5,
         label="Nash Equilibrium",
     )
     ax.axhline(
@@ -107,7 +154,7 @@ def create_animation():
         color="orange",
         linestyle="--",
         alpha=0.8,
-        linewidth=2,
+        linewidth=1.5,
         label="Monopoly Price",
     )
 
@@ -115,11 +162,14 @@ def create_animation():
     lines = {}
     agent_keys = list(price_data.keys())
     for i, agent_key in enumerate(agent_keys):
-        (line,) = ax.plot([], [], color=AGENT_COLORS[i], linewidth=2.5, label=agent_key)
+        (line,) = ax.plot([], [], color=AGENT_COLORS[i], linewidth=1.5, label=agent_key)
         lines[agent_key] = line
 
-    # Add legend
-    ax.legend(loc="upper right", fontsize=11)
+    # Add legend with consistent styling
+    ax.legend(loc="upper right", fontsize=8)
+
+    # Grid styling is already set in rcParams
+    ax.grid(True, alpha=0.4, linestyle="--")
 
     # Period text
     period_text = ax.text(
@@ -127,7 +177,7 @@ def create_animation():
         0.98,
         "",
         transform=ax.transAxes,
-        fontsize=12,
+        fontsize=8,
         verticalalignment="top",
         bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
     )
@@ -176,7 +226,7 @@ def create_animation():
         0.02,
         stats_text,
         transform=ax.transAxes,
-        fontsize=10,
+        fontsize=8,
         verticalalignment="bottom",
         horizontalalignment="left",
         bbox=dict(boxstyle="round", facecolor="lightblue", alpha=0.8),
@@ -220,8 +270,8 @@ def generate_beamer_frames(
     print(f"Generating frames every {frame_interval} period(s) for smooth animation...")
 
     for period in range(frame_interval, max_periods + 1, frame_interval):
-        # Create figure for this frame
-        fig, ax = plt.subplots(figsize=(8, 5))
+        # Create figure for this frame with consistent styling
+        fig, ax = plt.subplots(figsize=(FIG_WIDTH_IN, FIG_HEIGHT_IN))
         ax.set_xlim(0, 300)
 
         # Determine y-axis limits
@@ -233,22 +283,22 @@ def generate_beamer_frames(
         y_max = max(max(all_prices), nash_price, monopoly_price) * 1.1
         ax.set_ylim(y_min, y_max)
 
-        # Set labels and title
-        ax.set_xlabel("Period", fontsize=14)
-        ax.set_ylabel("Normalized Price (P/α)", fontsize=14)
+        # Set labels and title with consistent font sizes
+        ax.set_xlabel("Period", fontsize=8)
+        ax.set_ylabel("Normalized Price (P/α)", fontsize=8)
         ax.set_title(
-            "5-Agent Oligopoly: Normalized Price Evolution",  # by Firm & Prompt Type",
-            fontsize=16,
+            "5-Agent Oligopoly: Normalized Price Evolution",
+            fontsize=12,
             fontweight="bold",
         )
 
-        # Add reference lines
+        # Add reference lines with consistent styling
         ax.axhline(
             y=nash_price,
             color="gray",
             linestyle="--",
             alpha=0.8,
-            linewidth=2,
+            linewidth=1.5,
             label="Nash Equilibrium",
         )
         ax.axhline(
@@ -256,7 +306,7 @@ def generate_beamer_frames(
             color="orange",
             linestyle="--",
             alpha=0.8,
-            linewidth=2,
+            linewidth=1.5,
             label="Monopoly Price",
         )
 
@@ -274,7 +324,7 @@ def generate_beamer_frames(
                         x_data,
                         y_data,
                         color=AGENT_COLORS[i],
-                        linewidth=2.5,
+                        linewidth=1.5,
                         label=agent_key,
                         alpha=0.8,
                     )
@@ -285,22 +335,22 @@ def generate_beamer_frames(
                             x_data[-1],
                             y_data[-1],
                             color=AGENT_COLORS[i],
-                            s=50,
+                            s=16,  # Adjusted marker size to match rcParams
                             zorder=5,
                         )
 
-        # Add legend
-        # ax.legend(loc="upper right", fontsize=11)
-        # Add legend below the plot in 2 rows, 4 columns
+        # Add legend with consistent styling
         ax.legend(
             loc="upper center",
             bbox_to_anchor=(0.5, -0.125),
             ncol=4,
-            fontsize=11,
+            fontsize=8,
             frameon=True,
             shadow=True,
         )
-        ax.grid(True, alpha=0.3)
+
+        # Grid styling is already set in rcParams
+        ax.grid(True, alpha=0.4, linestyle="--")
 
         # Add prominent period counter in top middle
         period_text = f"Period: {period}"
@@ -309,45 +359,19 @@ def generate_beamer_frames(
             0.98,
             period_text,
             transform=ax.transAxes,
-            fontsize=12,
+            fontsize=8,
             fontweight="bold",
             verticalalignment="top",
             horizontalalignment="center",
             bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
         )
 
-        # # Add statistics text in top-left corner
-        # final_stats = []
-        # final_stats.append(f"Nash Equilibrium: {nash_price:.3f}")
-        # final_stats.append(f"Monopoly Price: {monopoly_price:.3f}")
-        # final_stats.append("\nCurrent Prices:")
-        #
-        # for agent_key in agent_keys:
-        #     if agent_key in price_data:
-        #         rounds, prices = price_data[agent_key]
-        #         # Find price at current period
-        #         current_mask = rounds <= period
-        #         if np.any(current_mask):
-        #             current_price = prices[current_mask][-1]
-        #             final_stats.append(f"{agent_key}: {current_price:.3f}")
-        #
-        # stats_text = "\n".join(final_stats)
-        # ax.text(
-        #     0.02,
-        #     0.98,
-        #     stats_text,
-        #     transform=ax.transAxes,
-        #     fontsize=10,
-        #     verticalalignment="top",
-        #     horizontalalignment="left",
-        #     bbox=dict(boxstyle="round", facecolor="lightblue", alpha=0.8),
-        # )
         plt.subplots_adjust(bottom=0.15)
         plt.tight_layout()
 
-        # Save frame
-        frame_filename = f"{output_dir}/frame_{frame_count:03d}.png"
-        plt.savefig(frame_filename, dpi=300, bbox_inches="tight")
+        # Save frame with consistent DPI and format
+        frame_filename = f"{output_dir}/frame_{frame_count:03d}.pdf"
+        plt.savefig(frame_filename, bbox_inches="tight")
         plt.close()
 
         frame_count += 1
