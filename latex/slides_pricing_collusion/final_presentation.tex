@@ -164,7 +164,11 @@ $$
 
 
 \begin{frame}{What's going on?}
-    \animategraphics[loop,controls,width=\textwidth]{10}{latex/imgs/beamer_frames/frame_}{000}{299}    
+    \animategraphics[controls, 
+            autoplay, % Starts playing immediately
+            autoresume, % Resumes after page focus returns
+            autopause, % Pauses when page loses focus
+            width=\linewidth]{10}{latex/imgs/beamer_frames/frame_}{000}{299}
 \end{frame}
 %\appendix
 
