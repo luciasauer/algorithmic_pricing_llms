@@ -142,29 +142,18 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}{Monopoly Experiment}\label{}
-\begin{figure}[htpb!]
-    \centering
-    \includesvg[width=0.7\linewidth]{latex/imgs/res/monopoly/monopoly_experiment_complete.svg}
-    \caption{Convergence behavior observed in monopoly experiments using the \textbf{Mistral Large} model across different $\alpha$ values.}
-    \label{fig:monopoly_convergence}
-\end{figure}
-\hfill\hyperlink{app:calvano}{\beamergotobutton{See Demand Function}}
-\end{frame}
-
 \begin{frame}{Duopoly Experiment}
 \centering
 \begin{minipage}[b]{0.48\linewidth}
     \centering
     \includesvg[width=\linewidth]{latex/imgs/res/duopoly/duopoly_jointplot.svg}
-    
 \end{minipage}
 \hfill
 \begin{minipage}[b]{0.48\linewidth}
     \centering
     \includesvg[width=\linewidth]{latex/imgs/res/duopoly/duopoly_profit_panel.svg}
-    
 \end{minipage}
+\hfill\hyperlink{app:calvano}{\beamergotobutton{See Demand Function}}
 \end{frame}
 
 \begin{frame}{Empirical Evidence: Real-World Validation}
@@ -265,6 +254,17 @@ How can we better understand the \textbf{strategies} of LLM-based pricing agents
     \item Are certain strategic patterns tied to specific prompt formulations?
 \end{itemize}
 
+\end{frame}
+
+
+\begin{frame}{Monopoly Experiment}\label{}
+\begin{figure}[htpb!]
+    \centering
+    \includesvg[width=0.7\linewidth]{latex/imgs/res/monopoly/monopoly_experiment_complete.svg}
+    \caption{Convergence behavior observed in monopoly experiments using the \textbf{Mistral Large} model across different $\alpha$ values.}
+    \label{fig:monopoly_convergence}
+\end{figure}
+\hfill\hyperlink{app:calvano}{\beamergotobutton{See Demand Function}}
 \end{frame}
 
 
@@ -455,10 +455,17 @@ R-squared     & 0.666         & 0.675           \\
 
 \begin{frame}{Findings}
     \begin{itemize}
-        \item LLM-based pricing agents autonomously collude in oligopoly settings.
-        \item $3.7\%$ price reduction per additional competitor with cumulative effects reaching $10.6\%$ from duopoly to five-agent markets, consistent with \textit{Folk Theorem} and \textcite{calvano_artificial_2020}. 
-        \item They are also prone to subtle prompt changes, resulting in vastly different outcomes.
-        \item Agents showed to be consistent between their pricing decisions and their \en{reasoning} process, highlighting their strength in decision-making tasks.
+        \item \textbf{Main findings:}
+        \begin{itemize}
+            \item LLM-based pricing agents autonomously collude in oligopoly settings.
+            \item $3.7\%$ price reduction per additional competitor with cumulative effects reaching $10.6\%$ from duopoly to five-agent markets, consistent with \textit{Folk Theorem} and \textcite{calvano_artificial_2020}.
+            \item Suggesting: as market concentration falls, price pressure increases and collusion becomes harder but \enquote{\emph{stubbornly}} persists (no collusive collapse)
+        \end{itemize}
+        \item \textbf{Re-confirmed:}
+        \begin{itemize}
+            \item Subtle prompt changes, resulting in vastly different outcomes, seem to be a consistent pattern across LLMs
+            \item Agents showed to be consistent between their pricing decisions and their \enquote{\emph{reasoning}} process, highlighting their strength in decision-making tasks.
+        \end{itemize}
     \end{itemize}
 \end{frame}
 
