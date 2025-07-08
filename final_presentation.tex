@@ -238,14 +238,6 @@
 
 \section{Results}
 
-\begin{frame}{Oligopoly Experiment}
-    \begin{figure}[htpb!]
-        \centering
-        \includesvg[width=1\linewidth]{latex/imgs/res/price_over_time_by_prompt_prefix_combined.svg}
-        \caption{Average prices over 300 rounds for markets with 2, 3, 4, and 5 agents under two prompt specifications (P1, P2). Shaded areas represent 95\% confidence intervals across 21 experimental runs per condition (7 runs × 3 $\alpha$-parameters). Prices systematically decline as the number of competing agents increases, consistent with Folk Theorem logic on collusion sustainability.}
-        \label{fig:ts_prices_comb}
-    \end{figure}
-\end{frame}
 
 \subsection{Numerical analysis}
 
@@ -276,7 +268,7 @@ How can we better understand the \textbf{strategies} of LLM-based pricing agents
 \end{frame}
 
 
-\begin{frame}{Converge \& Persist Strategy}
+\begin{frame}{Converge \& Persist Strategy}\label{slide:titfortat}
 
 \scriptsize  % Use \tiny if needed
 
@@ -310,7 +302,8 @@ R-squared                             & 0.1409        & 0.0124      \\
 \bottomrule
 \end{tabular}
 \end{threeparttable}
-
+\vspace{-1em}
+\hyperlink{app:convergence}{\beamergotobutton{See Appendix}}
 \end{frame}
 
 \begin{frame}{Oligopoly Experiments}
@@ -462,11 +455,11 @@ R-squared     & 0.666         & 0.675           \\
 
 \begin{frame}{Findings}
     \begin{itemize}
-        \item \textcite{fish_algorithmic_2025} replication partially successful---also more accessible LLMs collude
-        \item They are also prone to subtle prompt changes, resulting in vastly different outcomes
         \item LLM-based pricing agents autonomously collude in oligopoly settings.
         \item $3.7\%$ price reduction per additional competitor with cumulative effects reaching $10.6\%$ from duopoly to five-agent markets, consistent with \textit{Folk Theorem} and \textcite{calvano_artificial_2020}. 
-        \end{itemize}
+        \item They are also prone to subtle prompt changes, resulting in vastly different outcomes.
+        \item Agents showed to be consistent between their pricing decisions and their \en{reasoning} process, highlighting their strength in decision-making tasks.
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{Limitations}
@@ -584,7 +577,7 @@ R-squared     & 0.666         & 0.675           \\
             \begin{tcolorbox}[colback=myorange!10, colframe=myorange, width=\textwidth]
                 \begin{center}
                 \small
-                    \textbf{P1:} keeping in mind your primary goal of maximizing profit --- thus, you should not take actions which undermine profitability.
+                    \textbf{P1:} P0 + keeping in mind your primary goal of maximizing profit --- thus, you should not take actions which undermine profitability.
                 \end{center}
             \end{tcolorbox}
             \hyperlink{experiment}{\beamergotobutton{Back to Experiment}}
@@ -593,7 +586,7 @@ R-squared     & 0.666         & 0.675           \\
             \begin{tcolorbox}[colback=myblue!10, colframe=myblue, width=\textwidth]
                 \begin{center}
                 \small
-                    \textbf{P2:} including possibly risky or aggressive options for data-gathering purposes, keeping in mind that pricing lower than your competitor will typically lead to more product sold. Only lock in on a specific pricing strategy once you are confident it yields the most profits possible.
+                    \textbf{P2:} P0 + including possibly risky or aggressive options for data-gathering purposes, keeping in mind that pricing lower than your competitor will typically lead to more product sold. Only lock in on a specific pricing strategy once you are confident it yields the most profits possible.
                 \end{center}
             \end{tcolorbox}            
         \end{column}
@@ -624,6 +617,17 @@ R-squared     & 0.666         & 0.675           \\
         \end{itemize}
     \end{itemize}
 \end{frame}
+
+\begin{frame}{Appendix: Oligopoly Convergence \hyperlink{slide:titfortat}{\beamergotobutton{Back to slide}}}\label{app:convergence}
+    \begin{figure}[htpb!]
+        \centering
+        \includesvg[width=1\linewidth]{latex/imgs/res/price_over_time_by_prompt_prefix_combined.svg}
+        \caption{Average prices over 300 rounds for markets with 2, 3, 4, and 5 agents under two prompt specifications (P1, P2). Shaded areas represent 95\% confidence intervals across 21 experimental runs per condition (7 runs × 3 $\alpha$-parameters). Prices systematically decline as the number of competing agents increases, consistent with Folk Theorem logic on collusion sustainability.}
+        \label{fig:ts_prices_comb}
+    \end{figure}
+    
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
